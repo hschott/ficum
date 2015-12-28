@@ -69,22 +69,31 @@ The argument's type is negotiated from it's content by a few rules.
 
 #### Date
 
-Date or Timestamp is parsed from ISO 8601 string representation and results in a `java.util.Date` object.
+A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Date` object.
 
-A simple Date without time will be parsed from the format `yyyy-MM-dd`.
+A simple date without time will be parsed from the format `yyyy-MM-dd`.
+
 A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
 
 *Examples:*
-´´´
+```
 2015-12-24 evaluates to 24. December 2015
 -645-04-13 evaluates to 13. April 645 BC
 
 2013-01-04T09:15:00.000+01:00 evaluates to 04. January 2013 09:15 AM CET
-´´´
-
-
+1492-08-03T15:30:00.000Z evaluates to 03. August 1492 15:30 PM UTC
+```
 
 #### Number
+
+A number is parsed from a string literal containing digits, sign and decimal dot and results in either `java.lang.Integer`, `java.lang.Long`, `java.lang.Float` or `java.lang.Double`.
+
+*Examples:*
+
+Literal | Type | Value
+------ | ------ | ------
+23 | Integer | 23
+
 
 #### Text
 
