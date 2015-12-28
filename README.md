@@ -86,20 +86,32 @@ A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The ti
 
 #### Number
 
-A number is parsed from a string literal containing digits, sign and decimal dot and results in either `java.lang.Integer`, `java.lang.Long`, `java.lang.Float` or `java.lang.Double`.
+A number is parsed from a string literal containing digits, sign, decimal dot, qualifier and exponent and results in either `java.lang.Integer`, `java.lang.Long`, `java.lang.Float` or `java.lang.Double`.
 
 *Examples:*
 
 Literal | Type | Value
 ------ | ------ | ------
 23 | Integer | 23
-
+856l | Long | 856
+73L | Long | 73
+34.01 | Float | 34.01
+912.24f | Float | 912.24
+2.345F | Float | 2.345
+5.5d | Double | 5.5
+67.0D | Double | 67.0
+210.12E+1 | Float | 2101.2
+34.78e-1d | Double | 3.478
 
 #### Text
 
 #### Boolean
 
+A boolean is parsed from a string literal containing "true" or "false" or "yes" or "no" and results in a `java.lang.Boolean` object.
+
 #### Null
+
+A null reference is parsed from a string literal containing "null".
 
 
 #### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
