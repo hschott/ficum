@@ -60,20 +60,37 @@ comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
 A argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
 
 ```
-argument       =  text-arg / date-arg / number-arg / boolean-arg
+argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
 ```
 
 ### FICUM Types
 
-The argument's type is negtiated from it's content by a few rules. 
+The argument's type is negotiated from it's content by a few rules. 
 
-#### Text
+#### Date
 
-#### Date and Timestamp
+Date or Timestamp is parsed from ISO 8601 string representation and results in a `java.util.Date` object.
+
+A simple Date without time will be parsed from the format `yyyy-MM-dd`.
+A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
+
+*Examples:*
+´´´
+2015-12-24 evaluates to 24. December 2015
+-645-04-13 evaluates to 13. April 645 BC
+
+2013-01-04T09:15:00.000+01:00 evaluates to 04. January 2013 09:15 AM CET
+´´´
+
+
 
 #### Number
 
+#### Text
+
 #### Boolean
+
+#### Null
 
 
 #### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
@@ -89,13 +106,14 @@ selector       =  1*selector-char
                   [ 1*( "." 1*selector-char ) ]
 selector-char  =  ALPHA / DIGIT / "_"
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
-argument       =  text-arg / date-arg / boolean-arg / number-arg
+argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
+date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"
+null-arg       =  "null" / "Null"
 text-arg       =  1*( pct-encoded / hex-encoded / quoted-char )
 pct-encoded    =  "%" HEXDIG HEXDIG
 hex-encoded    =  ( "#" / "0x" / "0X") 1*( HEXDIG HEXDIG )
 quoted-char    =  ( "'" / DQUOTE ) 1*( CHAR ) ( "'" / DQUOTE )
-date-arg       =  date / timestamp ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
-boolean-arg    =  "yes" / "no" / "true" / "false"
 number-arg     =  [ "+" / "-" ]
                   ( integer-arg / long-arg / float-arg / double-arg )
 integer-arg    =  1*DIGIT
