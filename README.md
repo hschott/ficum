@@ -90,7 +90,7 @@ A number is parsed from a string literal containing digits, sign, decimal dot, q
 
 *Examples:*
 
-Literal | Type | Value
+literal | type | value
 ------ | ------ | ------
 23 | Integer | 23
 856l | Long | 856
@@ -103,8 +103,6 @@ Literal | Type | Value
 210.12E+1 | Float | 2101.2
 34.78e-1d | Double | 3.478
 
-#### Text
-
 #### Boolean
 
 A boolean is parsed from a string literal containing "true" or "false" or "yes" or "no" and results in a `java.lang.Boolean` object.
@@ -112,6 +110,17 @@ A boolean is parsed from a string literal containing "true" or "false" or "yes" 
 #### Null
 
 A null reference is parsed from a string literal containing "null".
+
+#### Text
+
+A text is parsed from pct or hex encoded string literals or any string literal that does not match the previous rules.
+
+*Examples:*
+
+literal | value
+------ | ------
+%24 | $
+%D4%A2 | Ԣ
 
 
 #### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
