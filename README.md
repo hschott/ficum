@@ -14,8 +14,7 @@ It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-s
 
 ```java
 // define selector names allowed to be used in query string
-String[] allowedSelectorNames = { "owner", "type", "address", "telephone", "city", "lastName", "nicknames", "firstName", "specialties", 
-"name", "visits", "date", "description", "birthDate" };
+String[] allowedSelectorNames = { "owner", "type", "city" };
 
 // define the query
 String input = "owner.city=='Madison',type=='dog'";
