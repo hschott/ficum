@@ -105,15 +105,17 @@ literal | type | value
 
 #### Boolean
 
-A boolean is parsed from a string literal containing "true" or "false" or "yes" or "no" and results in a `java.lang.Boolean` object.
+A boolean is parsed from a string literal equal to "true" or "false" or "yes" or "no" and results in a `java.lang.Boolean` object.
 
 #### Null
 
-A null reference is parsed from a string literal containing "null".
+A null reference is parsed from a string literal equal to "null".
 
 #### Text
 
-A text is parsed from pct or hex encoded string literals or any string literal that does not match the previous rules.
+A text is parsed from single quoted pct or hex encoded string literals or any string literal that does not match the previous rules and results in a `java.lang.String` object.
+
+Pct encoded strings must start with `%` followed by two hex digits. Hex encoded strings must start with one of `#`, `0x` or `0X` followed by two or more (even number) hex digits. Both can evaluate to a multibyte char.
 
 *Examples:*
 
@@ -121,6 +123,9 @@ literal | value
 ------ | ------
 %24 | $
 %D4%A2 | Ԣ
+#d4b1 | Ա
+0XD58C | Ռ
+Hello%20world | Hello world
 
 
 #### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
