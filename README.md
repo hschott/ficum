@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum)
 # FICUM
 ## Dynamic Queries - DSL, Parser and Criteria Visitor for Java
 
