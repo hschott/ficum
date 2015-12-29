@@ -3,9 +3,43 @@
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete application for just a new finder method?
 
-FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor.
+
+### FICUM In a Nutshell
+
+FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
+
+#### How to use it
+
+```java
+// define selector names allowed to be used in query string
+String[] allowedSelectorNames = { "owner", "type", "address", "telephone", "city", "lastName", "nicknames", "firstName", "specialties", "name", "visits", "date", "description", "birthDate" };
+
+// define the query
+String input = "owner.city=='Madison',type=='dog'";
+// and parse the query into a node tree
+Node root = ParseHelper.parse(input, allowedSelectorNames);
+
+// run the JPA visitor on the node tree
+JPATypedQueryVisitor<Pet> visitor = new JPATypedQueryVisitor<Pet>(Pet.class);
+TypedQuery<Pet> query = visitor.start(root);
+
+// and finally get a list of queried entities
+List<Pet> results = query.getResultList();
+```
+
+The query string could also passed in via RESTful query `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
+
+#### Builder
+
+It is also possible to build the node tree and from the node tree a query string.
+The Builder works in infix notation as you would write the query as string.
+
+```java
+Node root = Builder.newInstance().constraint("owner.city", Comparison.EQUALS, "Madison").and().constraint("type", Comparison.EQUALS, "dog").build();
+String query = new QueryPrinterVisitor().start(root);
+```
 
 
 
@@ -23,8 +57,8 @@ expression  = [ "(" ]
 operator    = ";" / ","
 ```
 
-* `;` is the Boolean AND operator; it yields True for a particular entry if both operands evaluate to True, otherwise False.
-* `,` is the Boolean OR operator; it yields True if either operand evaluates to True, otherwise False.
+* `,` is the Boolean AND operator; it yields True for a particular entry if both operands evaluate to True, otherwise False.
+* `;` is the Boolean OR operator; it yields True if either operand evaluates to True, otherwise False.
 
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
 
@@ -62,6 +96,15 @@ A argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
 ```
 argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
 ```
+
+*Examples:*
+```
+firstname==Jack
+birthdate==2015-12-24
+lastupdate=le=2013-01-04T09:15:00.000+01:00
+points=gt=120;points=le=120,lastplayed=lt=2015-06-05
+```
+
 
 ### FICUM Types
 
@@ -121,11 +164,25 @@ Pct encoded strings must start with `%` followed by two hex digits. Hex encoded 
 
 literal | value
 ------ | ------
-%24 | $
-%D4%A2 | Ԣ
-#d4b1 | Ա
-0XD58C | Ռ
-Hello%20world | Hello world
+'%24' | $
+'%D4%A2' | Ԣ
+'#d4b1' | Ա
+'0XD58C' | Ռ
+'Hello%20world' | Hello world
+
+
+
+### JPA Visitor
+
+The JPA visitor is capable of traversing a Node tree and converting it to a TypedQuery.
+
+##### Text with Wildcards
+
+Text arguments can contain wildcards.
+* `?` is a placeholder for one character
+* `*` is a placeholder for zero or more characters
+
+When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE` and from `NOT EQUALS` to `NOT LIKE`.
 
 
 #### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
@@ -145,10 +202,9 @@ argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"
 null-arg       =  "null" / "Null"
-text-arg       =  1*( pct-encoded / hex-encoded / quoted-char )
+text-arg       =  ( "'"  ) 1*( pct-encoded / hex-encoded / 1*( CHAR ) ) ( "'"  )
 pct-encoded    =  "%" HEXDIG HEXDIG
 hex-encoded    =  ( "#" / "0x" / "0X") 1*( HEXDIG HEXDIG )
-quoted-char    =  ( "'" / DQUOTE ) 1*( CHAR ) ( "'" / DQUOTE )
 number-arg     =  [ "+" / "-" ]
                   ( integer-arg / long-arg / float-arg / double-arg )
 integer-arg    =  1*DIGIT
