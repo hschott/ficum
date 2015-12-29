@@ -1,16 +1,16 @@
-## FICUM
-### Dynamic Queries - DSL, Parser and Criteria Visitor for Java
+# FICUM
+## Dynamic Queries - DSL, Parser and Criteria Visitor for Java
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete application for just a new finder method?
 
 
-### FICUM In a Nutshell
+## FICUM In a Nutshell
 
 FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
-#### How to use it
+### How to use it
 
 ```java
 // define selector names allowed to be used in query string
@@ -31,7 +31,7 @@ List<Pet> results = query.getResultList();
 
 The query string could also passed in via RESTful query `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
-#### Builder
+### Builder
 
 It is also possible to build the node tree and from the node tree a query string.
 The Builder works in infix notation as you would write the query as string.
@@ -43,7 +43,7 @@ String query = new QueryPrinterVisitor().start(root);
 
 
 
-### FICUM Query Language
+## FICUM Query Language
 
 A FICUM query's input is a string of Unicode characters in the form of an expression.
 
@@ -106,11 +106,11 @@ points=gt=120;points=le=120,lastplayed=lt=2015-06-05
 ```
 
 
-### FICUM Types
+## FICUM Types
 
 The argument's type is negotiated from it's content by a few rules. 
 
-#### Date
+### Date
 
 A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Date` object.
 
@@ -127,7 +127,7 @@ A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The ti
 1492-08-03T15:30:00.000Z evaluates to 03. August 1492 15:30 PM UTC
 ```
 
-#### Number
+### Number
 
 A number is parsed from a string literal containing digits, sign, decimal dot, qualifier and exponent and results in either `java.lang.Integer`, `java.lang.Long`, `java.lang.Float` or `java.lang.Double`.
 
@@ -146,15 +146,15 @@ literal | type | value
 210.12E+1 | Float | 2101.2
 34.78e-1d | Double | 3.478
 
-#### Boolean
+### Boolean
 
 A boolean is parsed from a string literal equal to "true" or "false" or "yes" or "no" and results in a `java.lang.Boolean` object.
 
-#### Null
+### Null
 
 A null reference is parsed from a string literal equal to "null".
 
-#### Text
+### Text
 
 A text is parsed from single quoted pct or hex encoded string literals or any string literal that does not match the previous rules and results in a `java.lang.String` object.
 
@@ -172,11 +172,11 @@ literal | value
 
 
 
-### JPA Visitor
+## FICUM JPA Visitor
 
 The JPA visitor is capable of traversing a Node tree and converting it to a TypedQuery.
 
-##### Text with Wildcards
+### Text with Wildcards
 
 Text arguments can contain wildcards.
 * `?` is a placeholder for one character
@@ -185,7 +185,7 @@ Text arguments can contain wildcards.
 When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE` and from `NOT EQUALS` to `NOT LIKE`.
 
 
-#### The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
+## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
 
 ```
 expression     =  [ "(" ]
