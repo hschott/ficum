@@ -180,7 +180,7 @@ The JPA visitor is capable of traversing a Node tree and converting it to a Type
 
 ### Text with Wildcards
 
-Text arguments can contain wildcards.
+Text arguments can contain wildcards:
 * `?` is a placeholder for one character
 * `*` is a placeholder for zero or more characters
 
@@ -188,7 +188,7 @@ When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE
 
 ### Collection size check
 
-When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the arguemnt.
+When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the argument.
 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
