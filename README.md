@@ -176,7 +176,7 @@ literal | value
 
 ## FICUM JPA Visitor
 
-The JPA visitor is capable of traversing a Node tree and converting it to a TypedQuery.
+The JPA visitor is capable of traversing a Node tree and converting it to a TypedQuery. The selector names must correspond to the entity field names. 
 
 ### Text with Wildcards
 
@@ -185,6 +185,10 @@ Text arguments can contain wildcards.
 * `*` is a placeholder for zero or more characters
 
 When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE` and from `NOT EQUALS` to `NOT LIKE`.
+
+### Collection size check
+
+When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the arguemnt.
 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
