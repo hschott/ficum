@@ -59,7 +59,7 @@ expression  = [ "(" ]
 operator    = ";" / ","
 ```
 
-* `,` is the Boolean AND operator; it yields True for a particular entry if both operands evaluate to True, otherwise False.
+* `,` is the Boolean AND operator; it yields True if both operands evaluate to True, otherwise False.
 * `;` is the Boolean OR operator; it yields True if either operand evaluates to True, otherwise False.
 
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
