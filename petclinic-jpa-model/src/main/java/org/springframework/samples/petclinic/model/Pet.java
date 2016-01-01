@@ -16,8 +16,8 @@
 package org.springframework.samples.petclinic.model;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +51,7 @@ public class Pet extends NamedEntity {
 
     @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
-    private Calendar birthDate;
+    private Date birthDate;
 
     @ManyToOne
     @JoinColumn(name = "type_id")
@@ -78,7 +78,7 @@ public class Pet extends NamedEntity {
         visit.setPet(this);
     }
 
-    public Calendar getBirthDate() {
+    public Date getBirthDate() {
         return this.birthDate;
     }
 
@@ -114,7 +114,7 @@ public class Pet extends NamedEntity {
         return this.visits;
     }
 
-    public void setBirthDate(Calendar birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 

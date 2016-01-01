@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -242,6 +244,11 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         Comparable<?> value = node.getArgument();
         if (clazz.isEnum()) {
             value = Enum.valueOf((Class<? extends Enum>) clazz, value.toString());
+        }
+
+        if (value instanceof Calendar && clazz.isAssignableFrom(Date.class)) {
+            Calendar cal = (Calendar) value;
+            value = cal.getTime();
         }
 
         Predicate pred = isCollectionSizeCheck(path, node.getArgument())

@@ -23,10 +23,10 @@ import org.parboiled.support.StringVar;
 @BuildParseTree
 public class ArgumentParser extends BaseParser<Object> {
 
-    private static final DateTimeFormatter ISO8601_TIMESTAMP = ISODateTimeFormat.dateTime().withOffsetParsed()
+    protected static final DateTimeFormatter ISO8601_TIMESTAMP = ISODateTimeFormat.dateTime().withOffsetParsed()
             .withChronology(GJChronology.getInstance());
-    private static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
-            .withChronology(GJChronology.getInstance());
+    protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
+            .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
 
     public ArgumentParser() {
         super();
@@ -238,6 +238,7 @@ public class ArgumentParser extends BaseParser<Object> {
                         try {
                             DateTime parse = ISO8601_TIMESTAMP.parseDateTime(match());
                             Calendar cal = Calendar.getInstance(parse.getZone().toTimeZone());
+                            cal.clear();
                             cal.setTimeInMillis(parse.getMillis());
                             return push(cal);
                         } catch (Exception e) {

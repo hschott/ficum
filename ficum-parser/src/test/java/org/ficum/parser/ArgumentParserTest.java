@@ -1,10 +1,15 @@
 package org.ficum.parser;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
+import java.util.Locale;
 
-import org.ficum.node.ISO8601DateFormat;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.chrono.GJChronology;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +37,12 @@ public class ArgumentParserTest {
         logInfo(result);
         Assert.assertFalse(ErrorUtils.printParseErrors(result.parseErrors), result.hasErrors());
         Assert.assertTrue(result.matched);
-        Assert.assertEquals(expected, result.resultValue);
+        if (expected instanceof Calendar) {
+            Calendar cal = (Calendar) expected;
+            Assert.assertThat((Calendar) result.resultValue, new CalendarMatcher(cal));
+        } else {
+            Assert.assertEquals(expected, result.resultValue);
+        }
     }
 
     void logInfo(ParsingResult<Comparable<?>> result) {
@@ -115,28 +125,31 @@ public class ArgumentParserTest {
 
     @Test()
     public void testDate() {
-        DateTime dateTime = new DateTime().withTimeAtStartOfDay();
-        String input = ISO8601DateFormat.ISO8601_DATE.print(dateTime);
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC))
+                .withTimeAtStartOfDay();
+        String input = ArgumentParser.ISO8601_DATE.print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
     public void testDateAD10000() {
-        DateTime dateTime = new DateTime().withTimeAtStartOfDay();
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC))
+                .withTimeAtStartOfDay();
         dateTime = dateTime.plusYears(12500);
-        String input = ISO8601DateFormat.ISO8601_DATE.print(dateTime);
+        String input = ArgumentParser.ISO8601_DATE.print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
     public void testDateBC() {
-        DateTime dateTime = new DateTime().withTimeAtStartOfDay();
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC))
+                .withTimeAtStartOfDay();
         dateTime = dateTime.minusYears(12500);
-        String input = ISO8601DateFormat.ISO8601_DATE.print(dateTime);
+        String input = ArgumentParser.ISO8601_DATE.print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
@@ -403,36 +416,37 @@ public class ArgumentParserTest {
 
     @Test()
     public void testTimestamp() {
-        DateTime dateTime = new DateTime();
-        String input = ISO8601DateFormat.ISO8601_TIMESTAMP.print(dateTime);
+        DateTime dateTime = new DateTime(DateTimeZone.forOffsetHours(3))
+                .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
+        String input = ISODateTimeFormat.dateTime().print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
     public void testTimestampAD10000() {
-        DateTime dateTime = new DateTime();
-        dateTime = dateTime.plusYears(12500);
-        String input = ISO8601DateFormat.ISO8601_TIMESTAMP.print(dateTime);
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC));
+        dateTime = dateTime.plusYears(10000);
+        String input = ISODateTimeFormat.dateTime().print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
     public void testTimestampBC() {
-        DateTime dateTime = new DateTime();
-        dateTime = dateTime.minusYears(12500);
-        String input = ISO8601DateFormat.ISO8601_TIMESTAMP.print(dateTime);
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC));
+        dateTime = dateTime.minusYears(2500);
+        String input = ISODateTimeFormat.dateTime().print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
     public void testTimestampZulu() {
-        DateTime dateTime = new DateTime().withZone(DateTimeZone.UTC);
-        String input = ISO8601DateFormat.ISO8601_TIMESTAMP.print(dateTime);
+        DateTime dateTime = new DateTime(DateTimeZone.UTC).withChronology(GJChronology.getInstance(DateTimeZone.UTC));
+        String input = ISODateTimeFormat.dateTime().print(dateTime);
 
-        assertValue(dateTime.toDate(), input);
+        assertValue(dateTime.toCalendar(Locale.ROOT), input);
     }
 
     @Test()
@@ -537,6 +551,32 @@ public class ArgumentParserTest {
         String input = "123L";
 
         assertValue(expected, input);
+    }
+
+    private class CalendarMatcher extends BaseMatcher<Calendar> {
+        private Calendar expected;
+
+        public CalendarMatcher(Calendar cal) {
+            super();
+            this.expected = cal;
+        }
+
+        public void describeTo(Description description) {
+            description.appendText("epoch millis ");
+            description.appendValue(expected.getTimeInMillis());
+            description.appendText(" timezone offset ");
+            description.appendValue(expected.getTimeZone().getRawOffset());
+        }
+
+        public boolean matches(Object item) {
+            if (item instanceof Calendar) {
+                Calendar actual = (Calendar) item;
+                return actual.getTimeInMillis() == expected.getTimeInMillis()
+                        && actual.getTimeZone().getRawOffset() == expected.getTimeZone().getRawOffset();
+            }
+            return false;
+        }
+
     }
 
 }
