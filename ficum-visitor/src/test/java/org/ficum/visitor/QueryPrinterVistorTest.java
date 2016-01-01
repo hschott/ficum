@@ -25,6 +25,28 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
+    public void testDate() {
+        String input = "first==2015-12-29";
+        ParsingResult<Deque<Object>> result = parseRunner.run(input);
+        Node node = Builder.build(result.resultValue);
+
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(input, actual);
+    }
+
+    @Test
+    public void testDateBC() {
+        String input = "first==-0650-12-29";
+        ParsingResult<Deque<Object>> result = parseRunner.run(input);
+        Node node = Builder.build(result.resultValue);
+
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(input, actual);
+    }
+
+    @Test
     public void testNaturalOrder() {
         String input = "first==1l,second=gt='two';third=le=3.0";
         ParsingResult<Deque<Object>> result = parseRunner.run(input);
@@ -49,6 +71,39 @@ public class QueryPrinterVistorTest {
     @Test
     public void testPrecededOrder() {
         String input = "(first==1l;second=gt='two'),(third=le=3.0;fourth=lt='five')";
+        ParsingResult<Deque<Object>> result = parseRunner.run(input);
+        Node node = Builder.build(result.resultValue);
+
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(input, actual);
+    }
+
+    @Test
+    public void testTimestampBC() {
+        String input = "first==-0456-03-19T18:34:12.000Z";
+        ParsingResult<Deque<Object>> result = parseRunner.run(input);
+        Node node = Builder.build(result.resultValue);
+
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(input, actual);
+    }
+
+    @Test
+    public void testTimestampZoneOffset() {
+        String input = "first==2015-12-29T18:34:12.000+05:00";
+        ParsingResult<Deque<Object>> result = parseRunner.run(input);
+        Node node = Builder.build(result.resultValue);
+
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(input, actual);
+    }
+
+    @Test
+    public void testTimestampZulu() {
+        String input = "first==2015-12-29T18:34:12.000Z";
         ParsingResult<Deque<Object>> result = parseRunner.run(input);
         Node node = Builder.build(result.resultValue);
 

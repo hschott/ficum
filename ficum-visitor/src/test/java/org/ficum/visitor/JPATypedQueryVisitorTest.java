@@ -7,11 +7,11 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
-import org.ficum.node.ISO8601DateFormat;
 import org.ficum.node.Node;
 import org.ficum.parser.ExpressionParser;
 import org.ficum.parser.ParseHelper;
 import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -148,7 +148,7 @@ public class JPATypedQueryVisitorTest {
     public void testNestedTimestamp() {
         DateTime dateTime = new DateTime().withTimeAtStartOfDay().withYear(2013).withMonthOfYear(1).withDayOfMonth(4)
                 .withHourOfDay(9).withMinuteOfHour(15).withSecondOfMinute(0);
-        String date = ISO8601DateFormat.ISO8601_TIMESTAMP.print(dateTime);
+        String date = ISODateTimeFormat.dateTime().print(dateTime);
 
         String input = "visits.date==" + date;
         Node node = ParseHelper.parse(input, allowedSelectorNames);

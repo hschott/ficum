@@ -5,10 +5,13 @@ import java.util.Date;
 
 import org.ficum.node.AndNode;
 import org.ficum.node.ConstraintNode;
-import org.ficum.node.ISO8601DateFormat;
 import org.ficum.node.Node;
 import org.ficum.node.OrNode;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * A Visitor that prints the Node tree as FICUM query dsl.
@@ -22,28 +25,46 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     private void printArgument(StringBuilder output, Comparable<?> argument) {
         if (argument instanceof String) {
             output.append('\'').append((String) argument).append('\'');
-        }
-        if (argument instanceof Integer) {
+
+        } else if (argument instanceof Integer) {
             output.append(argument);
-        }
-        if (argument instanceof Float) {
+
+        } else if (argument instanceof Float) {
             output.append(argument);
-        }
-        if (argument instanceof Long) {
+
+        } else if (argument instanceof Long) {
             output.append(argument).append("l");
-        }
-        if (argument instanceof Double) {
+
+        } else if (argument instanceof Double) {
             output.append(argument).append("d");
-        }
-        if (argument instanceof Date) {
+
+        } else if (argument instanceof Date) {
             Calendar cal = Calendar.getInstance();
             cal.setTime((Date) argument);
-            if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0
-                    && cal.get(Calendar.MILLISECOND) == 0) {
-                output.append(ISO8601DateFormat.ISO8601_DATE.print(new DateTime(argument)));
-            } else {
-                output.append(ISO8601DateFormat.ISO8601_TIMESTAMP.print(new DateTime(argument)));
-            }
+            printCalendar(output, cal);
+
+        } else if (argument instanceof Calendar) {
+            Calendar cal = (Calendar) argument;
+            printCalendar(output, cal);
+
+        } else if (argument instanceof ReadablePartial) {
+            output.append(ISODateTimeFormat.yearMonthDay().print((ReadablePartial) argument));
+
+        } else if (argument instanceof ReadableInstant) {
+            output.append(ISODateTimeFormat.dateTime().print((ReadableInstant) argument));
+
+        } else {
+            output.append(argument.toString());
+        }
+    }
+
+    private void printCalendar(StringBuilder output, Calendar cal) {
+        if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0
+                && cal.get(Calendar.MILLISECOND) == 0) {
+            output.append(ISODateTimeFormat.yearMonthDay().print(new DateTime(cal)));
+        } else {
+            output.append(
+                    ISODateTimeFormat.dateTime().print(new DateTime(cal, DateTimeZone.forTimeZone(cal.getTimeZone()))));
         }
     }
 

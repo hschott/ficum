@@ -2,9 +2,15 @@ package org.ficum.parser;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Calendar;
+import java.util.TimeZone;
 
-import org.ficum.node.ISO8601DateFormat;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+import org.joda.time.chrono.GJChronology;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
 import org.parboiled.Context;
@@ -16,6 +22,11 @@ import org.parboiled.support.StringVar;
 
 @BuildParseTree
 public class ArgumentParser extends BaseParser<Object> {
+
+    private static final DateTimeFormatter ISO8601_TIMESTAMP = ISODateTimeFormat.dateTime().withOffsetParsed()
+            .withChronology(GJChronology.getInstance());
+    private static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
+            .withChronology(GJChronology.getInstance());
 
     public ArgumentParser() {
         super();
@@ -54,8 +65,11 @@ public class ArgumentParser extends BaseParser<Object> {
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         try {
-                            DateTime parse = ISO8601DateFormat.ISO8601_DATE.parseDateTime(match());
-                            return push(parse.toDate());
+                            LocalDate parse = ISO8601_DATE.parseLocalDate(match());
+                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                            cal.clear();
+                            cal.setTimeInMillis(parse.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis());
+                            return push(cal);
                         } catch (Exception e) {
                             return false;
                         }
@@ -222,8 +236,10 @@ public class ArgumentParser extends BaseParser<Object> {
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         try {
-                            DateTime parse = ISO8601DateFormat.ISO8601_TIMESTAMP.parseDateTime(match());
-                            return push(parse.toDate());
+                            DateTime parse = ISO8601_TIMESTAMP.parseDateTime(match());
+                            Calendar cal = Calendar.getInstance(parse.getZone().toTimeZone());
+                            cal.setTimeInMillis(parse.getMillis());
+                            return push(cal);
                         } catch (Exception e) {
                             return false;
                         }
