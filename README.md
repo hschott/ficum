@@ -114,7 +114,7 @@ The argument's type is negotiated from it's content by a few rules.
 
 ### Date
 
-A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Date` object.
+A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Calendar` object.
 
 A simple date without time will be parsed from the format `yyyy-MM-dd`.
 
