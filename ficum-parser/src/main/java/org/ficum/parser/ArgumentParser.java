@@ -28,10 +28,6 @@ public class ArgumentParser extends BaseParser<Object> {
     protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
             .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
 
-    public ArgumentParser() {
-        super();
-    }
-
     Rule AnyString(final StringVar literal) {
         return Sequence(NoneOf("'"), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {

@@ -2,7 +2,6 @@ package org.ficum.parser;
 
 import org.ficum.node.Comparison;
 import org.ficum.node.Constraint;
-import org.ficum.parser.ConstraintParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +10,11 @@ import org.parboiled.errors.ErrorUtils;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConstraintParserTest {
+    private static Logger LOG = LoggerFactory.getLogger(ConstraintParserTest.class);
 
     private TracingParseRunner<Constraint> parseRunner;
 
@@ -26,9 +28,9 @@ public class ConstraintParserTest {
 
     void logInfo(ParsingResult<Constraint> result) {
         if (result.hasErrors()) {
-            System.out.println(ErrorUtils.printParseErrors(result.parseErrors));
+            LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            System.out.println("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
         }
     }
 

@@ -19,8 +19,11 @@ import org.parboiled.errors.InvalidInputError;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArgumentParserTest {
+    private static Logger LOG = LoggerFactory.getLogger(ArgumentParserTest.class);
 
     private TracingParseRunner<Comparable<?>> parseRunner;
 
@@ -47,9 +50,9 @@ public class ArgumentParserTest {
 
     void logInfo(ParsingResult<Comparable<?>> result) {
         if (result.hasErrors()) {
-            System.out.println(ErrorUtils.printParseErrors(result.parseErrors));
+            LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            System.out.println("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
         }
     }
 

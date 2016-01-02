@@ -19,8 +19,8 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
-    StringBuilder output;
-    boolean preceded = false;
+    private StringBuilder output;
+    private boolean preceded = false;
 
     private void printArgument(StringBuilder output, Comparable<?> argument) {
         if (argument instanceof String) {
@@ -33,10 +33,10 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             output.append(argument);
 
         } else if (argument instanceof Long) {
-            output.append(argument).append("l");
+            output.append(argument).append('l');
 
         } else if (argument instanceof Double) {
-            output.append(argument).append("d");
+            output.append(argument).append('d');
 
         } else if (argument instanceof Date) {
             Calendar cal = Calendar.getInstance();

@@ -18,21 +18,22 @@ public abstract class AbstractOperationNode implements OperationNode {
             return false;
         if (!(obj instanceof AbstractOperationNode))
             return false;
+
         AbstractOperationNode other = (AbstractOperationNode) obj;
         if (left == null) {
             if (other.left != null)
                 return false;
         } else if (!left.equals(other.left))
             return false;
+
         if (right == null) {
             if (other.right != null)
                 return false;
         } else if (!right.equals(other.right))
             return false;
-        if (!getOperator().equals(other.getOperator()))
-            return false;
 
-        return true;
+        return getOperator().equals(other.getOperator());
+
     }
 
     public Node getLeft() {

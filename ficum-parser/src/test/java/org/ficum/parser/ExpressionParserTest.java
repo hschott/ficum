@@ -15,8 +15,11 @@ import org.parboiled.errors.InvalidInputError;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExpressionParserTest {
+    private static Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
 
     private TracingParseRunner<Deque<Object>> parseRunner;
 
@@ -39,11 +42,11 @@ public class ExpressionParserTest {
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
     }
 
-    void logInfo(ParsingResult<Deque<Object>> result) {
+    private void logInfo(ParsingResult<Deque<Object>> result) {
         if (result.hasErrors()) {
-            System.out.println(ErrorUtils.printParseErrors(result.parseErrors));
+            LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            System.out.println("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
         }
     }
 

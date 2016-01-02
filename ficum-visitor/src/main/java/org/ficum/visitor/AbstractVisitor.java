@@ -8,8 +8,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -56,8 +56,9 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
 
     protected Class<?> getGenericTypeClazz(ParameterizedType type) {
         Map<TypeVariable<?>, Type> typeArguments = TypeUtils.getTypeArguments(type);
-        for (Entry<TypeVariable<?>, Type> entry : typeArguments.entrySet()) {
-            return TypeUtils.getRawType(entry.getValue(), null);
+        Iterator<Type> it = typeArguments.values().iterator();
+        if (it.hasNext()) {
+            return TypeUtils.getRawType(it.next(), null);
         }
         return Object.class;
     }

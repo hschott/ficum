@@ -204,11 +204,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
     }
 
     private boolean isCollectionSizeCheck(Path<?> path, Comparable<?> argument) {
-        if (isCollection(path.getJavaType()) && argument instanceof Integer) {
-            return true;
-        } else {
-            return false;
-        }
+        return isCollection(path.getJavaType()) && argument instanceof Integer;
     }
 
     public void setEntityManager(EntityManager entityManager) {
