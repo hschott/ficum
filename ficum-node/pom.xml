@@ -5,7 +5,7 @@
 
 	<artifactId>ficum-node</artifactId>
 	<packaging>jar</packaging>
-	<name>Dynamic Queries - Atomic elements, node tree and a builder</name>
+	<name>FICUM - Atomic elements, node tree and a builder</name>
 
 	<parent>
 		<groupId>org.ficum</groupId>

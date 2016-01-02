@@ -40,9 +40,14 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     private List<Predicate> predicates;
 
-    public JPATypedQueryVisitor(Class<T> queryClass) {
+    public JPATypedQueryVisitor() {
+        super();
+    }
+
+    public JPATypedQueryVisitor(Class<T> queryClass, EntityManager entityManager) {
         super();
         this.queryClass = queryClass;
+        this.entityManager = entityManager;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -210,9 +215,16 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         this.entityManager = entityManager;
     }
 
+    public void setQueryClass(Class<T> queryClass) {
+        this.queryClass = queryClass;
+    }
+
     public TypedQuery<T> start(Node node) {
         if (entityManager == null) {
             throw new IllegalStateException("EntityManager can not be null.");
+        }
+        if (queryClass == null) {
+            throw new IllegalStateException("QueryClass can not be null.");
         }
 
         builder = entityManager.getCriteriaBuilder();
@@ -251,8 +263,8 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
             value = cal.getTime();
         }
 
-        Predicate pred = isCollectionSizeCheck(path, node.getArgument())
-                ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) node.getArgument())
+        Predicate pred = isCollectionSizeCheck(path, value)
+                ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) value)
                 : doBuildPredicate(node.getComparison(), path.as(clazz), value);
 
         predicates.add(pred);

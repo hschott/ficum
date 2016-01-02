@@ -8,7 +8,6 @@ import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
 
 import org.ficum.node.Node;
-import org.ficum.parser.ExpressionParser;
 import org.ficum.parser.ParseHelper;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -16,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.parboiled.Parboiled;
 import org.springframework.samples.petclinic.model.Pet;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,9 +32,7 @@ public class JPATypedQueryVisitorTest {
 
     @Before
     public void setUp() {
-        ExpressionParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedSelectorNames);
-        petVisitor = new JPATypedQueryVisitor<Pet>(Pet.class);
-        petVisitor.setEntityManager(entityManager);
+        petVisitor = new JPATypedQueryVisitor<Pet>(Pet.class, entityManager);
     }
 
     @Test

@@ -23,7 +23,7 @@ String input = "owner.city=='Madison',type=='dog'";
 Node root = ParseHelper.parse(input, allowedSelectorNames);
 
 // run the JPA visitor on the node tree
-JPATypedQueryVisitor<Pet> visitor = new JPATypedQueryVisitor<Pet>(Pet.class);
+JPATypedQueryVisitor<Pet> visitor = new JPATypedQueryVisitor<Pet>(Pet.class, entityManager);
 TypedQuery<Pet> query = visitor.start(root);
 
 // and finally get a list of queried entities
