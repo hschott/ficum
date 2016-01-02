@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ArgumentParserTest {
-    private static Logger LOG = LoggerFactory.getLogger(ArgumentParserTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ArgumentParserTest.class);
 
     private TracingParseRunner<Comparable<?>> parseRunner;
 

@@ -28,7 +28,7 @@ public class ArgumentParser extends BaseParser<Object> {
     protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
             .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
 
-    Rule AnyString(final StringVar literal) {
+    protected Rule AnyString(final StringVar literal) {
         return Sequence(NoneOf("'"), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {
                 literal.append(match());
@@ -37,25 +37,25 @@ public class ArgumentParser extends BaseParser<Object> {
         });
     }
 
-    Rule Argument() {
+    protected Rule Argument() {
         return FirstOf(TimestampLiteral(), DateLiteral(), FloatLiteral(), DoubleLiteral(), IntegerLiteral(),
                 BooleanTrue(), BooleanFalse(), NullLiteral(), StringLiteral());
     }
 
     @SuppressSubnodes
-    Rule BooleanFalse() {
+    protected Rule BooleanFalse() {
         return Sequence(FirstOf(Sequence(AnyOf("Ff"), String("alse")), Sequence(AnyOf("Nn"), String("o"))),
                 push(Boolean.FALSE));
     }
 
     @SuppressSubnodes
-    Rule BooleanTrue() {
+    protected Rule BooleanTrue() {
         return Sequence(FirstOf(Sequence(AnyOf("Tt"), String("rue")), Sequence(AnyOf("Yy"), String("es"))),
                 push(Boolean.TRUE));
     }
 
     @SuppressSubnodes
-    Rule DateLiteral() {
+    protected Rule DateLiteral() {
         return Sequence(
                 Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit()),
                 new Action<Comparable<?>>() {
@@ -73,15 +73,15 @@ public class ArgumentParser extends BaseParser<Object> {
                 });
     }
 
-    Rule DecimalNumeral() {
+    protected Rule DecimalNumeral() {
         return FirstOf(Ch('0'), Sequence(CharRange('1', '9'), ZeroOrMore(Digit())));
     }
 
-    Rule Digit() {
+    protected Rule Digit() {
         return CharRange('0', '9');
     }
 
-    Rule DoubleDecimal() {
+    protected Rule DoubleDecimal() {
         return FirstOf(
                 Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("dD"))),
                 Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("dD"))),
@@ -90,7 +90,7 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @SuppressSubnodes
-    Rule DoubleLiteral() {
+    protected Rule DoubleLiteral() {
         return Sequence(Sequence(Optional(AnyOf("-+")), DoubleDecimal(), TestNot(Sign())), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {
                 try {
@@ -104,11 +104,11 @@ public class ArgumentParser extends BaseParser<Object> {
         });
     }
 
-    Rule Exponent() {
+    protected Rule Exponent() {
         return Sequence(AnyOf("eE"), Optional(AnyOf("-+")), OneOrMore(Digit()));
     }
 
-    Rule FloatDecimal() {
+    protected Rule FloatDecimal() {
         return FirstOf(
                 Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("fF"))),
                 Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("fF"))),
@@ -117,7 +117,7 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @SuppressSubnodes
-    Rule FloatLiteral() {
+    protected Rule FloatLiteral() {
         return Sequence(Sequence(Optional(AnyOf("-+")), FloatDecimal(), TestNot(Sign())), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {
                 try {
@@ -132,12 +132,12 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @MemoMismatches
-    Rule HexDigit() {
+    protected Rule HexDigit() {
         return FirstOf(CharRange('a', 'f'), CharRange('A', 'F'), Digit());
     }
 
     @SuppressSubnodes
-    Rule HexEscape(final StringVar literal) {
+    protected Rule HexEscape(final StringVar literal) {
         return Sequence(
                 Sequence(FirstOf(Ch('#'), Sequence(Ch('0'), AnyOf("xX"))), OneOrMore(Sequence(HexDigit(), HexDigit()))),
                 new Action<Comparable<?>>() {
@@ -149,7 +149,7 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @SuppressSubnodes
-    Rule IntegerLiteral() {
+    protected Rule IntegerLiteral() {
         return Sequence(Sequence(Optional(AnyOf("-+")), DecimalNumeral(), Optional(AnyOf("lL")), TestNot(Sign())),
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
@@ -183,17 +183,17 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @SuppressSubnodes
-    Rule NullLiteral() {
+    protected Rule NullLiteral() {
         return Sequence(Sequence(AnyOf("Nn"), String("ull")), push(null));
     }
 
     @MemoMismatches
-    Rule PctDigit() {
+    protected Rule PctDigit() {
         return FirstOf(CharRange('A', 'F'), Digit());
     }
 
     @SuppressSubnodes
-    Rule PctEncoded(final StringVar literal) {
+    protected Rule PctEncoded(final StringVar literal) {
         return Sequence(OneOrMore(Sequence(Ch('%'), PctDigit(), PctDigit())), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {
                 try {
@@ -211,11 +211,11 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @MemoMismatches
-    Rule Sign() {
+    protected Rule Sign() {
         return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), Digit(), AnyOf("-+."));
     }
 
-    Rule StringLiteral() {
+    protected Rule StringLiteral() {
         StringVar literal = new StringVar();
         return Sequence(Sequence(Ch('\''),
                 OneOrMore(FirstOf(PctEncoded(literal), HexEscape(literal), AnyString(literal))), Ch('\'')),
@@ -223,7 +223,7 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @SuppressSubnodes
-    Rule TimestampLiteral() {
+    protected Rule TimestampLiteral() {
         return Sequence(
                 Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit(),
                         Ch('T'), Digit(), Digit(), Ch(':'), Digit(), Digit(), Ch(':'), Digit(), Digit(),

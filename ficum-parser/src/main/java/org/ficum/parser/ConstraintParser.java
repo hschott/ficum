@@ -14,7 +14,7 @@ import org.parboiled.annotations.SuppressSubnodes;
 @BuildParseTree
 public class ConstraintParser extends ArgumentParser {
 
-    String[] allowedSelectorNames = {};
+    protected String[] allowedSelectorNames = {};
 
     public ConstraintParser(String... allowedSelectorNames) {
         super();
@@ -26,11 +26,11 @@ public class ConstraintParser extends ArgumentParser {
         });
     }
 
-    Rule Comparison() {
+    protected Rule Comparison() {
         return FirstOf(Equals(), NotEquals(), LowerEquals(), GreaterEquals(), LowerThen(), GreaterThen());
     }
 
-    Rule Constraint() {
+    protected Rule Constraint() {
         return Sequence(Selector(), Comparison(), Argument(), new Action<Object>() {
             public boolean run(Context<Object> context) {
                 Comparable<?> argument = (Comparable<?>) pop();
@@ -42,32 +42,32 @@ public class ConstraintParser extends ArgumentParser {
     }
 
     @SuppressSubnodes
-    Rule Equals() {
+    protected Rule Equals() {
         return Sequence(String(Comparison.EQUALS.sign), push(Comparison.EQUALS));
     }
 
     @SuppressSubnodes
-    Rule GreaterEquals() {
+    protected Rule GreaterEquals() {
         return Sequence(String(Comparison.GREATER_EQUALS.sign), push(Comparison.GREATER_EQUALS));
     }
 
     @SuppressSubnodes
-    Rule GreaterThen() {
+    protected Rule GreaterThen() {
         return Sequence(String(Comparison.GREATER_THAN.sign), push(Comparison.GREATER_THAN));
     }
 
     @SuppressSubnodes
-    Rule LowerEquals() {
+    protected Rule LowerEquals() {
         return Sequence(String(Comparison.LESS_EQUALS.sign), push(Comparison.LESS_EQUALS));
     }
 
     @SuppressSubnodes
-    Rule LowerThen() {
+    protected Rule LowerThen() {
         return Sequence(String(Comparison.LESS_THAN.sign), push(Comparison.LESS_THAN));
     }
 
     @SuppressSubnodes
-    Rule NotEquals() {
+    protected Rule NotEquals() {
         return Sequence(String(Comparison.NOT_EQUALS.sign), push(Comparison.NOT_EQUALS));
     }
 
@@ -77,7 +77,7 @@ public class ConstraintParser extends ArgumentParser {
     }
 
     @SuppressSubnodes
-    Rule Selector() {
+    protected Rule Selector() {
         return Sequence(Sequence(FirstOf(allowedSelectorNames), ZeroOrMore(Ch('.'), FirstOf(allowedSelectorNames))),
                 push(match()));
     }

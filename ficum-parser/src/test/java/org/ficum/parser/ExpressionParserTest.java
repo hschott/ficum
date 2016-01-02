@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExpressionParserTest {
-    private static Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
 
     private TracingParseRunner<Deque<Object>> parseRunner;
 
