@@ -48,7 +48,7 @@ public class ArgumentParserTest {
         }
     }
 
-    void logInfo(ParsingResult<Comparable<?>> result) {
+    private void logInfo(ParsingResult<Comparable<?>> result) {
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {

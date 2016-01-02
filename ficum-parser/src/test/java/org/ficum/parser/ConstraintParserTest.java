@@ -26,7 +26,7 @@ public class ConstraintParserTest {
         Assert.assertEquals(expected, result.resultValue);
     }
 
-    void logInfo(ParsingResult<Constraint> result) {
+    private void logInfo(ParsingResult<Constraint> result) {
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
