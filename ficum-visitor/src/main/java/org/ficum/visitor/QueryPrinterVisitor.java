@@ -19,10 +19,10 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
-    private StringBuilder output;
+    private StringBuffer output;
     private boolean preceded = false;
 
-    private void printArgument(StringBuilder output, Comparable<?> argument) {
+    private void printArgument(StringBuffer output, Comparable<?> argument) {
         if (argument instanceof String) {
             output.append('\'').append((String) argument).append('\'');
 
@@ -58,7 +58,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
         }
     }
 
-    private void printCalendar(StringBuilder output, Calendar cal) {
+    private void printCalendar(StringBuffer output, Calendar cal) {
         if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0
                 && cal.get(Calendar.MILLISECOND) == 0) {
             output.append(ISODateTimeFormat.yearMonthDay().print(new DateTime(cal)));
@@ -69,7 +69,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     }
 
     public String start(Node node) {
-        output = new StringBuilder();
+        output = new StringBuffer();
         node.accept(this);
         return output.toString();
     }
@@ -77,7 +77,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     public void visit(AndNode node) {
         preceded = true;
         node.getLeft().accept(this);
-        output.append(new Character(node.getOperator().sign).toString());
+        output.append(node.getOperator().sign);
         node.getRight().accept(this);
         preceded = false;
     }
@@ -92,7 +92,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
         if (preceded)
             output.append('(');
         node.getLeft().accept(this);
-        output.append(new Character(node.getOperator().sign).toString());
+        output.append(node.getOperator().sign);
         node.getRight().accept(this);
         if (preceded)
             output.append(')');
