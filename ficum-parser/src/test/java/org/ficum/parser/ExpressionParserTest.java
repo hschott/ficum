@@ -13,6 +13,7 @@ import org.parboiled.Parboiled;
 import org.parboiled.common.StringBuilderSink;
 import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.InvalidInputError;
+import org.parboiled.errors.ParseError;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
@@ -30,8 +31,9 @@ public class ExpressionParserTest {
         ParsingResult<Deque<Object>> result = parseRunner.run(input);
         logInfo(result);
         Assert.assertTrue(result.hasErrors());
-        Assert.assertEquals(1, result.parseErrors.size());
-        Assert.assertTrue(result.parseErrors.get(0).getClass().isAssignableFrom(expected));
+        for (ParseError parseError : result.parseErrors) {
+            Assert.assertTrue(parseError.getClass().isAssignableFrom(expected));
+        }
     }
 
     private void assertValue(Deque<?> expected, String input) {
