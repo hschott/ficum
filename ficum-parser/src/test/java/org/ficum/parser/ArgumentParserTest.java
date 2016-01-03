@@ -14,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.parboiled.Parboiled;
+import org.parboiled.common.StringBuilderSink;
 import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.parserunners.TracingParseRunner;
@@ -26,6 +27,8 @@ public class ArgumentParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentParserTest.class);
 
     private TracingParseRunner<Comparable<?>> parseRunner;
+
+    private StringBuilderSink sink;
 
     private void assertError(Class<?> expected, String input) {
         ParsingResult<Comparable<?>> result = parseRunner.run(input);
@@ -49,6 +52,7 @@ public class ArgumentParserTest {
     }
 
     private void logInfo(ParsingResult<Comparable<?>> result) {
+        LOG.info(sink.toString());
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
@@ -59,7 +63,8 @@ public class ArgumentParserTest {
     @Before
     public void setUp() {
         ArgumentParser parser = Parboiled.createParser(ArgumentParser.class);
-        parseRunner = new TracingParseRunner<Comparable<?>>(parser.root());
+        sink = new StringBuilderSink();
+        parseRunner = new TracingParseRunner<Comparable<?>>(parser.root()).withLog(sink);
     }
 
     @Test()

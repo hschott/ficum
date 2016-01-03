@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.parboiled.Parboiled;
+import org.parboiled.common.StringBuilderSink;
 import org.parboiled.errors.ErrorUtils;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
@@ -18,6 +19,8 @@ public class ConstraintParserTest {
 
     private TracingParseRunner<Constraint> parseRunner;
 
+    private StringBuilderSink sink;
+
     private void assertValue(Constraint expected, String input) {
         ParsingResult<Constraint> result = parseRunner.run(input);
         logInfo(result);
@@ -27,6 +30,7 @@ public class ConstraintParserTest {
     }
 
     private void logInfo(ParsingResult<Constraint> result) {
+        LOG.info(sink.toString());
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
@@ -39,7 +43,8 @@ public class ConstraintParserTest {
         String[] allowedPaths = { "first", "second", "third" };
         ConstraintParser parser = Parboiled.createParser(ConstraintParser.class, (Object) allowedPaths);
 
-        parseRunner = new TracingParseRunner<Constraint>(parser.root());
+        sink = new StringBuilderSink();
+        parseRunner = new TracingParseRunner<Constraint>(parser.root()).withLog(sink);
     }
 
     @Test()

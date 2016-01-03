@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.parboiled.Parboiled;
+import org.parboiled.common.StringBuilderSink;
 import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.parserunners.TracingParseRunner;
@@ -22,6 +23,8 @@ public class ExpressionParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
 
     private TracingParseRunner<Deque<Object>> parseRunner;
+
+    private StringBuilderSink sink;
 
     private void assertError(Class<?> expected, String input) {
         ParsingResult<Deque<Object>> result = parseRunner.run(input);
@@ -43,6 +46,7 @@ public class ExpressionParserTest {
     }
 
     private void logInfo(ParsingResult<Deque<Object>> result) {
+        LOG.info(sink.toString());
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
@@ -55,7 +59,8 @@ public class ExpressionParserTest {
         String[] allowedPaths = { "first", "second", "third", "fourth", "fifth" };
         ConstraintParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedPaths);
 
-        parseRunner = new TracingParseRunner<Deque<Object>>(parser.root());
+        sink = new StringBuilderSink();
+        parseRunner = new TracingParseRunner<Deque<Object>>(parser.root()).withLog(sink);
     }
 
     @Test()
