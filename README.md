@@ -43,6 +43,7 @@ Node root = Builder.newInstance().constraint("owner.city", Comparison.EQUALS, "M
 String query = new QueryPrinterVisitor().start(root);
 ```
 
+The Builder excepts as argument any `java.lang.Comparable`.
 
 
 ## FICUM Query Language
@@ -93,7 +94,7 @@ comparsion | operator
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
 ```
 
-A argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
+An argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
 
 ```
 argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
@@ -189,6 +190,19 @@ When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE
 ### Collection size check
 
 When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the argument.
+
+
+
+## FICUM Query Printer Visitor
+
+The QueryPrinterVisitor is capable of printing out a FICUM query as string. The FICUM Types are handled as arguments in the following ways:
+
+* Integer, Float or String - value as string
+* Long -  value as string suffixed with `l`
+* Double - value as string suffixed with `d`
+* JodaTime's ReadablePartial or Date or Calendar at midnight - value formated as `yyyy-MM-dd`
+* JodaTime's ReadableInstant or Date or Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
+* any other Comparable - value from toString()
 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
