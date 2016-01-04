@@ -197,9 +197,9 @@ When the selector name matches a `java.util.Collection` and the argument is an `
 
 The QueryPrinterVisitor is capable of printing out a FICUM query as string. The FICUM Types are handled as arguments in the following ways:
 
-* Boolean, Byte, Short, Integer, Float  - value as string
-* Long -  value as string suffixed with `l`
-* Double - value as string suffixed with `d`
+* Boolean, Byte, Short, Integer, Float  - value from toString()
+* Long -  from toString() suffixed with `l`
+* Double - from toString() suffixed with `d`
 * JodaTime's ReadablePartial or Date and Calendar at midnight - value formated as `yyyy-MM-dd`
 * JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
 * Enum - value from name() surrounded with single quotes
