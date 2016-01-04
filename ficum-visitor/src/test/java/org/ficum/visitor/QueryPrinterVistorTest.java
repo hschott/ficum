@@ -39,6 +39,16 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
+    public void testBuilderCharacter() {
+        String expected = "first=gt='H'";
+
+        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 'H').build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testBuilderDateTime() {
         String expected = "first==-0701-01-02T03:55:56.234-03:00";
 

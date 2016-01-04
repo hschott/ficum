@@ -9,6 +9,7 @@ import org.ficum.node.Node;
 import org.ficum.node.OrNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 import org.joda.time.format.ISODateTimeFormat;
@@ -22,58 +23,57 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     private StringBuffer output;
     private boolean preceded = false;
 
-    private void printArgument(StringBuffer output, Comparable<?> argument) {
+    private void printArgument(StringBuffer buffer, Comparable<?> argument) {
         if (argument instanceof Boolean) {
-            output.append(argument);
+            buffer.append(argument);
 
         } else if (argument instanceof Byte) {
-            output.append(argument);
+            buffer.append(argument);
 
         } else if (argument instanceof Short) {
-            output.append(argument);
+            buffer.append(argument);
 
         } else if (argument instanceof Integer) {
-            output.append(argument);
+            buffer.append(argument);
 
         } else if (argument instanceof Float) {
-            output.append(argument);
+            buffer.append(argument);
 
         } else if (argument instanceof Long) {
-            output.append(argument).append('l');
+            buffer.append(argument).append('l');
 
         } else if (argument instanceof Double) {
-            output.append(argument).append('d');
+            buffer.append(argument).append('d');
 
         } else if (argument instanceof Date) {
             Calendar cal = Calendar.getInstance();
             cal.setTime((Date) argument);
-            printCalendar(output, cal);
+            printCalendar(buffer, cal);
 
         } else if (argument instanceof Calendar) {
             Calendar cal = (Calendar) argument;
-            printCalendar(output, cal);
+            printCalendar(buffer, cal);
 
         } else if (argument instanceof ReadablePartial) {
-            output.append(ISODateTimeFormat.yearMonthDay().print((ReadablePartial) argument));
+            buffer.append(ISODateTimeFormat.yearMonthDay().print((ReadablePartial) argument));
 
         } else if (argument instanceof ReadableInstant) {
-            output.append(ISODateTimeFormat.dateTime().print((ReadableInstant) argument));
+            buffer.append(ISODateTimeFormat.dateTime().print((ReadableInstant) argument));
 
         } else if (argument instanceof Enum) {
-            output.append('\'').append(((Enum) argument).name()).append('\'');
+            buffer.append('\'').append(((Enum<?>) argument).name()).append('\'');
 
         } else {
-            output.append('\'').append(argument.toString()).append('\'');
+            buffer.append('\'').append(argument.toString()).append('\'');
         }
     }
 
-    private void printCalendar(StringBuffer output, Calendar cal) {
+    private void printCalendar(StringBuffer buffer, Calendar cal) {
         if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0
                 && cal.get(Calendar.MILLISECOND) == 0) {
-            output.append(ISODateTimeFormat.yearMonthDay().print(new DateTime(cal)));
+            printArgument(buffer, new LocalDate(cal, DateTimeZone.UTC));
         } else {
-            output.append(
-                    ISODateTimeFormat.dateTime().print(new DateTime(cal, DateTimeZone.forTimeZone(cal.getTimeZone()))));
+            printArgument(buffer, new DateTime(cal, DateTimeZone.forTimeZone(cal.getTimeZone())));
         }
     }
 
