@@ -53,6 +53,9 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
         } else if (argument instanceof ReadableInstant) {
             output.append(ISODateTimeFormat.dateTime().print((ReadableInstant) argument));
 
+        } else if (argument instanceof Enum) {
+            output.append('\'').append(((Enum) argument).name()).append('\'');
+
         } else {
             output.append(argument.toString());
         }

@@ -200,8 +200,9 @@ The QueryPrinterVisitor is capable of printing out a FICUM query as string. The 
 * Integer, Float or String - value as string
 * Long -  value as string suffixed with `l`
 * Double - value as string suffixed with `d`
-* JodaTime's ReadablePartial or Date or Calendar at midnight - value formated as `yyyy-MM-dd`
-* JodaTime's ReadableInstant or Date or Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
+* JodaTime's ReadablePartial or Date and Calendar at midnight - value formated as `yyyy-MM-dd`
+* JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
+* Enum - value from name()
 * any other Comparable - value from toString()
 
 
