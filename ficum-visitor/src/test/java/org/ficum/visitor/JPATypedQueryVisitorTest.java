@@ -111,6 +111,19 @@ public class JPATypedQueryVisitorTest {
     }
 
     @Test
+    public void testFieldStringAlwaysLike() {
+        String input = "name=='u'";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        petVisitor.setAlwaysWildcard(true);
+        TypedQuery<Pet> query = petVisitor.start(node);
+        petVisitor.setAlwaysWildcard(false);
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(3, results.size());
+    }
+
+    @Test
     public void testFieldStringLike() {
         String input = "name=='*uck*'";
         Node node = ParseHelper.parse(input, allowedSelectorNames);

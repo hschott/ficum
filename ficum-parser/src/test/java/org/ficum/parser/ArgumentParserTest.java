@@ -399,6 +399,14 @@ public class ArgumentParserTest {
     }
 
     @Test()
+    public void testStringEmpty() {
+        final String expected = "";
+        String input = "''";
+
+        assertValue(expected, input);
+    }
+
+    @Test()
     public void testStringHexEncoded() {
         final String expected = "\u3441\u3542\u4343";
         String input = "'0x34410X3542#4343'";
@@ -410,6 +418,14 @@ public class ArgumentParserTest {
     public void testStringMixedEncodedAny() {
         final String expected = "\u3441$Text\u3542()\u4343";
         String input = "'0x3441%24Text0X3542%28%29#4343'";
+
+        assertValue(expected, input);
+    }
+
+    @Test()
+    public void testStringOneChar() {
+        final Character expected = '\u0522';
+        String input = "'%D4%A2'";
 
         assertValue(expected, input);
     }

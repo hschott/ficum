@@ -159,7 +159,7 @@ A null reference is parsed from a string literal equal to "null".
 
 ### Text
 
-A text is parsed from single quoted pct or hex encoded string literals or any string literal that does not match the previous rules and results in a `java.lang.String` object.
+A text is parsed from single quoted pct or hex encoded string literals or any string literal that does not match the previous rules and results in a `java.lang.String` object. For results of length 1 a `java.lang.Character` is returned.
 
 Pct encoded strings must start with `%` followed by two hex digits. Hex encoded strings must start with one of `#`, `0x` or `0X` followed by two or more (even number) hex digits. Both can evaluate to a multibyte char.
 

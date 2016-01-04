@@ -31,6 +31,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
     public AbstractVisitor() {
         super();
         mappedTypes.add(String.class);
+        mappedTypes.add(Character.class);
         mappedTypes.add(Boolean.class);
         mappedTypes.add(Number.class);
         mappedTypes.add(Date.class);

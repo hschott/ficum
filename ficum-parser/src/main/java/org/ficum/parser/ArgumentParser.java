@@ -216,10 +216,22 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     protected Rule StringLiteral() {
-        StringVar literal = new StringVar();
+        final StringVar literal = new StringVar();
         return Sequence(Sequence(Ch('\''),
-                OneOrMore(FirstOf(PctEncoded(literal), HexEscape(literal), AnyString(literal))), Ch('\'')),
-                push(literal.get()));
+                ZeroOrMore(FirstOf(PctEncoded(literal), HexEscape(literal), AnyString(literal))), Ch('\'')),
+                new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        String value = literal.get();
+                        if (value == null) {
+                            return push("");
+                        }
+                        if (value.length() == 1) {
+                            return push(new Character(value.charAt(0)));
+                        }
+                        return push(value);
+
+                    }
+                });
     }
 
     @SuppressSubnodes
