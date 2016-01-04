@@ -23,8 +23,14 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     private boolean preceded = false;
 
     private void printArgument(StringBuffer output, Comparable<?> argument) {
-        if (argument instanceof String) {
-            output.append('\'').append((String) argument).append('\'');
+        if (argument instanceof Boolean) {
+            output.append(argument);
+
+        } else if (argument instanceof Byte) {
+            output.append(argument);
+
+        } else if (argument instanceof Short) {
+            output.append(argument);
 
         } else if (argument instanceof Integer) {
             output.append(argument);
@@ -57,7 +63,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             output.append('\'').append(((Enum) argument).name()).append('\'');
 
         } else {
-            output.append(argument.toString());
+            output.append('\'').append(argument.toString()).append('\'');
         }
     }
 

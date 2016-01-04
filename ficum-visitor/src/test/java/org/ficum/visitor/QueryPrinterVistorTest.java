@@ -16,6 +16,29 @@ public class QueryPrinterVistorTest {
     private String[] allowedSelectorNames = { "first", "second", "third", "fourth", "fifth" };
 
     @Test
+    public void testBuilderBoolean() {
+        String expected = "first==true,second==false";
+
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, true).and()
+                .constraint("second", Comparison.EQUALS, false).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderByte() {
+        String expected = "first=gt=127";
+
+        byte byteVar = 127;
+
+        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, byteVar).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testBuilderDateTime() {
         String expected = "first==-0701-01-02T03:55:56.234-03:00";
 
@@ -86,6 +109,18 @@ public class QueryPrinterVistorTest {
         String expected = "first=gt=45l";
 
         Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 45l).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderShort() {
+        String expected = "first=gt=32767";
+
+        short shortVar = 32767;
+
+        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, shortVar).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
