@@ -5,7 +5,7 @@
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete application for just a new finder method?
 
 
-## FICUM In a Nutshell
+## FICUM in a Nutshell
 
 FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA.
 
