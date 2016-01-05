@@ -208,6 +208,8 @@ The QueryPrinterVisitor is capable of printing out a FICUM query as string. The 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
 
+All string matches are case-sensitive.
+
 ```
 expression     =  [ "(" ]
                   ( constraint / expression )
@@ -223,7 +225,7 @@ argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"
 null-arg       =  "null" / "Null"
-text-arg       =  ( "'"  ) 1*( pct-encoded / hex-encoded / CHAR ) ( "'"  )
+text-arg       =  ( "'"  ) *( pct-encoded / hex-encoded / CHAR ) ( "'"  )
 pct-encoded    =  "%" HEXDIG HEXDIG
 hex-encoded    =  ( "#" / "0x" / "0X") 1*( HEXDIG HEXDIG )
 number-arg     =  [ "+" / "-" ]
