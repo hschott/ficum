@@ -193,6 +193,19 @@ When the selector name matches a `java.util.Collection` and the argument is an `
 
 
 
+## FICUM MongoDB Visitor
+
+The MongoDB visitor is capable of traversing a Node tree and converting it to a Bson filter. The selector names must correspond to the field names of a MongoDB document. 
+
+### Text with Wildcards
+
+Text arguments can contain wildcards:
+* `?` is a placeholder for one character
+* `*` is a placeholder for zero or more characters
+
+When a Test contains a wildcard the comparsion is done as regular expression.
+
+
 ## FICUM Query Printer Visitor
 
 The QueryPrinterVisitor is capable of printing out a FICUM query as string. The FICUM Types are handled as arguments in the following ways:
