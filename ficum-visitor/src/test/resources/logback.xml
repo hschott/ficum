@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+
+<configuration>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.hibernate" level="Info"/>
+    <logger name="org.springframework" level="Info"/>
+    <logger name="com.github.fakemongo" level="Info"/>
+    <logger name="com.mongodb" level="Info"/>
+
+    <root level="All">
+        <appender-ref ref="console"/>
+    </root>
+</configuration>

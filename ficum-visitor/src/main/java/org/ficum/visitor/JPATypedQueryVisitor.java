@@ -30,6 +30,8 @@ import org.ficum.node.OrNode;
 
 public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
+    public static final char ESCAPE_CHAR = '\\';
+
     private EntityManager entityManager;
 
     private CriteriaBuilder builder;
@@ -50,6 +52,22 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         this.entityManager = entityManager;
     }
 
+    private static boolean containsEscapedChar(String value) {
+        return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
+    }
+
+    protected static String escapeAndConvertWildcards(String value, boolean alwaysWildcard) {
+        String ret = value.replaceAll("\\\\", "\\\\\\\\") // escape 'sql escape'
+                                                          // char
+                .replaceAll("_", "\\\\_").replaceAll("%", "\\\\%") // escape sql
+                                                                   // wildcards
+                .replaceAll("\\*", "%").replaceAll("\\?", "_"); // replace rql
+                                                                // wildcard with
+                                                                // sql wildcard
+
+        return alwaysWildcard ? "%" + ret + "%" : ret;
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Predicate buildEquals(Object value, Expression<? extends Comparable> path) {
         Predicate pred;
@@ -57,9 +75,9 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
-                String theValue = SQLEscapeUtils.escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
-                if (SQLEscapeUtils.containsEscapedChar(theValue)) {
-                    pred = builder.like((Expression<String>) path, theValue, SQLEscapeUtils.ESCAPE_CHAR);
+                String theValue = escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
+                if (containsEscapedChar(theValue)) {
+                    pred = builder.like((Expression<String>) path, theValue, ESCAPE_CHAR);
                 } else {
                     pred = builder.like((Expression<String>) path, theValue);
                 }
@@ -79,9 +97,9 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
-                String theValue = SQLEscapeUtils.escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
-                if (SQLEscapeUtils.containsEscapedChar(theValue)) {
-                    pred = builder.notLike((Expression<String>) path, theValue, SQLEscapeUtils.ESCAPE_CHAR);
+                String theValue = escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
+                if (containsEscapedChar(theValue)) {
+                    pred = builder.notLike((Expression<String>) path, theValue, ESCAPE_CHAR);
                 } else {
                     pred = builder.notLike((Expression<String>) path, theValue);
                 }
