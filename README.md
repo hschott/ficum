@@ -1,13 +1,13 @@
 [![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum)
 # FICUM
-## Dynamic Queries - DSL, Parser and Criteria Visitor for Java
+## Dynamic Queries for Java - DSL, Parser and Criteria Visitors
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete application for just a new finder method?
 
 
 ## FICUM in a Nutshell
 
-FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA.
+FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA and MongoDB.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
