@@ -40,9 +40,6 @@ public class MongoDBVisitorTest {
 
     @Before
     public void setUp() throws IOException {
-        // URLConnection conn = new URL(
-        // "https://raw.githubusercontent.com/mongodb/docs-assets/primer-dataset/dataset.json").openConnection();
-        // InputStream inputStream = conn.getInputStream();
         InputStream inputStream = ClassLoader.getSystemResourceAsStream("dataset.json");
         List<String> lines = IOUtils.readLines(inputStream);
         inputStream.close();
@@ -60,6 +57,7 @@ public class MongoDBVisitorTest {
             collection.insertMany(documents, new InsertManyOptions().ordered(false).bypassDocumentValidation(true));
             documents.clear();
         }
+        collection.createIndex(new Document("address.location", "2d"));
 
         visitor = new MongoDBVisitor();
     }
@@ -79,6 +77,16 @@ public class MongoDBVisitorTest {
         Bson query = visitor.start(node);
 
         Assert.assertEquals(1, db.getCollection("restaurants").count(query));
+    }
+
+    @Test
+    public void testDatePredicate() {
+        String input = "grades.date=ge=2015-01-01,grades.score=lt=10";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(259, db.getCollection("restaurants").count(query));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package org.ficum.visitor;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -111,7 +112,12 @@ public class MongoDBVisitor extends AbstractVisitor<Bson> {
     }
 
     public void visit(ConstraintNode node) {
-        Bson pred = doBuildPredicate(node.getComparison(), node.getSelector(), node.getArgument());
+        Comparable<?> argument = node.getArgument();
+
+        if (argument instanceof Calendar) {
+            argument = ((Calendar) argument).getTime();
+        }
+        Bson pred = doBuildPredicate(node.getComparison(), node.getSelector(), argument);
         filters.add(pred);
     }
 
