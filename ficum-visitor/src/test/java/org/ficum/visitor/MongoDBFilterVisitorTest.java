@@ -52,8 +52,7 @@ public class MongoDBFilterVisitorTest {
         MongoDatabase database = setup.getDatabase("ficum");
         MongoCollection<Document> collection = database.getCollection("restaurants");
         if (collection.count() < 4999) {
-            database.drop();
-            collection = getCollection(database);
+            collection.drop();
 
             String line;
             while ((line = reader.readLine()) != null) {
