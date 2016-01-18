@@ -15,8 +15,7 @@
 
     <logger name="org.hibernate" level="Info"/>
     <logger name="org.springframework" level="Info"/>
-    <logger name="com.github.fakemongo" level="Info"/>
-    <logger name="com.mongodb" level="Info"/>
+    <logger name="org.mongodb" level="Info"/>
 
     <root level="All">
         <appender-ref ref="console"/>
