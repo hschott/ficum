@@ -8,7 +8,6 @@ import org.ficum.parser.ParseHelper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
-import org.joda.time.YearMonthDay;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -65,7 +64,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderDouble() {
-        String expected = "first=gt=232.34d";
+        String expected = "first=gt=232.34";
 
         Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 232.34).build();
         String actual = new QueryPrinterVisitor().start(node);
@@ -85,7 +84,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderFloat() {
-        String expected = "first=gt=23.234";
+        String expected = "first=gt=23.234f";
 
         Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 23.234f).build();
         String actual = new QueryPrinterVisitor().start(node);
@@ -98,6 +97,18 @@ public class QueryPrinterVistorTest {
         String expected = "first=gt=23234";
 
         Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 23234).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderIterable() {
+        String expected = "first=wi=[23,3.5f,7.02,null,true,'hello hello']";
+
+        Node node = Builder.newInstance()
+                .constraint("first", Comparison.WITHIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -125,24 +136,21 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
+    public void testBuilderNull() {
+        String expected = "first!=null";
+        Node node = Builder.newInstance().constraint("first", Comparison.NOT_EQUALS, (Comparable<?>) null).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testBuilderShort() {
         String expected = "first=gt=32767";
 
         short shortVar = 32767;
 
         Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, shortVar).build();
-        String actual = new QueryPrinterVisitor().start(node);
-
-        Assert.assertEquals(expected, actual);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testBuilderYearMonthDay() {
-        String expected = "first==1986-01-23";
-
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
-                new YearMonthDay().withYear(1986).withMonthOfYear(1).withDayOfMonth(23)).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);

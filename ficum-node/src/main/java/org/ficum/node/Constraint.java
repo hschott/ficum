@@ -1,14 +1,14 @@
 package org.ficum.node;
 
-public class Constraint {
+public class Constraint<T> {
 
     private String selector;
 
     private Comparison comparison;
 
-    private Comparable<?> argument;
+    private T argument;
 
-    public Constraint(String selector, Comparison comparison, Comparable<?> argument) {
+    public Constraint(String selector, Comparison comparison, T argument) {
         super();
         checkArgNotNull(comparison, "comparison");
         checkArgNotNull(selector, "selector");
@@ -32,7 +32,7 @@ public class Constraint {
             return false;
         if (!(obj instanceof Constraint))
             return false;
-        Constraint other = (Constraint) obj;
+        Constraint<?> other = (Constraint<?>) obj;
         if (argument == null) {
             if (other.argument != null)
                 return false;
@@ -48,7 +48,7 @@ public class Constraint {
         return true;
     }
 
-    public Comparable<?> getArgument() {
+    public T getArgument() {
         return argument;
     }
 
@@ -72,7 +72,7 @@ public class Constraint {
 
     @Override
     public String toString() {
-        return String.format("'%s%s(%s)%s'", selector, comparison.sign,
+        return String.format("'%s%s(%s)%s'", selector, comparison.getSign(),
                 argument == null ? "null" : argument.getClass().getSimpleName(), argument);
     }
 

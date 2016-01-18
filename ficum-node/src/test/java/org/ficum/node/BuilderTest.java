@@ -1,16 +1,9 @@
 package org.ficum.node;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 
-import org.ficum.node.AndNode;
-import org.ficum.node.Builder;
-import org.ficum.node.Comparison;
-import org.ficum.node.Constraint;
-import org.ficum.node.ConstraintNode;
-import org.ficum.node.Node;
-import org.ficum.node.Operator;
-import org.ficum.node.OrNode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +25,7 @@ public class BuilderTest {
         Node left = andNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
-        ConstraintNode leftConstraint = (ConstraintNode) left;
+        ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1l, leftConstraint.getArgument());
@@ -40,7 +33,7 @@ public class BuilderTest {
         Node right = andNode.getRight();
 
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
-        ConstraintNode rightConstraint = (ConstraintNode) right;
+        ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
 
         Assert.assertEquals("second", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
@@ -73,11 +66,11 @@ public class BuilderTest {
 
         Deque<Object> input = new ArrayDeque<Object>();
 
-        input.push(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.AND);
-        input.push(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        input.push(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         input.push(Operator.OR);
-        input.push(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
@@ -85,9 +78,9 @@ public class BuilderTest {
 
         expected.add(Operator.OR);
         expected.add(Operator.AND);
-        expected.add(new Constraint("first", Comparison.GREATER_THAN, 1L));
-        expected.add(new Constraint("second", Comparison.LESS_EQUALS, 2L));
-        expected.add(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
+        expected.add(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
+        expected.add(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
 
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
     }
@@ -97,21 +90,21 @@ public class BuilderTest {
 
         Deque<Object> input = new ArrayDeque<Object>();
 
-        input.push(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.OR);
-        input.push(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        input.push(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         input.push(Operator.AND);
-        input.push(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
         expected.add(Operator.OR);
-        expected.add(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.add(Operator.AND);
-        expected.add(new Constraint("second", Comparison.LESS_EQUALS, 2L));
-        expected.add(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        expected.add(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
+        expected.add(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
 
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
     }
@@ -122,18 +115,18 @@ public class BuilderTest {
         Deque<Object> input = new ArrayDeque<Object>();
 
         input.push(Operator.RIGHT);
-        input.push(new Constraint("fifth", Comparison.LESS_THAN, "5"));
+        input.push(new Constraint<Comparable<?>>("fifth", Comparison.LESS_THAN, "5"));
         input.push(Operator.AND);
         input.push(Operator.RIGHT);
-        input.push(new Constraint("fourth", Comparison.EQUALS, 4f));
+        input.push(new Constraint<Comparable<?>>("fourth", Comparison.EQUALS, 4f));
         input.push(Operator.OR);
-        input.push(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
         input.push(Operator.LEFT);
         input.push(Operator.OR);
-        input.push(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        input.push(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         input.push(Operator.LEFT);
         input.push(Operator.AND);
-        input.push(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
@@ -142,12 +135,12 @@ public class BuilderTest {
         expected.add(Operator.AND);
         expected.add(Operator.OR);
         expected.add(Operator.AND);
-        expected.add(new Constraint("fifth", Comparison.LESS_THAN, "5"));
+        expected.add(new Constraint<Comparable<?>>("fifth", Comparison.LESS_THAN, "5"));
         expected.add(Operator.OR);
-        expected.add(new Constraint("fourth", Comparison.EQUALS, 4f));
-        expected.add(new Constraint("third", Comparison.GREATER_THAN, 3L));
-        expected.add(new Constraint("second", Comparison.LESS_EQUALS, 2L));
-        expected.add(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.add(new Constraint<Comparable<?>>("fourth", Comparison.EQUALS, 4f));
+        expected.add(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
+        expected.add(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
+        expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
 
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
     }
@@ -157,12 +150,12 @@ public class BuilderTest {
 
         Deque<Object> input = new ArrayDeque<Object>();
 
-        input.push(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.AND);
         input.push(Operator.RIGHT);
-        input.push(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
         input.push(Operator.OR);
-        input.push(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        input.push(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         input.push(Operator.LEFT);
 
         Deque<Object> actual = Builder.infixToPostfix(input);
@@ -170,10 +163,10 @@ public class BuilderTest {
         Deque<Object> expected = new ArrayDeque<Object>();
 
         expected.add(Operator.AND);
-        expected.add(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.add(Operator.OR);
-        expected.add(new Constraint("third", Comparison.GREATER_THAN, 3L));
-        expected.add(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        expected.add(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
+        expected.add(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
 
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
     }
@@ -184,12 +177,12 @@ public class BuilderTest {
         Deque<Object> input = new ArrayDeque<Object>();
 
         input.push(Operator.RIGHT);
-        input.push(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
         input.push(Operator.OR);
-        input.push(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        input.push(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         input.push(Operator.LEFT);
         input.push(Operator.AND);
-        input.push(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
@@ -197,11 +190,54 @@ public class BuilderTest {
 
         expected.add(Operator.AND);
         expected.add(Operator.OR);
-        expected.add(new Constraint("third", Comparison.GREATER_THAN, 3L));
-        expected.add(new Constraint("second", Comparison.LESS_EQUALS, 2L));
-        expected.add(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.add(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
+        expected.add(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
+        expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
 
         Assert.assertArrayEquals(expected.toArray(), actual.toArray());
+    }
+
+    @Test()
+    public void testIterableComparableConstraint() {
+        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1, 2.2, 3.3f, "x.x");
+        Node root = builder.build();
+        Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
+
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        Comparable<?>[] expected = { 1, 2.2, 3.3f, "x.x" };
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+    }
+
+    @Test()
+    public void testIterableDoubleConstraint() {
+        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1.1, 2.2, 3.3);
+        Node root = builder.build();
+        Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
+
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        Double[] expected = { 1.1, 2.2, 3.3 };
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testIterableFewConstraint() {
+        Double[] array = { 1.1 };
+        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, array);
+        builder.build();
+    }
+
+    @Test()
+    public void testIterableIntegerConstraint() {
+        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1, 2, 3);
+        Node root = builder.build();
+        Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
+
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        Integer[] expected = { 1, 2, 3 };
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
     @Test()
@@ -217,7 +253,7 @@ public class BuilderTest {
         Node left = orNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
-        ConstraintNode leftConstraint = (ConstraintNode) left;
+        ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1l, leftConstraint.getArgument());
@@ -246,7 +282,7 @@ public class BuilderTest {
         Node left = orNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
-        ConstraintNode leftConstraint = (ConstraintNode) left;
+        ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1l, leftConstraint.getArgument());
@@ -254,7 +290,7 @@ public class BuilderTest {
         Node right = orNode.getRight();
 
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
-        ConstraintNode rightConstraint = (ConstraintNode) right;
+        ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
 
         Assert.assertEquals("second", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
@@ -266,7 +302,7 @@ public class BuilderTest {
         Node n = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).build();
         Assert.assertTrue(n.getClass().isAssignableFrom(ConstraintNode.class));
 
-        ConstraintNode constraint = (ConstraintNode) n;
+        ConstraintNode<?> constraint = (ConstraintNode<?>) n;
 
         Assert.assertEquals("first", constraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, constraint.getComparison());
@@ -291,7 +327,7 @@ public class BuilderTest {
         Node right = andNode.getRight();
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
 
-        ConstraintNode rightConstraint = (ConstraintNode) right;
+        ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
         Assert.assertEquals("third", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.GREATER_EQUALS, rightConstraint.getComparison());
         Assert.assertEquals(3l, rightConstraint.getArgument());

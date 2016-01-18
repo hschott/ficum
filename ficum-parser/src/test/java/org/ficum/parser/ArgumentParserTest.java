@@ -176,7 +176,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testNegative_Decimal() {
-        final Float expected = -123.456f;
+        final Double expected = -123.456;
         String input = "-123.456";
 
         assertValue(expected, input);
@@ -200,7 +200,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testNegative_Exponent_Decimal() {
-        final Float expected = -123.456f;
+        final Double expected = -123.456;
         String input = "-123456E-3";
 
         assertValue(expected, input);
@@ -233,7 +233,7 @@ public class ArgumentParserTest {
     @Test()
     public void testNegative_Exponent_Float() {
         final Float expected = -123.456f;
-        String input = "-12.3456E+1";
+        String input = "-12.3456E+1F";
 
         assertValue(expected, input);
     }
@@ -296,7 +296,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testPositive_Decimal() {
-        final Float expected = 123.456f;
+        final Double expected = 123.456;
         String input = "+123.456";
 
         assertValue(expected, input);
@@ -320,7 +320,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testPositive_Exponent_Decimal() {
-        final Float expected = 123.456f;
+        final Double expected = 123.456;
         String input = "+123456E-3";
 
         assertValue(expected, input);
@@ -475,7 +475,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testUnsigned_Decimal() {
-        final Float expected = 123.456f;
+        final Double expected = 123.456;
         String input = "123.456";
 
         assertValue(expected, input);
@@ -499,7 +499,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testUnsigned_Exponent_Decimal() {
-        final Float expected = 123.456f;
+        final Double expected = 123.456;
         String input = "123456E-3";
 
         assertValue(expected, input);

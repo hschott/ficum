@@ -1,10 +1,10 @@
 package org.ficum.node;
 
-public class ConstraintNode implements OperandNode {
+public class ConstraintNode<T> implements OperandNode {
 
-    private Constraint constraint;
+    private Constraint<T> constraint;
 
-    public ConstraintNode(Constraint constraint) {
+    public ConstraintNode(Constraint<T> constraint) {
         super();
         this.constraint = constraint;
     }
@@ -21,7 +21,7 @@ public class ConstraintNode implements OperandNode {
             return false;
         if (!(obj instanceof ConstraintNode))
             return false;
-        ConstraintNode other = (ConstraintNode) obj;
+        ConstraintNode<?> other = (ConstraintNode<?>) obj;
         if (constraint == null) {
             if (other.constraint != null)
                 return false;
@@ -30,7 +30,7 @@ public class ConstraintNode implements OperandNode {
         return true;
     }
 
-    public Comparable<?> getArgument() {
+    public T getArgument() {
         return constraint != null ? constraint.getArgument() : null;
     }
 

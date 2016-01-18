@@ -6,7 +6,7 @@ public interface Visitor<T> {
 
     void visit(AndNode node);
 
-    void visit(ConstraintNode node);
+    void visit(ConstraintNode<?> node);
 
     void visit(Node node);
 

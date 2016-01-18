@@ -71,11 +71,11 @@ public class ExpressionParserTest {
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
-        expected.addLast(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.AND);
-        expected.addLast(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         expected.addLast(Operator.AND);
-        expected.addLast(new Constraint("third", Comparison.GREATER_THAN, 3L));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
 
         assertValue(expected, input);
     }
@@ -86,18 +86,18 @@ public class ExpressionParserTest {
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
-        expected.addLast(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.AND);
         expected.addLast(Operator.LEFT);
-        expected.addLast(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         expected.addLast(Operator.OR);
         expected.addLast(Operator.LEFT);
-        expected.addLast(new Constraint("third", Comparison.GREATER_THAN, 3));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3));
         expected.addLast(Operator.OR);
-        expected.addLast(new Constraint("fourth", Comparison.EQUALS, 4f));
+        expected.addLast(new Constraint<Comparable<?>>("fourth", Comparison.EQUALS, 4f));
         expected.addLast(Operator.RIGHT);
         expected.addLast(Operator.AND);
-        expected.addLast(new Constraint("fifth", Comparison.LESS_THAN, "five"));
+        expected.addLast(new Constraint<Comparable<?>>("fifth", Comparison.LESS_THAN, "five"));
         expected.addLast(Operator.RIGHT);
 
         assertValue(expected, input);
@@ -109,11 +109,11 @@ public class ExpressionParserTest {
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
-        expected.addLast(new Constraint("first", Comparison.EQUALS, true));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.EQUALS, true));
         expected.addLast(Operator.OR);
-        expected.addLast(new Constraint("second", Comparison.LESS_EQUALS, 2L));
+        expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         expected.addLast(Operator.AND);
-        expected.addLast(new Constraint("third", Comparison.GREATER_THAN, 3f));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3f));
 
         assertValue(expected, input);
     }
@@ -124,11 +124,11 @@ public class ExpressionParserTest {
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
-        expected.addLast(new Constraint("first", Comparison.GREATER_THAN, 1L));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.OR);
-        expected.addLast(new Constraint("second", Comparison.LESS_EQUALS, 2F));
+        expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2F));
         expected.addLast(Operator.OR);
-        expected.addLast(new Constraint("third", Comparison.GREATER_THAN, 3));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3));
 
         assertValue(expected, input);
     }
@@ -139,12 +139,12 @@ public class ExpressionParserTest {
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
-        expected.addLast(new Constraint("first", Comparison.GREATER_THAN, 1));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1));
         expected.addLast(Operator.AND);
         expected.addLast(Operator.LEFT);
-        expected.addLast(new Constraint("second", Comparison.LESS_EQUALS, 2));
+        expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2));
         expected.addLast(Operator.OR);
-        expected.addLast(new Constraint("third", Comparison.GREATER_THAN, 3));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3));
         expected.addLast(Operator.RIGHT);
 
         assertValue(expected, input);
@@ -171,7 +171,7 @@ public class ExpressionParserTest {
         Deque<Object> expected = new ArrayDeque<Object>();
 
         expected.addLast(Operator.LEFT);
-        expected.addLast(new Constraint("first", Comparison.GREATER_THAN, -1F));
+        expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, -1F));
         expected.addLast(Operator.RIGHT);
 
         assertValue(expected, input);

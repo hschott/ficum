@@ -1,6 +1,7 @@
 package org.ficum.node;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 
 /**
@@ -29,11 +30,12 @@ public class Builder {
         return eval(infixToPostfix(stack));
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private static Node eval(Deque<Object> postfix) {
         while (!postfix.isEmpty()) {
             Object element = postfix.removeFirst();
             if (element instanceof Constraint) {
-                Constraint constraint = (Constraint) element;
+                Constraint<?> constraint = (Constraint<?>) element;
                 return new ConstraintNode(constraint);
             }
 
@@ -180,7 +182,31 @@ public class Builder {
         if (!halfopen) {
             throw new IllegalStateException("Can not add constraint. Expected 'and()' or 'or()'.");
         }
-        infixStack.push(new Constraint(selector, comparison, argument));
+        infixStack.push(new Constraint<Comparable<?>>(selector, comparison, argument));
+        halfopen = false;
+        return this;
+    }
+
+    /**
+     * Add a {@link Constraint} to the stack
+     *
+     * @param selector
+     *            identifier for an field this constraint applies to
+     * @param comparison
+     *            {@link Comparison} to apply
+     * @param argument
+     *            Array of Comparable to process against the value of the
+     *            selected field
+     * @return {@link Builder} this builder object
+     */
+    public Builder constraint(String selector, Comparison comparison, Comparable<?>... argument) {
+        if (argument.length < 2) {
+            throw new IllegalArgumentException("Comparable argument array must have at least 2 members.");
+        }
+        if (!halfopen) {
+            throw new IllegalStateException("Can not add constraint. Expected 'and()' or 'or()'.");
+        }
+        infixStack.push(new Constraint<Iterable<Comparable<?>>>(selector, comparison, Arrays.asList(argument)));
         halfopen = false;
         return this;
     }

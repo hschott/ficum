@@ -3,6 +3,10 @@ package org.ficum.parser;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
@@ -23,10 +27,28 @@ import org.parboiled.support.StringVar;
 @BuildParseTree
 public class ArgumentParser extends BaseParser<Object> {
 
+    private static final Set<Class<?>> baseTypes = new HashSet<Class<?>>();
+
+    static {
+        baseTypes.add(Character.class);
+        baseTypes.add(String.class);
+        baseTypes.add(Float.class);
+        baseTypes.add(Double.class);
+        baseTypes.add(Integer.class);
+        baseTypes.add(Long.class);
+        baseTypes.add(Boolean.class);
+        baseTypes.add(Calendar.class);
+    }
+
     protected static final DateTimeFormatter ISO8601_TIMESTAMP = ISODateTimeFormat.dateTime().withOffsetParsed()
             .withChronology(GJChronology.getInstance());
+
     protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
             .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
+
+    public static Collection<Class<?>> getBaseTypes() {
+        return Collections.unmodifiableCollection(baseTypes);
+    }
 
     protected Rule AnyString(final StringVar literal) {
         return Sequence(NoneOf("'"), new Action<Comparable<?>>() {
@@ -38,8 +60,14 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     protected Rule Argument() {
-        return FirstOf(TimestampLiteral(), DateLiteral(), FloatLiteral(), DoubleLiteral(), IntegerLiteral(),
-                BooleanTrue(), BooleanFalse(), NullLiteral(), StringLiteral());
+        return Sequence(FirstOf(TimestampLiteral(), DateLiteral(), DoubleLiteral(), FloatLiteral(), IntegerLiteral(),
+                BooleanTrue(), BooleanFalse(), NullLiteral(), StringLiteral()), new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        Comparable<?> argument = context.getValueStack().peek();
+                        return isBaseType(argument);
+                    }
+
+                });
     }
 
     @SuppressSubnodes
@@ -180,6 +208,20 @@ public class ArgumentParser extends BaseParser<Object> {
                         }
                     }
                 });
+    }
+
+    protected boolean isBaseType(Comparable<?> type) {
+        if (type == null) {
+            return true;
+        }
+
+        Class<?> clazz = type.getClass();
+        for (Class<?> baseType : baseTypes) {
+            if (baseType.isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SuppressSubnodes

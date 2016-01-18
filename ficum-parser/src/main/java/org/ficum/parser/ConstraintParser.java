@@ -1,7 +1,10 @@
 package org.ficum.parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import org.ficum.node.Comparison;
 import org.ficum.node.Constraint;
@@ -13,6 +16,10 @@ import org.parboiled.annotations.SuppressSubnodes;
 
 @BuildParseTree
 public class ConstraintParser extends ArgumentParser {
+
+    protected String selector;
+
+    protected Comparison comparison;
 
     protected String[] allowedSelectorNames = {};
 
@@ -27,48 +34,34 @@ public class ConstraintParser extends ArgumentParser {
     }
 
     protected Rule Comparison() {
-        return FirstOf(Equals(), NotEquals(), LowerEquals(), GreaterEquals(), LowerThen(), GreaterThen());
-    }
-
-    protected Rule Constraint() {
-        return Sequence(Selector(), Comparison(), Argument(), new Action<Object>() {
+        comparison = null;
+        return Sequence(FirstOf(Comparison.allSigns()), new Action<Object>() {
             public boolean run(Context<Object> context) {
-                Comparable<?> argument = (Comparable<?>) pop();
-                Comparison comparison = (Comparison) pop();
-                String selector = (String) pop();
-                return push(new Constraint(selector, comparison, argument));
+                comparison = Comparison.from(match());
+                return true;
             }
         });
     }
 
-    @SuppressSubnodes
-    protected Rule Equals() {
-        return Sequence(String(Comparison.EQUALS.sign), push(Comparison.EQUALS));
-    }
+    protected Rule Constraint() {
+        return Sequence(Selector(), Comparison(),
+                FirstOf(Argument(), Sequence(Ch('['), Argument(),
+                        OneOrMore(Sequence(Ch(','), Optional(Ch(' ')), Argument())), Ch(']'))),
+                new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        List<Comparable<?>> arguments = new ArrayList<Comparable<?>>();
+                        while (!context.getValueStack().isEmpty() && isBaseType(context.getValueStack().peek())) {
+                            arguments.add(context.getValueStack().pop());
+                        }
 
-    @SuppressSubnodes
-    protected Rule GreaterEquals() {
-        return Sequence(String(Comparison.GREATER_EQUALS.sign), push(Comparison.GREATER_EQUALS));
-    }
-
-    @SuppressSubnodes
-    protected Rule GreaterThen() {
-        return Sequence(String(Comparison.GREATER_THAN.sign), push(Comparison.GREATER_THAN));
-    }
-
-    @SuppressSubnodes
-    protected Rule LowerEquals() {
-        return Sequence(String(Comparison.LESS_EQUALS.sign), push(Comparison.LESS_EQUALS));
-    }
-
-    @SuppressSubnodes
-    protected Rule LowerThen() {
-        return Sequence(String(Comparison.LESS_THAN.sign), push(Comparison.LESS_THAN));
-    }
-
-    @SuppressSubnodes
-    protected Rule NotEquals() {
-        return Sequence(String(Comparison.NOT_EQUALS.sign), push(Comparison.NOT_EQUALS));
+                        if (arguments.size() == 1) {
+                            return push(new Constraint<Comparable<?>>(selector, comparison, arguments.get(0)));
+                        } else {
+                            Collections.reverse(arguments);
+                            return push(new Constraint<List<Comparable<?>>>(selector, comparison, arguments));
+                        }
+                    }
+                });
     }
 
     @Override
@@ -78,8 +71,14 @@ public class ConstraintParser extends ArgumentParser {
 
     @SuppressSubnodes
     protected Rule Selector() {
+        selector = null;
         return Sequence(Sequence(FirstOf(allowedSelectorNames), ZeroOrMore(Ch('.'), FirstOf(allowedSelectorNames))),
-                push(match()));
+                new Action<Object>() {
+                    public boolean run(Context<Object> context) {
+                        selector = match();
+                        return true;
+                    }
+                });
     }
 
 }

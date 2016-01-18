@@ -2,6 +2,7 @@ package org.ficum.visitor;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.ficum.node.AndNode;
 import org.ficum.node.ConstraintNode;
@@ -23,8 +24,11 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     private StringBuffer output;
     private boolean preceded = false;
 
-    private void printArgument(StringBuffer buffer, Comparable<?> argument) {
-        if (argument instanceof Boolean) {
+    private void printArgument(StringBuffer buffer, Object argument) {
+        if (argument == null) {
+            buffer.append("null");
+
+        } else if (argument instanceof Boolean) {
             buffer.append(argument);
 
         } else if (argument instanceof Byte) {
@@ -37,13 +41,13 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             buffer.append(argument);
 
         } else if (argument instanceof Float) {
-            buffer.append(argument);
+            buffer.append(argument).append('f');
 
         } else if (argument instanceof Long) {
             buffer.append(argument).append('l');
 
         } else if (argument instanceof Double) {
-            buffer.append(argument).append('d');
+            buffer.append(argument);
 
         } else if (argument instanceof Date) {
             Calendar cal = Calendar.getInstance();
@@ -62,6 +66,20 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
         } else if (argument instanceof Enum) {
             buffer.append('\'').append(((Enum<?>) argument).name()).append('\'');
+
+        } else if (argument instanceof Iterable) {
+            @SuppressWarnings("unchecked")
+            Iterator<Comparable<?>> it = ((Iterable<Comparable<?>>) argument).iterator();
+
+            buffer.append('[');
+            if (it.hasNext()) {
+                printArgument(buffer, it.next());
+                while (it.hasNext()) {
+                    buffer.append(',');
+                    printArgument(buffer, it.next());
+                }
+            }
+            buffer.append(']');
 
         } else {
             buffer.append('\'').append(argument.toString()).append('\'');
@@ -91,9 +109,9 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
         preceded = false;
     }
 
-    public void visit(ConstraintNode node) {
+    public void visit(ConstraintNode<?> node) {
         output.append(node.getSelector());
-        output.append(node.getComparison().sign);
+        output.append(node.getComparison().getSign());
         printArgument(output, node.getArgument());
     }
 

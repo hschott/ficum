@@ -13,6 +13,7 @@ It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-s
 
 ### How to use it
 
+*With JPA* 
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "owner", "type", "city" };
@@ -28,6 +29,24 @@ TypedQuery<Pet> query = visitor.start(root);
 
 // and finally get a list of queried entities
 List<Pet> results = query.getResultList();
+```
+
+*With MongoDB* 
+```java
+// define selector names allowed to be used in query string
+String[] allowedSelectorNames = { "address", "location", "score" };
+
+// define the query
+String input = "address.location=nr=[-73.856077,40.848447,250.0],score=lt=10";
+// and parse the query into a node tree
+Node root = ParseHelper.parse(input, allowedSelectorNames);
+
+// run the MongoDB visitor on the node tree
+MongoDBFilterVisitor visitor = new MongoDBFilterVisitor();
+Bson filter = visitor.start(root);
+
+// and finally get a iterable of filtered documents
+FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
 
 The query string could also passed in via RESTful query `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
@@ -66,12 +85,14 @@ operator    = ";" / ","
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
 
 A constraint is composed of a selector, comparison and argument triple, which refines the constraint. When processed, a constraint yields a Boolean value.
+An array of arguments must be enclosed in square brackets and each argument separated with a comma.
 
 ```
-constraint     =  selector comparison argument
+constraint     =  selector comparison ( argument / args-array )
+args-array     =  "[" argument *( "," argument ) "]"
 ```
 
-A selector identifies the field of an entity that a constraint applies to. Since entities can be nested, also a selector can be defined as nested fields with a dot as seperator.
+A selector identifies the field of an entity that a constraint applies to. Since entities can be nested, also a selector can be defined as nested fields with a dot as separator.
 
 ```
 selector       =  1*selector-char
@@ -81,17 +102,22 @@ selector-char  =  ALPHA / DIGIT / "_"
 
 A comparsion yields to True if the argument can be processed against the selector defined entity field's value in the following manner:
 
-comparsion | operator
------- | ------
-==   | EQUALS
-!=   | NOT EQUALS
-=ge= | GREATER EQUALS
-=le= | LESS EQUALS
-=gt= | GREATER THAN
-=lt= | LESS THEN
+comparsion | operator       | JPA visitor support | MongoDB visitor support | argument type
+------     | ------         | ------              | ------                  | ------
+==         | EQUALS         | X                   | X                       | any single argument 
+!=         | NOT EQUALS     | X                   | X                       | any single argument
+=ge=       | GREATER EQUALS | X                   | X                       | any single argument
+=le=       | LESS EQUALS    | X                   | X                       | any single argument
+=gt=       | GREATER THAN   | X                   | X                       | any single argument
+=lt=       | LESS THEN      | X                   | X                       | any single argument
+=nr=       | NEAR           |                     | X                       | argument array of 3 or 4 Double values
+=wi=       | WITHIN         |                     | X                       | argument array of 3, 4 or more than 5 Double values
+=ix=       | INTERSECTS     |                     | X                       | argument array of 2, 4 or more than 5 Double values
+
+
 
 ```
-comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
+comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
 ```
 
 An argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
@@ -136,18 +162,18 @@ A number is parsed from a string literal containing digits, sign, decimal dot, q
 
 *Examples:*
 
-literal | type | value
------- | ------ | ------
-23 | Integer | 23
-856l | Long | 856
-73L | Long | 73
-34.01 | Float | 34.01
-912.24f | Float | 912.24
-2.345F | Float | 2.345
-5.5d | Double | 5.5
-67.0D | Double | 67.0
-210.12E+1 | Float | 2101.2
-34.78e-1d | Double | 3.478
+literal    | type    | value
+------     | ------  | ------
+23         | Integer | 23
+856l       | Long    | 856
+73L        | Long    | 73
+34.01      | Double  | 34.01
+5.5d       | Double  | 5.5
+67.0D      | Double  | 67.0
+34.78e-1d  | Double  | 3.478
+912.24f    | Float   | 912.24
+2.345F     | Float   | 2.345
+210.12E+1f | Float   | 2101.2
 
 ### Boolean
 
@@ -165,12 +191,12 @@ Pct encoded strings must start with `%` followed by two hex digits. Hex encoded 
 
 *Examples:*
 
-literal | value
------- | ------
-'%24' | $
-'%D4%A2' | Ԣ
-'#d4b1' | Ա
-'0XD58C' | Ռ
+literal         | value
+------          | ------
+'%24'           | $
+'%D4%A2'        | Ԣ
+'#d4b1'         | Ա
+'0XD58C'        | Ռ
 'Hello%20world' | Hello world
 
 
@@ -205,18 +231,40 @@ Text arguments can contain wildcards:
 
 When a Test contains a wildcard the comparsion is done as regular expression.
 
+### Geospatial comparisons
+
+With the MongoDB Visitor some [geospatial queries](https://docs.mongodb.org/manual/reference/operator/query-geospatial/) can be done. The type of MongoDB filter predicate depends on the comparison and number of arguments used.
+Anyway, all arguments in the arguments array must be of type Double.
+The order of coordinate values is x, y respectively longitude, latitude.
+Polygons are closed automatically by duplicating the first Position to the last Position.
+Please also read [Calculate Distance Using Spherical Geometry](https://docs.mongodb.org/manual/tutorial/calculate-distances-using-spherical-geometry-with-2d-geospatial-indexes/).
+
+
+comparison | number of arguments | MongoDB predicate                         | notation                                          | shape description
+----       | ----                | ----                                      | ----                                              | ----
+NEAR       | 3                   | $nearSphere                               | address.location=nr=[x,y,maxDistance]             | coordinates of a point and distance in meters
+NEAR       | 4                   | $nearSphere                               | address.location=nr=[x,y,maxDistance,minDistance] | coordinates of a point and distances in meters
+WITHIN     | 3                   | $geoWithin $centerSphere                  | address.location=wi=[x,y,radius]                  | coordinates of a point and distance in radians 
+WITHIN     | 4                   | $geoWithin $box                           | address.location=wi=[x1,y1,x2,y2]                 | bottom left and upper right corners of a rectangle
+WITHIN     | >5                  | $geoWithin $polygon                       | address.location=wi=[x1,y1 , ...]                 | list of coordinates of a polygon
+INTERSECTS | 2                   | $geoIntersects $geometry type: Point      | address.location=ix=[x,y]                         | coordinates of a point
+INTERSECTS | 4                   | $geoIntersects $geometry type: LineString | address.location=ix=[x1,y1,x2,y2]                 | start and end point of a line
+INTERSECTS | >5                  | $geoIntersects $geometry type: Polygon    | address.location=ix=[x1,y1 , ...]                 | list of coordinates of a polygon
+
+
 
 ## FICUM Query Printer Visitor
 
 The QueryPrinterVisitor is capable of printing out a FICUM query as string. The FICUM Types are handled as arguments in the following ways:
 
-* Boolean, Byte, Short, Integer, Float  - value from toString()
-* Long -  from toString() suffixed with `l`
-* Double - from toString() suffixed with `d`
+* Boolean, Byte, Short, Integer, Float - value from toString()
+* Long - value from toString() suffixed with `l`
+* Double - value from toString() suffixed with `d`
 * JodaTime's ReadablePartial or Date and Calendar at midnight - value formated as `yyyy-MM-dd`
 * JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
 * Enum - value from name() surrounded with single quotes
 * String, Character and any other Comparable - value from toString() surrounded with single quotes
+* Iterable of previous types - all values as described above enclosed in square brackets and separated by commas, e.g. `[12.5,4.5]`
 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
@@ -229,11 +277,12 @@ expression     =  [ "(" ]
                   [ operator ( constraint / expression ) ]
                   [ ")" ]
 operator       =  ";" / ","
-constraint     =  selector comparison argument
+constraint     =  selector comparison ( argument / args-array )
 selector       =  1*selector-char
                   [ 1*( "." 1*selector-char ) ]
 selector-char  =  ALPHA / DIGIT / "_"
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
+args-array     =  "[" argument *( "," argument ) "]"
 argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"

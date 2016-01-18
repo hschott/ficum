@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,10 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     private List<Predicate> predicates;
 
+    private boolean distinct = true;
+
+    private Set<Class<?>> mappedTypes = new HashSet<Class<?>>();
+
     public JPATypedQueryVisitor() {
         super();
     }
@@ -50,6 +55,13 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         super();
         this.queryClass = queryClass;
         this.entityManager = entityManager;
+        mappedTypes.add(String.class);
+        mappedTypes.add(Character.class);
+        mappedTypes.add(Boolean.class);
+        mappedTypes.add(Number.class);
+        mappedTypes.add(Date.class);
+        mappedTypes.add(Calendar.class);
+        mappedTypes.add(Enum.class);
     }
 
     private static boolean containsEscapedChar(String value) {
@@ -66,6 +78,10 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
                                                                 // sql wildcard
 
         return alwaysWildcard ? "%" + ret + "%" : ret;
+    }
+
+    public boolean addMappedType(Class<?> mappedType) {
+        return mappedTypes.add(mappedType);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -119,16 +135,22 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         switch (comparison) {
         case GREATER_THAN:
             return builder.greaterThan(exp, argument);
+
         case EQUALS:
             return builder.equal(exp, argument);
+
         case NOT_EQUALS:
             return builder.notEqual(exp, argument);
+
         case LESS_THAN:
             return builder.lessThan(exp, argument);
+
         case LESS_EQUALS:
             return builder.lessThanOrEqualTo(exp, argument);
+
         case GREATER_EQUALS:
             return builder.greaterThanOrEqualTo(exp, argument);
+
         default:
             return null;
         }
@@ -138,30 +160,28 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
     private Predicate doBuildPredicate(Comparison comparison, Expression<? extends Comparable> path,
             Comparable<?> argument) {
 
-        Predicate pred = null;
         switch (comparison) {
         case GREATER_THAN:
-            pred = builder.greaterThan(path, argument);
-            break;
+            return builder.greaterThan(path, argument);
+
         case EQUALS:
-            pred = buildEquals(argument, path);
-            break;
+            return buildEquals(argument, path);
+
         case NOT_EQUALS:
-            pred = buildNotEquals(argument, path);
-            break;
+            return buildNotEquals(argument, path);
+
         case LESS_THAN:
-            pred = builder.lessThan(path, argument);
-            break;
+            return builder.lessThan(path, argument);
+
         case LESS_EQUALS:
-            pred = builder.lessThanOrEqualTo(path, argument);
-            break;
+            return builder.lessThanOrEqualTo(path, argument);
+
         case GREATER_EQUALS:
-            pred = builder.greaterThanOrEqualTo(path, argument);
-            break;
+            return builder.greaterThanOrEqualTo(path, argument);
+
         default:
-            break;
+            return null;
         }
-        return pred;
     }
 
     private Path<?> findPath(String names) {
@@ -225,6 +245,23 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         return isCollection(path.getJavaType()) && argument instanceof Integer;
     }
 
+    public boolean isDistinct() {
+        return distinct;
+    }
+
+    protected boolean isMappedType(Class<?> clazz) {
+        for (Class<?> mappedType : mappedTypes) {
+            if (mappedType.isAssignableFrom(clazz)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setDistinct(boolean distinct) {
+        this.distinct = distinct;
+    }
+
     public void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
@@ -248,10 +285,8 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
         node.accept(this);
 
-        CriteriaQuery<T> select = cq.select(root).distinct(isDistinct());
-        select.where(predicates.toArray(new Predicate[predicates.size()]));
-
-        return entityManager.createQuery(cq);
+        return entityManager.createQuery(
+                cq.select(root).distinct(isDistinct()).where(predicates.toArray(new Predicate[predicates.size()])));
     }
 
     public void visit(AndNode node) {
@@ -267,21 +302,34 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         Path<?> path = findPath(node.getSelector());
 
         Class<? extends Comparable> clazz = (Class<? extends Comparable>) path.getJavaType();
-        Comparable<?> value = node.getArgument();
-        if (clazz.isEnum()) {
-            value = Enum.valueOf((Class<? extends Enum>) clazz, value.toString());
+        Object argument = node.getArgument();
+
+        if (argument instanceof Comparable<?>) {
+            Comparable<?> value = (Comparable<?>) argument;
+
+            if (clazz.isEnum()) {
+                value = Enum.valueOf((Class<? extends Enum>) clazz, value.toString());
+            }
+
+            if (value instanceof Calendar && clazz.isAssignableFrom(Date.class)) {
+                Calendar cal = (Calendar) value;
+                value = cal.getTime();
+            }
+
+            Predicate pred = isCollectionSizeCheck(path, value)
+                    ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) value)
+                    : doBuildPredicate(node.getComparison(), path.as(clazz), value);
+
+            if (pred != null) {
+                predicates.add(pred);
+            } else {
+                throw new IllegalArgumentException("Constraint: " + node + " does not resolve to a predicate");
+            }
+
+        } else {
+            throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
         }
 
-        if (value instanceof Calendar && clazz.isAssignableFrom(Date.class)) {
-            Calendar cal = (Calendar) value;
-            value = cal.getTime();
-        }
-
-        Predicate pred = isCollectionSizeCheck(path, value)
-                ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) value)
-                : doBuildPredicate(node.getComparison(), path.as(clazz), value);
-
-        predicates.add(pred);
     }
 
     public void visit(OrNode node) {
