@@ -38,29 +38,32 @@ public class MongoDBFilterVisitorTest {
 
     private MongoDatabase db;
 
+    protected static MongoCollection<Document> getCollection(MongoDatabase database) {
+        return database.getCollection("restaurants");
+    }
+
     @BeforeClass
     public static void setUpClass() throws IOException, URISyntaxException {
         File input = new File(ClassLoader.getSystemResource("dataset.json").toURI());
         BufferedReader reader = new BufferedReader(new FileReader(input));
 
         MongoClient setup = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017/"));
-        setup.dropDatabase("ficum");
 
-        MongoCollection<Document> collection = setup.getDatabase("ficum").getCollection("restaurants");
+        MongoDatabase database = setup.getDatabase("ficum");
+        MongoCollection<Document> collection = database.getCollection("restaurants");
+        if (collection.count() < 4999) {
+            database.drop();
+            collection = getCollection(database);
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            collection.insertOne(Document.parse(line));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                collection.insertOne(Document.parse(line));
+            }
+            reader.close();
+
+            collection.createIndex(new Document("address.location", "2dsphere"), new IndexOptions().background(false));
         }
-        reader.close();
-
-        collection.createIndex(new Document("address.location", "2dsphere"), new IndexOptions().background(false));
-
         setup.close();
-    }
-
-    protected MongoCollection<Document> getCollection() {
-        return db.getCollection("restaurants");
     }
 
     @Before
@@ -84,7 +87,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection().count(query));
+        Assert.assertEquals(2, getCollection(db).count(query));
     }
 
     @Test
@@ -94,7 +97,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(11, getCollection().count(query));
+        Assert.assertEquals(11, getCollection(db).count(query));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -104,7 +107,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection().count(query));
+        Assert.assertEquals(2, getCollection(db).count(query));
     }
 
     @Test
@@ -114,7 +117,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection().count(query));
+        Assert.assertEquals(2, getCollection(db).count(query));
     }
 
     @Test
@@ -124,7 +127,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection().count(query));
+        Assert.assertEquals(24, getCollection(db).count(query));
     }
 
     @Test
@@ -134,7 +137,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1, getCollection().count(query));
+        Assert.assertEquals(1, getCollection(db).count(query));
     }
 
     @Test
@@ -144,17 +147,17 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection().count(query));
+        Assert.assertEquals(24, getCollection(db).count(query));
     }
 
     @Test
     public void testGeometryNearMaxMinPredicate() {
-        String input = "address.location=nr=[-73.856077, 40.848447, 500.0, 400.0]";
+        String input = "address.location=nr=[-73.856077, 40.899447, 400.0, 10.0]";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1, getCollection().count(query));
+        Assert.assertEquals(2, getCollection(db).count(query));
     }
 
     @Test
@@ -164,7 +167,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4, getCollection().count(query));
+        Assert.assertEquals(4, getCollection(db).count(query));
     }
 
     @Test
@@ -174,7 +177,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(10, getCollection().count(query));
+        Assert.assertEquals(10, getCollection(db).count(query));
     }
 
     @Test
@@ -184,7 +187,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4, getCollection().count(query));
+        Assert.assertEquals(4, getCollection(db).count(query));
     }
 
     @Test
@@ -194,7 +197,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection().count(query));
+        Assert.assertEquals(24, getCollection(db).count(query));
     }
 
     @Test
@@ -204,7 +207,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1149, getCollection().count(query));
+        Assert.assertEquals(1149, getCollection(db).count(query));
     }
 
     @Test
@@ -214,7 +217,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(435, getCollection().count(query));
+        Assert.assertEquals(435, getCollection(db).count(query));
     }
 
     @Test
@@ -224,7 +227,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(260, getCollection().count(query));
+        Assert.assertEquals(260, getCollection(db).count(query));
     }
 
 }
