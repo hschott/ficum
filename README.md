@@ -7,13 +7,24 @@ Are you tired of writing finder methods for every single use case? Do you have t
 
 ## FICUM in a Nutshell
 
-FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser and a Criteria Visitor for JPA and MongoDB.
+FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser, a Builder and a Criteria Visitor for JPA and MongoDB.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
-### How to use it
+### tl;dc
+```
+                                     Builder API
+                                     +----------------+
+                                                      |
+                                                      |
+                  +----------+                  +-----v-----+                 +-----------+
+Query Literal     |          |   Infix Stack    |           |    Node Tree    |           |  Predicate or Query Literal
++---------------- >  PARSER  +------------------>  BUILDER  +----------------->  VISITOR  +------------>
+                  |          |                  |           |                 |           |
+                  +----------+                  +-----------+                 +-----------+
+```
 
-*With JPA* 
+*with JPA* 
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "owner", "type", "city" };
@@ -31,7 +42,7 @@ TypedQuery<Pet> query = visitor.start(root);
 List<Pet> results = query.getResultList();
 ```
 
-*With MongoDB* 
+*with MongoDB* 
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "address", "location", "score" };
@@ -51,7 +62,7 @@ FindIterable<Document> documents = getMongoDB().getCollection("restaurants").fin
 
 The query string could also passed in via RESTful query `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
-### Builder
+*with Builder*
 
 It is also possible to build the node tree and from the node tree a query string.
 The Builder works in infix notation as you would write the query as string.
