@@ -264,7 +264,7 @@ The QueryPrinterVisitor is capable of printing out a FICUM query as string. The 
 * JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
 * Enum - value from name() surrounded with single quotes
 * String, Character and any other Comparable - value from toString() surrounded with single quotes
-* Iterable of previous types - all values as described above enclosed in square brackets and separated by commas, e.g. `[12.5,4.5]`
+* Array of previous types - all values as described above enclosed in square brackets and separated by commas, e.g. `[12.5,4.5]`
 
 
 ## The complete [ABNF](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form)
