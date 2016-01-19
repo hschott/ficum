@@ -224,6 +224,10 @@ Text arguments can contain wildcards:
 
 When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE` and from `NOT EQUALS` to `NOT LIKE`.
 
+### Enum as Text
+
+If a selector name matches a entity field of type `java.lang.Enum` and the argument is a Text and results into a `java.lang.String`, then an attempt is made to get the Enum instance and compare it against the entity field value.
+
 ### Collection size check
 
 When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the argument.
