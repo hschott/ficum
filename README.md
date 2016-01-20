@@ -297,7 +297,7 @@ constraint     =  selector comparison ( argument / args-array )
 selector       =  1*selector-char
                   [ 1*( "." 1*selector-char ) ]
 selector-char  =  ALPHA / DIGIT / "_"
-comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt="
+comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
 args-array     =  "[" argument *( "," argument ) "]"
 argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
@@ -310,10 +310,10 @@ number-arg     =  [ "+" / "-" ]
                   ( integer-arg / long-arg / float-arg / double-arg )
 integer-arg    =  1*DIGIT
 long-arg       =  1*DIGIT ( "l" / "L")
-float-arg      =  ( 1*DIGIT "." 1*DIGIT )
-                  [ "f" / "F" ]
+float-arg      =  ( 1*DIGIT "." 1*DIGIT ( "f" / "F" ))
                   [ exponent ]
-double-arg     =  ( 1*DIGIT "." 1*DIGIT ( "d" / "D" ) )
+double-arg     =  ( 1*DIGIT "." 1*DIGIT )
+                  [ "d" / "D" ]
                   [ exponent ]
 exponent       =  ( "e" / "E" )
                   [ "+" / "-" ]
