@@ -1,13 +1,13 @@
 [![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum)
 # FICUM
-## Dynamic Queries for Java - DSL, Parser and Criteria Visitors
+## Dynamic Filters for Java - DSL, Parser and Visitors
 
-Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete application for just a new finder method?
+Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
 
 
 ## FICUM in a Nutshell
 
-FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser, a Builder and a Criteria Visitor for JPA and MongoDB.
+FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser, a Builder and a Visitor for JPA and MongoDB.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
@@ -17,14 +17,14 @@ It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-s
                                      +----------------+
                                                       |
                                                       |
-                  +----------+                  +-----v-----+                 +-----------+
-Query Literal     |          |   Infix Stack    |           |    Node Tree    |           |  Predicate or Query Literal
+                  +----------+                  +-----v-----+                 +-----------+  Predicate
+Query Literal     |          |   Infix Stack    |           |    Node Tree    |           |  or Query Literal
 +---------------- >  PARSER  +------------------>  BUILDER  +----------------->  VISITOR  +------------>
                   |          |                  |           |                 |           |
                   +----------+                  +-----------+                 +-----------+
 ```
 
-*with JPA* 
+_with JPA_ 
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "owner", "type", "city" };
@@ -42,7 +42,7 @@ TypedQuery<Pet> query = visitor.start(root);
 List<Pet> results = query.getResultList();
 ```
 
-*with MongoDB* 
+_with MongoDB_ 
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "address", "location", "score" };
@@ -60,12 +60,11 @@ Bson filter = visitor.start(root);
 FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
 
-The query string could also passed in via RESTful query `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
+The query could also be passed in via RESTful query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
-*with Builder*
-
-It is also possible to build the node tree and from the node tree a query string.
-The Builder works in infix notation as you would write the query as string.
+_with Builder_
+It is also possible to build the node tree with an API and from the node tree a query literal.
+The Builder works in infix notation just as you would write the query as string.
 
 ```java
 Node root = Builder.newInstance().constraint("owner.city", Comparison.EQUALS, "Madison").and()
@@ -73,7 +72,7 @@ Node root = Builder.newInstance().constraint("owner.city", Comparison.EQUALS, "M
 String query = new QueryPrinterVisitor().start(root);
 ```
 
-The Builder excepts as argument any `java.lang.Comparable`.
+The Builder.constraint() method excepts as argument any `java.lang.Comparable`.
 
 
 ## FICUM Query Language
@@ -96,14 +95,14 @@ operator    = ";" / ","
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
 
 A constraint is composed of a selector, comparison and argument triple, which refines the constraint. When processed, a constraint yields a Boolean value.
-An array of arguments must be enclosed in square brackets and each argument separated with a comma.
+An array of arguments must be enclosed in square brackets and each argument separated by a comma.
 
 ```
 constraint     =  selector comparison ( argument / args-array )
 args-array     =  "[" argument *( "," argument ) "]"
 ```
 
-A selector identifies the field of an entity that a constraint applies to. Since entities can be nested, also a selector can be defined as nested fields with a dot as separator.
+A selector identifies the field of an entity that a constraint applies to. Since entities can be nested, an selector can also be defined as nested fields with a dot as separator.
 
 ```
 selector       =  1*selector-char
@@ -111,7 +110,7 @@ selector       =  1*selector-char
 selector-char  =  ALPHA / DIGIT / "_"
 ```
 
-A comparsion yields to True if the argument can be processed against the selector defined entity field's value in the following manner:
+A comparsion yields to True if the argument can be processed against the selector defined entity field value in the following manner:
 
 comparsion | operator       | JPA visitor support | MongoDB visitor support | argument type
 ------     | ------         | ------              | ------                  | ------
@@ -131,7 +130,7 @@ comparsion | operator       | JPA visitor support | MongoDB visitor support | ar
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
 ```
 
-An argument can be of 5 main types. Text, Datetime, Number, Boolean and Null.
+An argument can be one of 5 main types. _Text, Datetime, Number, Boolean and Null._
 
 ```
 argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
@@ -154,7 +153,7 @@ The argument's type is negotiated from it's content by a few rules.
 
 A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Calendar` object.
 
-A simple date without time will be parsed from the format `yyyy-MM-dd`.
+A simple date without time part will be parsed from the format `yyyy-MM-dd`.
 
 A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
 
@@ -196,7 +195,7 @@ A null reference is parsed from a string literal equal to "null".
 
 ### Text
 
-A text is parsed from single quoted pct or hex encoded string literals or any string literal that does not match the previous rules and results in a `java.lang.String` object. For results of length 1 a `java.lang.Character` is returned.
+A text is parsed from single quoted pct or hex encoded string literals or any other string literal and results in a `java.lang.String` object. For results of length 1 a `java.lang.Character` is returned.
 
 Pct encoded strings must start with `%` followed by two hex digits. Hex encoded strings must start with one of `#`, `0x` or `0X` followed by two or more (even number) hex digits. Both can evaluate to a multibyte char.
 
@@ -214,7 +213,7 @@ literal         | value
 
 ## FICUM JPA Visitor
 
-The JPA visitor is capable of traversing a Node tree and converting it to a TypedQuery. The selector names must correspond to the entity field names. 
+The JPA visitor is capable of traversing a Node tree and converting it to a `javax.persistence.TypedQuery<T>`. The selector names must correspond to the entity `<T>` field names. 
 
 ### Text with Wildcards
 
@@ -226,17 +225,17 @@ When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE
 
 ### Enum as Text
 
-If a selector name matches a entity field of type `java.lang.Enum` and the argument is a Text and results into a `java.lang.String`, then an attempt is made to get the Enum instance and compare it against the entity field value.
+When the selector name matches a entity field of type `java.lang.Enum` and the argument is a Text wich results into a `java.lang.String`, then an attempt is made to get the Enum instance and compare it against the entity field value.
 
 ### Collection size check
 
-When the selector name matches a `java.util.Collection` and the argument is an `java.lang.Integer` the collections size is compared against the argument.
+When the selector name matches a `java.util.Collection` and the argument results into an `java.lang.Integer`, then the collections size is compared against the argument.
 
 
 
 ## FICUM MongoDB Visitor
 
-The MongoDB visitor is capable of traversing a Node tree and converting it to a Bson filter. The selector names must correspond to the field names of a MongoDB document. 
+The MongoDB visitor is capable of traversing a Node tree and converting it to a `org.bson.conversions.Bson` filter document. The selector names must correspond to the field names of a MongoDB document. 
 
 ### Text with Wildcards
 
@@ -248,7 +247,7 @@ When a Test contains a wildcard the comparsion is done as regular expression.
 
 ### Geospatial comparisons
 
-With the MongoDB Visitor some [geospatial queries](https://docs.mongodb.org/manual/reference/operator/query-geospatial/) can be done. The type of MongoDB filter predicate depends on the comparison and number of arguments used.
+With the MongoDB Visitor selected [geospatial queries](https://docs.mongodb.org/manual/reference/operator/query-geospatial/) can be executed. The type of MongoDB filter predicate depends on the comparison and the number of arguments used.
 Anyway, all arguments in the arguments array must be of type Double.
 The order of coordinate values is x, y respectively longitude, latitude.
 Polygons are closed automatically by duplicating the first Position to the last Position.
