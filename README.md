@@ -24,7 +24,7 @@ Query Literal     |          |   Infix Stack    |           |    Node Tree    | 
                   +----------+                  +-----------+                 +-----------+
 ```
 
-_with JPA_ 
+**with JPA**
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "owner", "type", "city" };
@@ -42,7 +42,7 @@ TypedQuery<Pet> query = visitor.start(root);
 List<Pet> results = query.getResultList();
 ```
 
-_with MongoDB_ 
+**with MongoDB**
 ```java
 // define selector names allowed to be used in query string
 String[] allowedSelectorNames = { "address", "location", "score" };
@@ -62,7 +62,8 @@ FindIterable<Document> documents = getMongoDB().getCollection("restaurants").fin
 
 The query could also be passed in via RESTful query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
-_with Builder_
+**with Builder**
+
 It is also possible to build the node tree with an API and from the node tree a query literal.
 The Builder works in infix notation just as you would write the query as string.
 
@@ -89,8 +90,8 @@ expression  = [ "(" ]
 operator    = ";" / ","
 ```
 
-* `,` is the Boolean AND operator; it yields True if both operands evaluate to True, otherwise False.
-* `;` is the Boolean OR operator; it yields True if either operand evaluates to True, otherwise False.
+* `,` is the Boolean **AND** operator; it yields True if both operands evaluate to True, otherwise False.
+* `;` is the Boolean **OR** operator; it yields True if either operand evaluates to True, otherwise False.
 
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
 
@@ -130,13 +131,14 @@ comparsion | operator       | JPA visitor support | MongoDB visitor support | ar
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
 ```
 
-An argument can be one of 5 main types. _Text, Datetime, Number, Boolean and Null._
+An argument can be one of 5 main types.
+**Text, Datetime, Number, Boolean and Null.**
 
 ```
 argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
 ```
 
-*Examples:*
+**Examples:**
 ```
 firstname==Jack
 birthdate==2015-12-24
@@ -157,7 +159,7 @@ A simple date without time part will be parsed from the format `yyyy-MM-dd`.
 
 A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
 
-*Examples:*
+**Examples:**
 ```
 2015-12-24 evaluates to 24. December 2015
 -645-04-13 evaluates to 13. April 645 BC
@@ -170,7 +172,7 @@ A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The ti
 
 A number is parsed from a string literal containing digits, sign, decimal dot, qualifier and exponent and results in either `java.lang.Integer`, `java.lang.Long`, `java.lang.Float` or `java.lang.Double`.
 
-*Examples:*
+**Examples:**
 
 literal    | type    | value
 ------     | ------  | ------
@@ -199,7 +201,7 @@ A text is parsed from single quoted pct or hex encoded string literals or any ot
 
 Pct encoded strings must start with `%` followed by two hex digits. Hex encoded strings must start with one of `#`, `0x` or `0X` followed by two or more (even number) hex digits. Both can evaluate to a multibyte char.
 
-*Examples:*
+**Examples:**
 
 literal         | value
 ------          | ------
