@@ -307,10 +307,9 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         if (argument instanceof Comparable<?>) {
             Comparable<?> value = (Comparable<?>) argument;
 
-            if (clazz.isEnum()) {
+            if (value instanceof String && clazz.isEnum()) {
                 value = Enum.valueOf((Class<? extends Enum>) clazz, value.toString());
             }
-
             if (value instanceof Calendar && clazz.isAssignableFrom(Date.class)) {
                 Calendar cal = (Calendar) value;
                 value = cal.getTime();
