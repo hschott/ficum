@@ -6,7 +6,7 @@
 	<artifactId>ficum</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>FICUM - DSL, Parser and Criteria Visitor</name>
+	<name>FICUM - Dynamic Filters</name>
 	<description>A query DSL and parser for real dynamic queries.</description>
 	<url>https://github.com/hschott/ficum</url>
 	<developers>
