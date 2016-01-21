@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.conversions.Bson;
-import org.ficum.node.AndNode;
 import org.ficum.node.Comparison;
 import org.ficum.node.ConstraintNode;
 import org.ficum.node.Node;
-import org.ficum.node.OrNode;
+import org.ficum.node.OperationNode;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -187,14 +186,6 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         return positions;
     }
 
-    public void visit(AndNode node) {
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
-        Bson pred = Filters.and(filters.toArray(new Bson[filters.size()]));
-        filters.clear();
-        filters.add(pred);
-    }
-
     public void visit(ConstraintNode<?> node) {
         Object argument = node.getArgument();
 
@@ -221,10 +212,24 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         }
     }
 
-    public void visit(OrNode node) {
+    public void visit(OperationNode node) {
         node.getLeft().accept(this);
         node.getRight().accept(this);
-        Bson pred = Filters.or(filters.toArray(new Bson[filters.size()]));
+
+        Bson pred = null;
+        switch (node.getOperator()) {
+        case AND:
+            pred = Filters.and(filters.toArray(new Bson[filters.size()]));
+            break;
+
+        case OR:
+            pred = Filters.or(filters.toArray(new Bson[filters.size()]));
+            break;
+
+        default:
+            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        }
+
         filters.clear();
         filters.add(pred);
     }

@@ -17,19 +17,18 @@ public class ExpressionParser extends ConstraintParser {
         super(allowedSelectorNames);
     }
 
-    @SuppressSubnodes
-    protected Rule AndOperation() {
-        return Sequence(Ch(Operator.AND.sign), push(Operator.AND));
-    }
-
     protected Rule Expression() {
         return Sequence(FirstOf(SubExpression(), Constraint()),
-                ZeroOrMore(FirstOf(AndOperation(), OrOperation()), FirstOf(SubExpression(), Constraint())));
+                ZeroOrMore(Operation(), FirstOf(SubExpression(), Constraint())));
     }
 
     @SuppressSubnodes
-    protected Rule OrOperation() {
-        return Sequence(Ch(Operator.OR.sign), push(Operator.OR));
+    protected Rule Operation() {
+        return Sequence(FirstOf(Operator.allSigns()), new Action<Object>() {
+            public boolean run(Context<Object> context) {
+                return push(Operator.from(match()));
+            }
+        });
     }
 
     @Override
@@ -46,8 +45,8 @@ public class ExpressionParser extends ConstraintParser {
     }
 
     protected Rule SubExpression() {
-        return Sequence(Ch(Operator.LEFT.sign), push(Operator.LEFT), OneOrMore(Expression()), Ch(Operator.RIGHT.sign),
-                push(Operator.RIGHT));
+        return Sequence(String(Operator.LEFT.getSign()), push(Operator.LEFT), OneOrMore(Expression()),
+                String(Operator.RIGHT.getSign()), push(Operator.RIGHT));
     }
 
 }

@@ -4,10 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.ficum.node.AndNode;
 import org.ficum.node.ConstraintNode;
 import org.ficum.node.Node;
-import org.ficum.node.OrNode;
+import org.ficum.node.OperationNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -101,27 +100,38 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
         return output.toString();
     }
 
-    public void visit(AndNode node) {
-        preceded = true;
-        node.getLeft().accept(this);
-        output.append(node.getOperator().sign);
-        node.getRight().accept(this);
-        preceded = false;
-    }
-
     public void visit(ConstraintNode<?> node) {
         output.append(node.getSelector());
         output.append(node.getComparison().getSign());
         printArgument(output, node.getArgument());
     }
 
-    public void visit(OrNode node) {
-        if (preceded)
-            output.append('(');
-        node.getLeft().accept(this);
-        output.append(node.getOperator().sign);
-        node.getRight().accept(this);
-        if (preceded)
-            output.append(')');
+    public void visit(OperationNode node) {
+        switch (node.getOperator()) {
+        case AND:
+            preceded = true;
+            node.getLeft().accept(this);
+            output.append(node.getOperator().getSign());
+            node.getRight().accept(this);
+            preceded = false;
+
+            break;
+
+        case OR:
+            if (preceded)
+                output.append('(');
+            node.getLeft().accept(this);
+            output.append(node.getOperator().getSign());
+            node.getRight().accept(this);
+            if (preceded)
+                output.append(')');
+
+            break;
+
+        default:
+            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        }
+
     }
+
 }

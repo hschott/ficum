@@ -10,10 +10,9 @@ import java.util.Map;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.ficum.node.AndNode;
 import org.ficum.node.ConstraintNode;
 import org.ficum.node.Node;
-import org.ficum.node.OrNode;
+import org.ficum.node.OperationNode;
 import org.ficum.node.Visitor;
 
 public abstract class AbstractVisitor<T> implements Visitor<T> {
@@ -58,12 +57,8 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
             visit((ConstraintNode<?>) node);
             return;
         }
-        if (node instanceof AndNode) {
-            visit((AndNode) node);
-            return;
-        }
-        if (node instanceof OrNode) {
-            visit((OrNode) node);
+        if (node instanceof OperationNode) {
+            visit((OperationNode) node);
             return;
         }
     }

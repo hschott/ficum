@@ -23,11 +23,10 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.ficum.node.AndNode;
 import org.ficum.node.Comparison;
 import org.ficum.node.ConstraintNode;
 import org.ficum.node.Node;
-import org.ficum.node.OrNode;
+import org.ficum.node.OperationNode;
 
 public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
@@ -289,14 +288,6 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
                 cq.select(root).distinct(isDistinct()).where(predicates.toArray(new Predicate[predicates.size()])));
     }
 
-    public void visit(AndNode node) {
-        node.getLeft().accept(this);
-        node.getRight().accept(this);
-        Predicate pred = builder.and(predicates.toArray(new Predicate[predicates.size()]));
-        predicates.clear();
-        predicates.add(pred);
-    }
-
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void visit(ConstraintNode node) {
         Path<?> path = findPath(node.getSelector());
@@ -331,10 +322,24 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     }
 
-    public void visit(OrNode node) {
+    public void visit(OperationNode node) {
         node.getLeft().accept(this);
         node.getRight().accept(this);
-        Predicate pred = builder.or(predicates.toArray(new Predicate[predicates.size()]));
+
+        Predicate pred = null;
+        switch (node.getOperator()) {
+        case AND:
+            pred = builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            break;
+
+        case OR:
+            pred = builder.or(predicates.toArray(new Predicate[predicates.size()]));
+            break;
+
+        default:
+            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        }
+
         predicates.clear();
         predicates.add(pred);
     }
