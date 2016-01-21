@@ -87,11 +87,13 @@ expression  = [ "(" ]
               ( constraint / expression )
               [ operator ( constraint / expression ) ]
               [ ")" ]
-operator    = ";" / ","
+operator    = "," / ";" / "." / ":"
 ```
 
 * `,` is the Boolean **AND** operator; it yields True if both operands evaluate to True, otherwise False.
 * `;` is the Boolean **OR** operator; it yields True if either operand evaluates to True, otherwise False.
+* `.` is the Boolean **NAND** operator; it yields False if both operands evaluate to True, otherwise True.
+* `:` is the Boolean **NOR** operator; it yields False if either operand evaluates to True, otherwise True.
 
 By default, the AND operator takes precedence (i.e., it is evaluated before any OR operators are). However, a parenthesised expression can be used to change precedence, yielding whatever the contained expression yields.
 
@@ -292,7 +294,7 @@ expression     =  [ "(" ]
                   ( constraint / expression )
                   [ operator ( constraint / expression ) ]
                   [ ")" ]
-operator       =  ";" / ","
+operator       = "," / ";" / "." / ":"
 constraint     =  selector comparison ( argument / args-array )
 selector       =  1*selector-char
                   [ 1*( "." 1*selector-char ) ]

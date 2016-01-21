@@ -1,10 +1,17 @@
 package org.ficum.node;
 
-public abstract class AbstractOperationNode implements OperationNode {
+public class LogicalOperationNode implements OperationNode {
 
     private Node left;
 
     private Node right;
+
+    private final Operator operator;
+
+    public LogicalOperationNode(Operator operator) {
+        super();
+        this.operator = operator;
+    }
 
     public void accept(Visitor<?> visitor) {
         visitor.visit(this);
@@ -16,10 +23,10 @@ public abstract class AbstractOperationNode implements OperationNode {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof AbstractOperationNode))
+        if (!(obj instanceof LogicalOperationNode))
             return false;
 
-        AbstractOperationNode other = (AbstractOperationNode) obj;
+        LogicalOperationNode other = (LogicalOperationNode) obj;
         if (left == null) {
             if (other.left != null)
                 return false;
@@ -38,6 +45,10 @@ public abstract class AbstractOperationNode implements OperationNode {
 
     public Node getLeft() {
         return left;
+    }
+
+    public Operator getOperator() {
+        return operator;
     }
 
     public Node getRight() {

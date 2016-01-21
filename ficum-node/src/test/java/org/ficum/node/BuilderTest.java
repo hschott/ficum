@@ -18,11 +18,13 @@ public class BuilderTest {
     public void testAndOperatorConstraint() {
         Node root = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).and()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).build();
-        Assert.assertTrue(root.getClass().isAssignableFrom(AndNode.class));
+        Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
-        AndNode andNode = (AndNode) root;
+        LogicalOperationNode node = (LogicalOperationNode) root;
 
-        Node left = andNode.getLeft();
+        Assert.assertEquals(Operator.AND, node.getOperator());
+
+        Node left = node.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
@@ -30,7 +32,7 @@ public class BuilderTest {
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1l, leftConstraint.getArgument());
 
-        Node right = andNode.getRight();
+        Node right = node.getRight();
 
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
         ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
@@ -246,9 +248,11 @@ public class BuilderTest {
                 .constraint("second", Comparison.NOT_EQUALS, 2L).and()
                 .constraint("third", Comparison.GREATER_EQUALS, 3L);
         Node root = builder.build();
-        Assert.assertTrue(root.getClass().isAssignableFrom(OrNode.class));
+        Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
-        OrNode orNode = (OrNode) root;
+        LogicalOperationNode orNode = (LogicalOperationNode) root;
+
+        Assert.assertEquals(Operator.OR, orNode.getOperator());
 
         Node left = orNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
@@ -260,8 +264,8 @@ public class BuilderTest {
 
         Node right = orNode.getRight();
 
-        Assert.assertTrue(right.getClass().isAssignableFrom(AndNode.class));
-        AndNode andNode = (AndNode) right;
+        Assert.assertTrue(right.getClass().isAssignableFrom(LogicalOperationNode.class));
+        LogicalOperationNode andNode = (LogicalOperationNode) right;
         Assert.assertTrue(andNode.getLeft().getClass().isAssignableFrom(ConstraintNode.class));
         Assert.assertTrue(andNode.getRight().getClass().isAssignableFrom(ConstraintNode.class));
     }
@@ -275,9 +279,11 @@ public class BuilderTest {
     public void testOrOperatorConstraint() {
         Node root = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).or()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).build();
-        Assert.assertTrue(root.getClass().isAssignableFrom(OrNode.class));
+        Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
-        OrNode orNode = (OrNode) root;
+        LogicalOperationNode orNode = (LogicalOperationNode) root;
+
+        Assert.assertEquals(Operator.OR, orNode.getOperator());
 
         Node left = orNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
@@ -320,9 +326,11 @@ public class BuilderTest {
                 .constraint("second", Comparison.NOT_EQUALS, 2L).endsub().and()
                 .constraint("third", Comparison.GREATER_EQUALS, 3L);
         Node root = builder.build();
-        Assert.assertTrue(root.getClass().isAssignableFrom(AndNode.class));
+        Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
-        AndNode andNode = (AndNode) root;
+        LogicalOperationNode andNode = (LogicalOperationNode) root;
+
+        Assert.assertEquals(Operator.AND, andNode.getOperator());
 
         Node right = andNode.getRight();
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
@@ -333,9 +341,9 @@ public class BuilderTest {
         Assert.assertEquals(3l, rightConstraint.getArgument());
 
         Node left = andNode.getLeft();
-        Assert.assertTrue(left.getClass().isAssignableFrom(OrNode.class));
+        Assert.assertTrue(left.getClass().isAssignableFrom(LogicalOperationNode.class));
 
-        OrNode orNode = (OrNode) left;
+        LogicalOperationNode orNode = (LogicalOperationNode) left;
         Assert.assertTrue(orNode.getLeft().getClass().isAssignableFrom(ConstraintNode.class));
         Assert.assertTrue(orNode.getRight().getClass().isAssignableFrom(ConstraintNode.class));
     }

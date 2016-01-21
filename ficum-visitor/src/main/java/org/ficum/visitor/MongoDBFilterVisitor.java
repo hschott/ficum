@@ -219,11 +219,19 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         Bson pred = null;
         switch (node.getOperator()) {
         case AND:
-            pred = Filters.and(filters.toArray(new Bson[filters.size()]));
+            pred = Filters.and(filters.get(0), filters.get(1));
             break;
 
         case OR:
-            pred = Filters.or(filters.toArray(new Bson[filters.size()]));
+            pred = Filters.or(filters.get(0), filters.get(1));
+            break;
+
+        case NAND:
+            pred = Filters.or(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
+            break;
+
+        case NOR:
+            pred = Filters.and(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
             break;
 
         default:

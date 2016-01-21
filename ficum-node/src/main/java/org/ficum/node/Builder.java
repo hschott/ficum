@@ -41,25 +41,11 @@ public class Builder {
 
             if (element instanceof Operator) {
                 Operator operator = (Operator) element;
-                OperationNode node = null;
-                switch (operator) {
-                case AND:
-                    node = new AndNode();
-                    break;
-
-                case OR:
-                    node = new OrNode();
-                    break;
-
-                default:
-                    break;
-                }
-
+                OperationNode node = new LogicalOperationNode(operator);
                 Node operand1 = eval(postfix);
                 Node operand2 = eval(postfix);
-                node.setLeft(operand2);
                 node.setRight(operand1);
-
+                node.setLeft(operand2);
                 return node;
             }
         }
@@ -80,11 +66,13 @@ public class Builder {
 
                 switch (op) {
                 case AND:
+                case NOR:
                 case LEFT:
                     operatorStack.push(op);
                     break;
 
                 case OR:
+                case NAND:
                     while (!operatorStack.isEmpty() && operatorStack.peek().preceded) {
                         output.push(operatorStack.pop());
                     }

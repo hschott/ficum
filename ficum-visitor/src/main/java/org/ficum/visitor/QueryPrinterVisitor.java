@@ -109,7 +109,8 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     public void visit(OperationNode node) {
         switch (node.getOperator()) {
         case AND:
-            preceded = true;
+        case NOR:
+            preceded = node.getOperator().preceded;
             node.getLeft().accept(this);
             output.append(node.getOperator().getSign());
             node.getRight().accept(this);
@@ -118,6 +119,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             break;
 
         case OR:
+        case NAND:
             if (preceded)
                 output.append('(');
             node.getLeft().accept(this);

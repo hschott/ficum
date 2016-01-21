@@ -112,7 +112,7 @@ public class JPATypedQueryVisitorTest {
 
     @Test
     public void testFieldStringAlwaysLike() {
-        String input = "name=='u'";
+        String input = "name=='uck'";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
         petVisitor.setAlwaysWildcard(true);
@@ -120,7 +120,7 @@ public class JPATypedQueryVisitorTest {
         petVisitor.setAlwaysWildcard(false);
         List<Pet> results = query.getResultList();
 
-        Assert.assertEquals(3, results.size());
+        Assert.assertEquals(2, results.size());
     }
 
     @Test
@@ -140,6 +140,18 @@ public class JPATypedQueryVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
         petVisitor.start(node);
+    }
+
+    @Test
+    public void testNandPredicate() {
+        String input = "name!='Chuck'.owner.firstName!='Jeff'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        TypedQuery<Pet> query = petVisitor.start(node);
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(1, results.size());
     }
 
     @Test
@@ -166,6 +178,30 @@ public class JPATypedQueryVisitorTest {
         List<Pet> results = query.getResultList();
 
         Assert.assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testNorPredicate() {
+        String input = "name!='Leo':owner.firstName=='Jeff'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        TypedQuery<Pet> query = petVisitor.start(node);
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testOrPredicate() {
+        String input = "name=='Leo';owner.firstName=='Jeff'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        TypedQuery<Pet> query = petVisitor.start(node);
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(2, results.size());
     }
 
 }

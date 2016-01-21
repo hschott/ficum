@@ -329,11 +329,19 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         Predicate pred = null;
         switch (node.getOperator()) {
         case AND:
-            pred = builder.and(predicates.toArray(new Predicate[predicates.size()]));
+            pred = builder.and(predicates.get(0), predicates.get(1));
             break;
 
         case OR:
-            pred = builder.or(predicates.toArray(new Predicate[predicates.size()]));
+            pred = builder.or(predicates.get(0), predicates.get(1));
+            break;
+
+        case NAND:
+            pred = builder.or(builder.not(predicates.get(0)), builder.not(predicates.get(1)));
+            break;
+
+        case NOR:
+            pred = builder.and(builder.not(predicates.get(0)), builder.not(predicates.get(1)));
             break;
 
         default:

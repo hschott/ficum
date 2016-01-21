@@ -200,6 +200,16 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Test
+    public void testNorPredicate() {
+        String input = "name!='*Kitchen':name!='*Cafe'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(3, getCollection(db).count(query));
+    }
+
+    @Test
     public void testNotPredicate() {
         String input = "name!='*e*'";
 

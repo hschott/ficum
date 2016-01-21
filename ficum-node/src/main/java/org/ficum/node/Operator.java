@@ -6,7 +6,7 @@ import java.util.Map;
 
 public enum Operator {
 
-    AND(",", true), OR(";", false), LEFT("(", false), RIGHT(")", true);
+    AND(",", true), NAND(".", false), OR(";", false), NOR(":", true), LEFT("(", false), RIGHT(")", true);
 
     private static final Map<String, Operator> lookup = new HashMap<String, Operator>();
 
