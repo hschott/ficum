@@ -5,3 +5,4 @@ addons:
   apt:
     packages:
       - mongodb-org-server 3.2.1
+      - mongodb-org-shell 3.2.1
