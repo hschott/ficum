@@ -201,12 +201,13 @@ public class MongoDBFilterVisitorTest {
 
     @Test
     public void testNorPredicate() {
-        String input = "name!='*Kitchen':name!='*Cafe'";
+        String input = "cuisine=='American':address.location=wi=[-73.856077, 40.848447, " + 25000 / (6371.2 * 1000)
+                + "]";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(3, getCollection(db).count(query));
+        Assert.assertEquals(685, getCollection(db).count(query));
     }
 
     @Test
