@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.conversions.Bson;
+import org.ficum.node.AbstractVisitor;
 import org.ficum.node.Comparison;
 import org.ficum.node.ConstraintNode;
 import org.ficum.node.Node;

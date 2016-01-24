@@ -1,12 +1,9 @@
-package org.ficum.visitor;
+package org.ficum.node;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.ficum.node.ConstraintNode;
-import org.ficum.node.Node;
-import org.ficum.node.OperationNode;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;

@@ -1,13 +1,10 @@
-package org.ficum.visitor;
+package org.ficum.node;
 
 import org.apache.commons.lang3.JavaVersion;
-import org.ficum.node.Builder;
-import org.ficum.node.Comparison;
-import org.ficum.node.Node;
-import org.ficum.parser.ParseHelper;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
+import org.joda.time.chrono.GregorianChronology;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -158,74 +155,108 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testDate() {
-        String input = "first==2015-12-29";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
+                new LocalDate().withYear(2015).withMonthOfYear(12).withDayOfMonth(29)).build();
+
+        String expected = "first==2015-12-29";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testDateBC() {
-        String input = "first==-0650-12-29";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
+                new LocalDate().withYear(-650).withMonthOfYear(12).withDayOfMonth(29)).build();
+
+        String expected = "first==-0650-12-29";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testNaturalOrder() {
-        String input = "first==1l,second=gt='two';third=le=3.0";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, 1l).and()
+                .constraint("second", Comparison.GREATER_THAN, "two").or()
+                .constraint("third", Comparison.LESS_EQUALS, 3.0f).build();
+
+        String expected = "first==1l,second=gt='two';third=le=3.0f";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testNestedPreceded() {
-        String input = "first==1l,((second=gt='two';third=le=3.0);fourth=lt='five')";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, 1l).and().sub().sub()
+                .constraint("second", Comparison.GREATER_THAN, "two").or()
+                .constraint("third", Comparison.LESS_EQUALS, 3.0f).endsub().or()
+                .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
+
+        String expected = "first==1l,((second=gt='two';third=le=3.0f);fourth=lt='five')";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testPrecededOrder() {
-        String input = "(first==1l;second=gt='two'),(third=le=3.0;fourth=lt='five')";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Node node = Builder.newInstance().sub().constraint("first", Comparison.EQUALS, 1l).or()
+                .constraint("second", Comparison.GREATER_THAN, "two").endsub().and().sub()
+                .constraint("third", Comparison.LESS_EQUALS, 3.0f).or()
+                .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
+
+        String expected = "(first==1l;second=gt='two'),(third=le=3.0f;fourth=lt='five')";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testTimestampBC() {
-        String input = "first==-0456-03-19T18:34:12.000Z";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance()
+                .constraint("first", Comparison.EQUALS,
+                        new DateTime(GregorianChronology.getInstance(DateTimeZone.forOffsetHours(0))).withYear(-456)
+                                .withMonthOfYear(3).withDayOfMonth(19).withHourOfDay(18).withMinuteOfHour(34)
+                                .withSecondOfMinute(12).withMillisOfSecond(0))
+                .build();
+
+        String expected = "first==-0456-03-19T18:34:12.000Z";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testTimestampZoneOffset() {
-        String input = "first==2015-12-29T18:34:12.000+05:00";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance()
+                .constraint("first", Comparison.EQUALS,
+                        new DateTime().withZone(DateTimeZone.forOffsetHours(5)).withYear(2015).withMonthOfYear(12)
+                                .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
+                                .withMillisOfSecond(0))
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000+05:00";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void testTimestampZulu() {
-        String input = "first==2015-12-29T18:34:12.000Z";
-        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Node node = Builder.newInstance()
+                .constraint("first", Comparison.EQUALS,
+                        new DateTime(DateTimeZone.forOffsetHours(0)).withYear(2015).withMonthOfYear(12)
+                                .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
+                                .withMillisOfSecond(0))
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000Z";
         String actual = new QueryPrinterVisitor().start(node);
 
-        Assert.assertEquals(input, actual);
+        Assert.assertEquals(expected, actual);
     }
 
 }
