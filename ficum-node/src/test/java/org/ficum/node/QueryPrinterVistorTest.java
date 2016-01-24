@@ -1,6 +1,5 @@
 package org.ficum.node;
 
-import org.apache.commons.lang3.JavaVersion;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -71,9 +70,9 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderEnum() {
-        String expected = "first=='JAVA_1_6'";
+        String expected = "first=='ET'";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, JavaVersion.JAVA_1_6).build();
+        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, Aliens.ET).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -257,6 +256,10 @@ public class QueryPrinterVistorTest {
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
+    }
+
+    private enum Aliens {
+        ET
     }
 
 }
