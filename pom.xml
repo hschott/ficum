@@ -27,9 +27,8 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/hoschott/ficum.git</connection>
-        <developerConnection>scm:git:https://github.com/hoschott/ficum.git</developerConnection>
-        <url>https://github.com/hschott/ficum.git</url>
+        <connection>scm:git:https://github.com/hoschott/ficum</connection>
+        <developerConnection>scm:git:https://github.com/hoschott/ficum</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <modules>
