@@ -232,7 +232,7 @@ public class QueryPrinterVistorTest {
     public void testTimestampZoneOffset() {
         Node node = Builder.newInstance()
                 .constraint("first", Comparison.EQUALS,
-                        new DateTime().withZone(DateTimeZone.forOffsetHours(5)).withYear(2015).withMonthOfYear(12)
+                        new DateTime(DateTimeZone.forOffsetHours(5)).withYear(2015).withMonthOfYear(12)
                                 .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
                                 .withMillisOfSecond(0))
                 .build();

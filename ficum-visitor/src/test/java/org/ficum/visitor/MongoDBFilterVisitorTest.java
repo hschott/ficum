@@ -44,7 +44,7 @@ public class MongoDBFilterVisitorTest {
 
     @BeforeClass
     public static void setUpClass() throws IOException, URISyntaxException {
-        File input = new File(ClassLoader.getSystemResource("dataset.json").toURI());
+        File input = new File(ClassLoader.getSystemResource("db/mongodb/dataset.json").toURI());
         BufferedReader reader = new BufferedReader(new FileReader(input));
 
         MongoClient setup = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017/"));

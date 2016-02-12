@@ -14,9 +14,9 @@
 	<context:property-placeholder location="classpath:spring/data-access.properties"
 		system-properties-mode="OVERRIDE" />
 
-	<bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource"
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SingleConnectionDataSource"
 		p:driverClassName="${jdbc.driverClassName}" p:url="${jdbc.url}"
-		p:username="${jdbc.username}" p:password="${jdbc.password}" />
+		p:username="${jdbc.username}" p:password="${jdbc.password}" p:suppressClose="true" />
 
 	<jdbc:initialize-database data-source="dataSource">
 		<jdbc:script location="${jdbc.initLocation}" />
