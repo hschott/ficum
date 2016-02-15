@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tsystems.ficum</groupId>
     <artifactId>ficum</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>FICUM - Dynamic Filters</name>
     <description>A query DSL and parser for real dynamic queries.</description>
@@ -29,7 +29,7 @@
     <scm>
         <connection>scm:git:https://github.com/hschott/ficum</connection>
         <developerConnection>scm:git:https://github.com/hschott/ficum</developerConnection>
-        <tag>v0.2.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <modules>
         <module>ficum-node</module>
