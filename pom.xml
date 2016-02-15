@@ -29,6 +29,7 @@
     <scm>
         <connection>scm:git:https://github.com/hschott/ficum</connection>
         <developerConnection>scm:git:https://github.com/hschott/ficum</developerConnection>
+        <url>https://github.com/hschott/ficum</url>
         <tag>HEAD</tag>
     </scm>
     <modules>
