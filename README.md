@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)]()
+[![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.tsystems.ficum)
 # FICUM
 ## Dynamic Filters for Java - DSL, Parser and Visitors
 
