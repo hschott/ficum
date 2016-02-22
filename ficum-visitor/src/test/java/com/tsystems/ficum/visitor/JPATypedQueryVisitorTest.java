@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.tsystems.ficum.node.Node;
 import com.tsystems.ficum.parser.ParseHelper;
-import com.tsystems.ficum.visitor.JPATypedQueryVisitor;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:spring/petclinic-jpa-model-ctx.xml" })
@@ -29,8 +28,8 @@ public class JPATypedQueryVisitorTest {
     private EntityManager entityManager;
 
     private JPATypedQueryVisitor<Pet> petVisitor;
-    private String[] allowedSelectorNames = { "owner", "type", "address", "telephone", "city", "lastName", "nicknames",
-            "firstName", "specialties", "name", "visits", "date", "description", "birthDate", "unknown" };
+    private String[] allowedSelectorNames = { "nicknames", "owner.firstName", "name", "visits", "visits.type",
+            "visits.date", "birthDate", "unknown" };
 
     @Before
     public void setUp() {

@@ -12,6 +12,7 @@ FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.or
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
 ### tl;dc
+
 ```
                                      Builder API
                                      +----------------+
@@ -25,9 +26,10 @@ Query Literal     |          |   Infix Stack    |           |    Node Tree    | 
 ```
 
 **with JPA**
+
 ```java
 // define selector names allowed to be used in query string
-String[] allowedSelectorNames = { "owner", "type", "city" };
+String[] allowedSelectorNames = { "owner.city" , "type"};
 
 // define the query
 String input = "owner.city=='Madison',type=='dog'";
@@ -43,9 +45,10 @@ List<Pet> results = query.getResultList();
 ```
 
 **with MongoDB**
+
 ```java
 // define selector names allowed to be used in query string
-String[] allowedSelectorNames = { "address", "location", "score" };
+String[] allowedSelectorNames = { "address.location", "score" };
 
 // define the query
 String input = "address.location=nr=[-73.856077,40.848447,250.0],score=lt=10";
@@ -162,6 +165,7 @@ A simple date without time part will be parsed from the format `yyyy-MM-dd`.
 A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
 
 **Examples:**
+
 ```
 2015-12-24 evaluates to 24. December 2015
 -645-04-13 evaluates to 13. April 645 BC
@@ -207,7 +211,7 @@ Pct encoded strings must start with `%` followed by two hex digits. Hex encoded 
 
 literal         | value
 ------          | ------
-'%24'           | $
+'%25'           | %
 '%D4%A2'        | Ԣ
 '#d4b1'         | Ա
 '0XD58C'        | Ռ
@@ -217,7 +221,7 @@ literal         | value
 
 ## FICUM JPA Visitor
 
-The JPA visitor is capable of traversing a Node tree and converting it to a `javax.persistence.TypedQuery<T>`. The selector names must correspond to the entity `<T>` field names. 
+The JPA visitor is capable of traversing a Node tree and converting it to a `javax.persistence.TypedQuery<T>`. The selector names must correspond to the entity `<T>` field names or will be resolved against the visitors `selectorToFieldMapping` Map.
 
 ### Text with Wildcards
 
@@ -229,17 +233,17 @@ When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE
 
 ### Enum as Text
 
-When the selector name matches a entity field of type `java.lang.Enum` and the argument is a Text wich results into a `java.lang.String`, then an attempt is made to get the Enum instance and compare it against the entity field value.
+When the selector name matches an entity field of type `java.lang.Enum` and the argument is a Text wich results into a `java.lang.String`, then an attempt is made to get the Enum instance and compare it against the entity field value.
 
 ### Collection size check
 
-When the selector name matches a `java.util.Collection` and the argument results into an `java.lang.Integer`, then the collections size is compared against the argument.
+When the selector name matches a `java.util.Collection` field and the argument results into an `java.lang.Integer`, then the collection's size is compared against the argument.
 
 
 
 ## FICUM MongoDB Visitor
 
-The MongoDB visitor is capable of traversing a Node tree and converting it to a `org.bson.conversions.Bson` filter document. The selector names must correspond to the field names of a MongoDB document. 
+The MongoDB visitor is capable of traversing a Node tree and converting it to a `org.bson.conversions.Bson` filter document. The selector names must correspond to the field names of a MongoDB document or will be resolved against the visitors `selectorToFieldMapping` Map.
 
 ### Text with Wildcards
 

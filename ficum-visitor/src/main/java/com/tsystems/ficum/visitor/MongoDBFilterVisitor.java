@@ -189,6 +189,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
     public void visit(ConstraintNode<?> node) {
         Object argument = node.getArgument();
+        String fieldName = getMappedField(node.getSelector());
 
         Bson pred = null;
         if (argument instanceof Comparable<?>) {
@@ -197,11 +198,11 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             if (argument instanceof Calendar) {
                 value = ((Calendar) value).getTime();
             }
-            pred = doBuildPredicate(node.getComparison(), node.getSelector(), value);
+            pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
         } else if (argument instanceof Iterable) {
             Iterator<Double> value = Iterators.filter(((Iterable<?>) argument).iterator(), Double.class);
-            pred = doBuildGeoSpatialPredicate(node.getComparison(), node.getSelector(), Lists.newArrayList(value));
+            pred = doBuildGeoSpatialPredicate(node.getComparison(), fieldName, Lists.newArrayList(value));
         } else {
             throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
         }

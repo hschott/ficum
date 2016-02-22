@@ -24,7 +24,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.tsystems.ficum.node.Node;
 import com.tsystems.ficum.parser.ParseHelper;
-import com.tsystems.ficum.visitor.MongoDBFilterVisitor;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = MongoDBFilterVisitorTest.class)
@@ -34,8 +33,8 @@ public class MongoDBFilterVisitorTest {
 
     private MongoDBFilterVisitor visitor;
 
-    private String[] allowedSelectorNames = { "address", "building", "location", "street", "zipcode", "borough",
-            "cuisine", "grades", "date", "grade", "score", "name", "restaurant_id" };
+    private String[] allowedSelectorNames = { "name", "borough", "cuisine", "address.location", "address.street",
+            "grades.date", "grades.score" };
 
     private MongoDatabase db;
 

@@ -318,7 +318,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public void visit(ConstraintNode node) {
-        Path<?> path = findPath(node.getSelector());
+        Path<?> path = findPath(getMappedField(node.getSelector()));
 
         Class<? extends Comparable> clazz = (Class<? extends Comparable>) path.getJavaType();
         Object argument = node.getArgument();

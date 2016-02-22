@@ -22,12 +22,12 @@ public class ConstraintParser extends ArgumentParser {
 
     protected Comparison comparison;
 
-    protected String[] allowedSelectorNames = {};
+    protected String[] allowedSelectors = {};
 
-    public ConstraintParser(String... allowedSelectorNames) {
+    public ConstraintParser(String... allowedSelectors) {
         super();
-        this.allowedSelectorNames = allowedSelectorNames;
-        Arrays.sort(this.allowedSelectorNames, new Comparator<String>() {
+        this.allowedSelectors = allowedSelectors;
+        Arrays.sort(this.allowedSelectors, new Comparator<String>() {
             public int compare(String o1, String o2) {
                 return o2.compareTo(o1);
             }
@@ -73,13 +73,12 @@ public class ConstraintParser extends ArgumentParser {
     @SuppressSubnodes
     protected Rule Selector() {
         selector = null;
-        return Sequence(Sequence(FirstOf(allowedSelectorNames), ZeroOrMore(Ch('.'), FirstOf(allowedSelectorNames))),
-                new Action<Object>() {
-                    public boolean run(Context<Object> context) {
-                        selector = match();
-                        return true;
-                    }
-                });
+        return Sequence(FirstOf(allowedSelectors), new Action<Object>() {
+            public boolean run(Context<Object> context) {
+                selector = match();
+                return true;
+            }
+        });
     }
 
 }

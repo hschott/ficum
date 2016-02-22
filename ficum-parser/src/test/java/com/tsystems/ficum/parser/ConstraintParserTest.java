@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import com.tsystems.ficum.node.Comparison;
 import com.tsystems.ficum.node.Constraint;
-import com.tsystems.ficum.parser.ConstraintParser;
 
 public class ConstraintParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintParserTest.class);
@@ -54,7 +53,7 @@ public class ConstraintParserTest {
 
     @Before
     public void setUp() {
-        String[] allowedPaths = { "first", "second", "third" };
+        String[] allowedPaths = { "first", "second", "first.second", "first.second.third" };
         ConstraintParser parser = Parboiled.createParser(ConstraintParser.class, (Object) allowedPaths);
 
         sink = new StringBuilderSink();
