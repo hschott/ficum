@@ -145,9 +145,11 @@ argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
 
 **Examples:**
 ```
-firstname==Jack
+firstname=='Jack'
 birthdate==2015-12-24
 lastupdate=le=2013-01-04T09:15:00.000+01:00
+secure==true
+email!=null
 points=gt=120;points=le=120,lastplayed=lt=2015-06-05
 ```
 
