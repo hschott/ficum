@@ -42,7 +42,7 @@ TypedQuery<Pet> query = visitor.start(root);
 // and finally get a list of queried entities
 List<Pet> results = query.getResultList();
 ```
-
+Add dependencies for FICUM and JPA
 ```xml
 <dependency>
     <groupId>com.tsystems.ficum</groupId>
@@ -75,7 +75,7 @@ Bson filter = visitor.start(root);
 // and finally get a iterable of filtered documents
 FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
-
+Add dependencies for FICUM and MongoDB
 ```xml
 <dependency>
     <groupId>com.tsystems.ficum</groupId>
