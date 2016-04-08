@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.tsystems.ficum)
-# FICUM
-## Dynamic Filters for Java - DSL, Parser and Visitors
+# FICUM - RESTful Dynamic Filters for Java
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
 
@@ -62,8 +61,9 @@ Bson filter = visitor.start(root);
 // and finally get a iterable of filtered documents
 FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
+**as RESTful request parameter**
 
-The query could also be passed in via RESTful query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
+The query could be passed in via uriencoded query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
 **with Builder**
 
