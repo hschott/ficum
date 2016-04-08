@@ -43,6 +43,20 @@ TypedQuery<Pet> query = visitor.start(root);
 List<Pet> results = query.getResultList();
 ```
 
+```xml
+<dependency>
+    <groupId>com.tsystems.ficum</groupId>
+    <artifactId>ficum-visitor</artifactId>
+    <version>0.4.0</version>
+</dependency>
+<dependency>
+    <groupId>org.hibernate.javax.persistence</groupId>
+    <artifactId>hibernate-jpa-2.1-api</artifactId>
+    <version>1.0.0.Final</version>
+</dependency>
+```
+
+
 **with MongoDB**
 
 ```java
@@ -61,6 +75,21 @@ Bson filter = visitor.start(root);
 // and finally get a iterable of filtered documents
 FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
+
+```xml
+<dependency>
+    <groupId>com.tsystems.ficum</groupId>
+    <artifactId>ficum-visitor</artifactId>
+    <version>0.4.0</version>
+</dependency>
+<dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>mongodb-driver</artifactId>
+    <version>3.2.0</version>
+</dependency>
+```
+
+
 **as RESTful request parameter**
 
 The query could be passed in via uriencoded query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
