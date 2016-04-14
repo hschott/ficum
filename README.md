@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.tsystems.ficum)
+[![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.tsystems.ficum) [![Codacy Badge](https://api.codacy.com/project/badge/grade/24b8272573164f8f97eb6e810f8fa6fb)](https://www.codacy.com/app/hschott/ficum)
 # FICUM - RESTful Dynamic Filters for Java
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
