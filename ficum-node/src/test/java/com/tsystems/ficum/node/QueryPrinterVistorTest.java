@@ -7,13 +7,7 @@ import org.joda.time.chrono.GregorianChronology;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tsystems.ficum.node.Builder;
-import com.tsystems.ficum.node.Comparison;
-import com.tsystems.ficum.node.Node;
-import com.tsystems.ficum.node.QueryPrinterVisitor;
-
 public class QueryPrinterVistorTest {
-    private String[] allowedSelectorNames = { "first", "second", "third", "fourth", "fifth" };
 
     @Test
     public void testBuilderBoolean() {

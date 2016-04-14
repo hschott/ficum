@@ -27,10 +27,6 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
     private List<Bson> filters;
 
-    public MongoDBFilterVisitor() {
-        super();
-    }
-
     public static String escapeAndConvertWildcards(String value, boolean alwaysWildcard) {
         String ret = SPECIAL_REGEX_CHARS.matcher(value).replaceAll("\\\\$0").replaceAll("\\*", ".*").replaceAll("\\?",
                 ".?");
