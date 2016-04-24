@@ -43,6 +43,7 @@ TypedQuery<Pet> query = visitor.start(root);
 List<Pet> results = query.getResultList();
 ```
 Add dependencies for FICUM and JPA
+
 ```xml
 <dependency>
     <groupId>com.tsystems.ficum</groupId>
@@ -61,10 +62,10 @@ Add dependencies for FICUM and JPA
 
 ```java
 // define selector names allowed to be used in query string
-String[] allowedSelectorNames = { "address.location", "score" };
+String[] allowedSelectorNames = { "address.location", "grades.score" };
 
 // define the query
-String input = "address.location=nr=[-73.856077,40.848447,250.0],score=lt=10";
+String input = "address.location=nr=[-73.856077,40.848447,250.0],grades.score=lt=10";
 // and parse the query into a node tree
 Node root = ParseHelper.parse(input, allowedSelectorNames);
 
@@ -76,6 +77,7 @@ Bson filter = visitor.start(root);
 FindIterable<Document> documents = getMongoDB().getCollection("restaurants").find(filter);
 ```
 Add dependencies for FICUM and MongoDB
+
 ```xml
 <dependency>
     <groupId>com.tsystems.ficum</groupId>
@@ -86,6 +88,41 @@ Add dependencies for FICUM and MongoDB
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver</artifactId>
     <version>3.2.0</version>
+</dependency>
+```
+
+
+**with Hazelcast**
+
+```java
+// define selector names allowed to be used in query string
+String[] allowedSelectorNames = { "owner.city" , "type"};
+
+// define the query
+String input = "owner.city=='Madison',type=='dog'";
+// and parse the query into a node tree
+Node root = ParseHelper.parse(input, allowedSelectorNames);
+
+// run the JPA visitor on the node tree
+HazelcastPredicateVisitor visitor = new HazelcastPredicateVisitor();
+Predicate<?, ?> query = visitor.start(root);
+
+// and finally get a list of queried entities
+Collection<?> results = getHazelcastInstance().getMap("pets").values(query);
+
+```
+Add dependencies for FICUM and Hazelcast
+
+```xml
+<dependency>
+    <groupId>com.tsystems.ficum</groupId>
+    <artifactId>ficum-visitor</artifactId>
+    <version>0.4.0</version>
+</dependency>
+<dependency>
+    <groupId>com.hazelcast</groupId>
+    <artifactId>hazelcast-client</artifactId>
+    <version>3.6.2</version>
 </dependency>
 ```
 
