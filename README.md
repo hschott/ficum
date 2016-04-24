@@ -1,12 +1,12 @@
 [![Build Status](https://travis-ci.org/hschott/ficum.svg)](https://travis-ci.org/hschott/ficum) [![Maven Central](https://img.shields.io/maven-central/v/com.tsystems.ficum/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.tsystems.ficum) [![Codacy Badge](https://api.codacy.com/project/badge/grade/24b8272573164f8f97eb6e810f8fa6fb)](https://www.codacy.com/app/hschott/ficum)
-# FICUM - RESTful Dynamic Filters for Java
+# FICUM - RESTful Dynamic Filters for JPA, MongoDB and Hazelcast
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
 
 
 ## FICUM in a Nutshell
 
-FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser, a Builder and a Visitor for JPA and MongoDB.
+FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.org/html/draft-nottingham-atompub-fiql-00), tied together with a Parser, a Builder and Visitors for JPA, MongoDB ad Hazelcast.
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
@@ -250,7 +250,7 @@ literal         | value
 
 
 
-## FICUM JPA Visitor
+## FICUM JPA TypedQuery Visitor
 
 The JPA visitor is capable of traversing a Node tree and converting it to a `javax.persistence.TypedQuery<T>`. The selector names must correspond to the entity `<T>` field names or will be resolved against the visitors `selectorToFieldMapping` Map.
 
@@ -272,7 +272,7 @@ When the selector name matches a `java.util.Collection` field and the argument r
 
 
 
-## FICUM MongoDB Visitor
+## FICUM MongoDB Filter Visitor
 
 The MongoDB visitor is capable of traversing a Node tree and converting it to a `org.bson.conversions.Bson` filter document. The selector names must correspond to the field names of a MongoDB document or will be resolved against the visitors `selectorToFieldMapping` Map.
 
@@ -303,6 +303,20 @@ WITHIN     | >5                  | $geoWithin $polygon                       | a
 INTERSECTS | 2                   | $geoIntersects $geometry type: Point      | address.location=ix=[x,y]                         | coordinates of a point
 INTERSECTS | 4                   | $geoIntersects $geometry type: LineString | address.location=ix=[x1,y1,x2,y2]                 | start and end point of a line
 INTERSECTS | >5                  | $geoIntersects $geometry type: Polygon    | address.location=ix=[x1,y1 , ...]                 | list of coordinates of a polygon
+
+
+
+## FICUM Hazelcast Predicate Visitor
+
+The Hazelcast visitor is capable of traversing a Node tree and converting it to a `com.hazelcast.query.Predicate<K, V>`. The selector names must correspond to the entity `<V>` field names or will be resolved against the visitors `selectorToFieldMapping` Map.
+
+### Text with Wildcards
+
+Text arguments can contain wildcards:
+* `?` is a placeholder for one character
+* `*` is a placeholder for zero or more characters
+
+When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE` and from `NOT EQUALS` to `NOT LIKE`.
 
 
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.bson.conversions.Bson;
 
@@ -23,15 +22,7 @@ import com.tsystems.ficum.node.OperationNode;
 
 public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
-    private static final Pattern SPECIAL_REGEX_CHARS = Pattern.compile("[{}()\\[\\].+^$\\\\|]");
-
     private List<Bson> filters;
-
-    public static String escapeAndConvertWildcards(String value, boolean alwaysWildcard) {
-        String ret = SPECIAL_REGEX_CHARS.matcher(value).replaceAll("\\\\$0").replaceAll("\\*", ".*").replaceAll("\\?",
-                ".?");
-        return alwaysWildcard ? ".*" + ret + ".*" : ret;
-    }
 
     private Bson buildEquals(String fieldName, Comparable<?> argument) {
         Bson pred;
@@ -39,7 +30,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             final String value = (String) argument;
 
             if (containsWildcard(value) || isAlwaysWildcard()) {
-                String regex = escapeAndConvertWildcards(value, isAlwaysWildcard());
+                String regex = Wildcards.escapeAndConvertToRegexWildcards(value, isAlwaysWildcard());
                 pred = Filters.regex(fieldName, regex);
             } else {
                 pred = Filters.eq(fieldName, value);
@@ -57,7 +48,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             final String value = (String) argument;
 
             if (containsWildcard(value) || isAlwaysWildcard()) {
-                String regex = escapeAndConvertWildcards(value, isAlwaysWildcard());
+                String regex = Wildcards.escapeAndConvertToRegexWildcards(value, isAlwaysWildcard());
                 pred = Filters.not(Filters.regex(fieldName, regex));
             } else {
                 pred = Filters.ne(fieldName, value);

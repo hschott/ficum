@@ -74,18 +74,6 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
     }
 
-    protected static String escapeAndConvertWildcards(String value, boolean alwaysWildcard) {
-        String ret = value.replaceAll("\\\\", "\\\\\\\\") // escape 'sql escape'
-                                                          // char
-                .replaceAll("_", "\\\\_").replaceAll("%", "\\\\%") // escape sql
-                                                                   // wildcards
-                .replaceAll("\\*", "%").replaceAll("\\?", "_"); // replace rql
-                                                                // wildcard with
-                                                                // sql wildcard
-
-        return alwaysWildcard ? "%" + ret + "%" : ret;
-    }
-
     public boolean addMappedType(Class<?> mappedType) {
         return mappedTypes.add(mappedType);
     }
@@ -97,7 +85,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
-                String theValue = escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
+                String theValue = Wildcards.escapeAndConvertToSQLWildcards(originalValue, isAlwaysWildcard());
                 if (containsEscapedChar(theValue)) {
                     pred = builder.like((Expression<String>) path, theValue, ESCAPE_CHAR);
                 } else {
@@ -119,7 +107,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
-                String theValue = escapeAndConvertWildcards(originalValue, isAlwaysWildcard());
+                String theValue = Wildcards.escapeAndConvertToSQLWildcards(originalValue, isAlwaysWildcard());
                 if (containsEscapedChar(theValue)) {
                     pred = builder.notLike((Expression<String>) path, theValue, ESCAPE_CHAR);
                 } else {

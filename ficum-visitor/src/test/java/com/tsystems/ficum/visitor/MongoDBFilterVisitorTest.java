@@ -80,6 +80,18 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Test
+    public void testAlwaysWildcardPredicate() {
+        String input = "name=='Kitchen'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        visitor.setAlwaysWildcard(true);
+        Bson query = visitor.start(node);
+        visitor.setAlwaysWildcard(false);
+
+        Assert.assertEquals(53, getCollection(db).count(query));
+    }
+
+    @Test
     public void testAndPredicate() {
         String input = "borough=='Manhattan',address.street=='11 Avenue'";
 
@@ -212,12 +224,12 @@ public class MongoDBFilterVisitorTest {
 
     @Test
     public void testNotPredicate() {
-        String input = "name!='*e*'";
+        String input = "borough!='Manhattan'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1149, getCollection(db).count(query));
+        Assert.assertEquals(2511, getCollection(db).count(query));
     }
 
     @Test
@@ -227,7 +239,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(435, getCollection(db).count(query));
+        Assert.assertEquals(249, getCollection(db).count(query));
     }
 
     @Test
@@ -237,7 +249,16 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(260, getCollection(db).count(query));
+        Assert.assertEquals(141, getCollection(db).count(query));
     }
 
+    @Test
+    public void testWildcardPredicate() {
+        String input = "name=='*Kitchen'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(44, getCollection(db).count(query));
+    }
 }
