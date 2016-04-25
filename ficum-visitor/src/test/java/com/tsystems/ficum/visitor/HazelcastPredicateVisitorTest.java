@@ -6,16 +6,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.config.CacheDeserializedValues;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.config.MapIndexConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
@@ -27,6 +32,11 @@ import com.tsystems.ficum.parser.ParseHelper;
 @ContextConfiguration(classes = HazelcastPredicateVisitorTest.class)
 public class HazelcastPredicateVisitorTest {
 
+    static {
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+    }
+
     private static HazelcastInstance hazelcastInstance;
 
     private HazelcastPredicateVisitor visitor;
@@ -34,8 +44,26 @@ public class HazelcastPredicateVisitorTest {
     private String[] allowedSelectorNames = { "name", "borough", "address.street", "grade.date", "grade.score" };
 
     protected static IMap<Long, Restaurant> getMap() {
-        if (hazelcastInstance == null)
-            hazelcastInstance = Hazelcast.newHazelcastInstance();
+        if (hazelcastInstance == null) {
+            Config config = new Config();
+            config.setProperty("hazelcast.logging.type", "slf4j");
+            config.setProperty("hazelcast.phone.home.enabled", "false");
+
+            config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+            config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
+
+            MapConfig mapConfig = new MapConfig();
+            mapConfig.setName("restaurants").setInMemoryFormat(InMemoryFormat.BINARY)
+                    .setCacheDeserializedValues(CacheDeserializedValues.ALWAYS);
+            mapConfig.addMapIndexConfig(new MapIndexConfig("name", false));
+            mapConfig.addMapIndexConfig(new MapIndexConfig("borough", false));
+            mapConfig.addMapIndexConfig(new MapIndexConfig("address.street", false));
+            mapConfig.addMapIndexConfig(new MapIndexConfig("grade.date", true));
+            mapConfig.addMapIndexConfig(new MapIndexConfig("grade.score", true));
+            config.addMapConfig(mapConfig);
+            hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+        }
         return hazelcastInstance.getMap("restaurants");
     }
 
@@ -45,12 +73,6 @@ public class HazelcastPredicateVisitorTest {
         BufferedReader reader = new BufferedReader(new FileReader(input));
 
         IMap<Long, Restaurant> restaurants = getMap();
-        restaurants.addIndex("name", false);
-        restaurants.addIndex("borough", false);
-        restaurants.addIndex("address.street", false);
-        restaurants.addIndex("grade.date", true);
-        restaurants.addIndex("grade.score", true);
-
         ObjectMapper objectMapper = new ObjectMapper();
         String line;
         while ((line = reader.readLine()) != null) {
@@ -64,10 +86,6 @@ public class HazelcastPredicateVisitorTest {
     @Before
     public void setUp() throws IOException {
         visitor = new HazelcastPredicateVisitor();
-    }
-
-    @After
-    public void tearDown() {
     }
 
     @Test

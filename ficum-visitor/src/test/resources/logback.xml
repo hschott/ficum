@@ -16,6 +16,8 @@
     <logger name="org.hibernate" level="Info"/>
     <logger name="org.springframework" level="Info"/>
     <logger name="org.mongodb" level="Info"/>
+    <logger name="com.hazelcast" level="Info"/>
+    <logger name="com.fasterxml.jackson" level="Info"/>
 
     <root level="All">
         <appender-ref ref="console"/>
