@@ -37,33 +37,35 @@ public class HazelcastPredicateVisitorTest {
         SLF4JBridgeHandler.install();
     }
 
-    private static HazelcastInstance hazelcastInstance;
+    private static HazelcastInstance hazelcastInstance = getHazelcastInstance();
 
     private HazelcastPredicateVisitor visitor;
 
     private String[] allowedSelectorNames = { "name", "borough", "address.street", "grade.date", "grade.score" };
 
+    private static HazelcastInstance getHazelcastInstance() {
+        Config config = new Config();
+        config.setProperty("hazelcast.logging.type", "slf4j");
+        config.setProperty("hazelcast.phone.home.enabled", "false");
+
+        config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
+
+        MapConfig mapConfig = new MapConfig();
+        mapConfig.setName("restaurants").setInMemoryFormat(InMemoryFormat.BINARY)
+                .setCacheDeserializedValues(CacheDeserializedValues.ALWAYS);
+        mapConfig.addMapIndexConfig(new MapIndexConfig("name", false));
+        mapConfig.addMapIndexConfig(new MapIndexConfig("borough", false));
+        mapConfig.addMapIndexConfig(new MapIndexConfig("address.street", false));
+        mapConfig.addMapIndexConfig(new MapIndexConfig("grade.date", true));
+        mapConfig.addMapIndexConfig(new MapIndexConfig("grade.score", true));
+        config.addMapConfig(mapConfig);
+
+        return Hazelcast.newHazelcastInstance(config);
+    }
+
     protected static IMap<Long, Restaurant> getMap() {
-        if (hazelcastInstance == null) {
-            Config config = new Config();
-            config.setProperty("hazelcast.logging.type", "slf4j");
-            config.setProperty("hazelcast.phone.home.enabled", "false");
-
-            config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
-            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
-            config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
-
-            MapConfig mapConfig = new MapConfig();
-            mapConfig.setName("restaurants").setInMemoryFormat(InMemoryFormat.BINARY)
-                    .setCacheDeserializedValues(CacheDeserializedValues.ALWAYS);
-            mapConfig.addMapIndexConfig(new MapIndexConfig("name", false));
-            mapConfig.addMapIndexConfig(new MapIndexConfig("borough", false));
-            mapConfig.addMapIndexConfig(new MapIndexConfig("address.street", false));
-            mapConfig.addMapIndexConfig(new MapIndexConfig("grade.date", true));
-            mapConfig.addMapIndexConfig(new MapIndexConfig("grade.score", true));
-            config.addMapConfig(mapConfig);
-            hazelcastInstance = Hazelcast.newHazelcastInstance(config);
-        }
         return hazelcastInstance.getMap("restaurants");
     }
 
