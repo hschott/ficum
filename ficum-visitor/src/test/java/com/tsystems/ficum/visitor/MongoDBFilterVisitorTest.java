@@ -212,14 +212,37 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Test
-    public void testNorPredicate() {
-        String input = "cuisine=='American':address.location=wi=[-73.856077, 40.848447, " + 25000 / (6371.2 * 1000)
-                + "]";
+    public void testNandPredicate() {
+        String input = "borough!='Manhattan'.name!='*Cafe'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(685, getCollection(db).count(query));
+        Assert.assertEquals(2574, getCollection(db).count(query));
+
+        input = "borough=='Manhattan';name=='*Cafe'";
+
+        node = ParseHelper.parse(input, allowedSelectorNames);
+        query = visitor.start(node);
+
+        Assert.assertEquals(2574, getCollection(db).count(query));
+    }
+
+    @Test
+    public void testNorPredicate() {
+        String input = "name=='*Kitchen':name=='*Cafe'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(4750, getCollection(db).count(query));
+
+        input = "name!='*Kitchen',name!='*Cafe'";
+
+        node = ParseHelper.parse(input, allowedSelectorNames);
+        query = visitor.start(node);
+
+        Assert.assertEquals(4750, getCollection(db).count(query));
     }
 
     @Test

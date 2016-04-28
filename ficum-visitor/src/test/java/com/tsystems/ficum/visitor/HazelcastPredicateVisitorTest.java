@@ -123,6 +123,33 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Test
+    public void testNandPredicate() {
+        String input = "borough!='Manhattan'.name!='*Cafe'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(2574, getMap().values(query).size());
+
+        input = "borough=='Manhattan';name=='*Cafe'";
+
+        node = ParseHelper.parse(input, allowedSelectorNames);
+        query = visitor.start(node);
+
+        Assert.assertEquals(2574, getMap().values(query).size());
+    }
+
+    @Test
+    public void testNorPredicate() {
+        String input = "name=='*Kitchen':name=='*Cafe'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(4750, getMap().values(query).size());
+    }
+
+    @Test
     public void testNotPredicate() {
         String input = "borough!='Manhattan'";
 
