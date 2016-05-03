@@ -118,7 +118,7 @@ public class ConstraintParserTest {
         Arrays.asList(args);
         Constraint<List<Integer>> expected = new Constraint<List<Integer>>("second", Comparison.NEAR,
                 Arrays.asList(args));
-        String input = "second=nr=[1, 2,3, 4]";
+        String input = "second=nr=[1, 2, 3, 4]";
 
         assertValue(expected, input);
     }

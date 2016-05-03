@@ -20,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.tsystems.ficum.node.Comparison;
 import com.tsystems.ficum.node.Constraint;
 import com.tsystems.ficum.node.Operator;
-import com.tsystems.ficum.parser.ConstraintParser;
-import com.tsystems.ficum.parser.ExpressionParser;
 
 public class ExpressionParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
@@ -108,7 +106,7 @@ public class ExpressionParserTest {
 
     @Test()
     public void testOrBeforeAndOperator() {
-        String input = "first==true;second=le=2l,third=gt=3f";
+        String input = "first==true;second=le=2l,third=gt=3.34f";
 
         Deque<Object> expected = new ArrayDeque<Object>();
 
@@ -116,7 +114,7 @@ public class ExpressionParserTest {
         expected.addLast(Operator.OR);
         expected.addLast(new Constraint<Comparable<?>>("second", Comparison.LESS_EQUALS, 2L));
         expected.addLast(Operator.AND);
-        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3f));
+        expected.addLast(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3.34f));
 
         assertValue(expected, input);
     }

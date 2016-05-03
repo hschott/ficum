@@ -50,6 +50,11 @@ public class ArgumentParser extends BaseParser<Object> {
         return Collections.unmodifiableCollection(baseTypes);
     }
 
+    @MemoMismatches
+    protected Rule AlgebraicSign() {
+        return AnyOf("-+");
+    }
+
     protected Rule AnyString(final StringVar literal) {
         return Sequence(NoneOf("'"), new Action<Comparable<?>>() {
             public boolean run(Context<Comparable<?>> context) {
@@ -60,8 +65,8 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     protected Rule Argument() {
-        return Sequence(FirstOf(TimestampLiteral(), DateLiteral(), DoubleLiteral(), FloatLiteral(), IntegerLiteral(),
-                BooleanTrue(), BooleanFalse(), NullLiteral(), StringLiteral()), new Action<Comparable<?>>() {
+        return Sequence(FirstOf(StringLiteral(), IntegerLiteral(), DoubleLiteral(), FloatLiteral(), DateLiteral(),
+                TimestampLiteral(), BooleanTrue(), BooleanFalse(), NullLiteral()), new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         Comparable<?> argument = context.getValueStack().peek();
                         return isBaseType(argument);
@@ -84,9 +89,8 @@ public class ArgumentParser extends BaseParser<Object> {
 
     @SuppressSubnodes
     protected Rule DateLiteral() {
-        return Sequence(
-                Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit()),
-                new Action<Comparable<?>>() {
+        return Sequence(Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(),
+                Digit(), TestNot(Ch('T'))), new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         try {
                             LocalDate parse = ISO8601_DATE.parseLocalDate(match());
@@ -105,63 +109,76 @@ public class ArgumentParser extends BaseParser<Object> {
         return FirstOf(Ch('0'), Sequence(CharRange('1', '9'), ZeroOrMore(Digit())));
     }
 
+    @MemoMismatches
     protected Rule Digit() {
         return CharRange('0', '9');
     }
 
     protected Rule DoubleDecimal() {
         return FirstOf(
-                Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("dD"))),
-                Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("dD"))),
-                Sequence(OneOrMore(Digit()), Exponent(), Optional(AnyOf("dD"))),
-                Sequence(OneOrMore(Digit()), Optional(Exponent()), AnyOf("dD")));
+                Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()),
+                        Optional(DoubleMarker())),
+                Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(DoubleMarker())),
+                Sequence(OneOrMore(Digit()), Exponent(), Optional(DoubleMarker())),
+                Sequence(OneOrMore(Digit()), Optional(Exponent()), DoubleMarker()));
     }
 
     @SuppressSubnodes
     protected Rule DoubleLiteral() {
-        return Sequence(Sequence(Optional(AnyOf("-+")), DoubleDecimal(), TestNot(Sign())), new Action<Comparable<?>>() {
-            public boolean run(Context<Comparable<?>> context) {
-                try {
-                    Double valueOf = Double.parseDouble(match());
-                    return push(valueOf);
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            }
+        return Sequence(Sequence(Optional(AlgebraicSign()), DoubleDecimal(), TestNot(Sign())),
+                new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        try {
+                            Double valueOf = Double.parseDouble(match());
+                            return push(valueOf);
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    }
 
-        });
+                });
+    }
+
+    @MemoMismatches
+    protected Rule DoubleMarker() {
+        return AnyOf("dD");
     }
 
     protected Rule Exponent() {
-        return Sequence(AnyOf("eE"), Optional(AnyOf("-+")), OneOrMore(Digit()));
+        return Sequence(AnyOf("eE"), Optional(AlgebraicSign()), OneOrMore(Digit()));
     }
 
     protected Rule FloatDecimal() {
         return FirstOf(
-                Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("fF"))),
-                Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(AnyOf("fF"))),
-                Sequence(OneOrMore(Digit()), Exponent(), Optional(AnyOf("fF"))),
-                Sequence(OneOrMore(Digit()), Optional(Exponent()), AnyOf("fF")));
+                Sequence(OneOrMore(Digit()), Ch('.'), ZeroOrMore(Digit()), Optional(Exponent()),
+                        Optional(FloatingPointMarker())),
+                Sequence('.', OneOrMore(Digit()), Optional(Exponent()), Optional(FloatingPointMarker())),
+                Sequence(OneOrMore(Digit()), Exponent(), Optional(FloatingPointMarker())),
+                Sequence(OneOrMore(Digit()), Optional(Exponent()), FloatingPointMarker()));
+    }
+
+    protected Rule FloatingPointMarker() {
+        return AnyOf("fF");
     }
 
     @SuppressSubnodes
     protected Rule FloatLiteral() {
-        return Sequence(Sequence(Optional(AnyOf("-+")), FloatDecimal(), TestNot(Sign())), new Action<Comparable<?>>() {
-            public boolean run(Context<Comparable<?>> context) {
-                try {
-                    Float valueOf = Float.parseFloat(match());
-                    return push(valueOf);
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            }
+        return Sequence(Sequence(Optional(AlgebraicSign()), FloatDecimal(), TestNot(Sign())),
+                new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        try {
+                            Float valueOf = Float.parseFloat(match());
+                            return push(valueOf);
+                        } catch (NumberFormatException e) {
+                            return false;
+                        }
+                    }
 
-        });
+                });
     }
 
-    @MemoMismatches
     protected Rule HexDigit() {
-        return FirstOf(CharRange('a', 'f'), CharRange('A', 'F'), Digit());
+        return FirstOf(CharRange('a', 'f'), UpperHexChar(), Digit());
     }
 
     @SuppressSubnodes
@@ -178,7 +195,7 @@ public class ArgumentParser extends BaseParser<Object> {
 
     @SuppressSubnodes
     protected Rule IntegerLiteral() {
-        return Sequence(Sequence(Optional(AnyOf("-+")), DecimalNumeral(), Optional(AnyOf("lL")), TestNot(Sign())),
+        return Sequence(Sequence(Optional(AlgebraicSign()), DecimalNumeral(), Optional(AnyOf("lL")), TestNot(Sign())),
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         try {
@@ -229,9 +246,8 @@ public class ArgumentParser extends BaseParser<Object> {
         return Sequence(Sequence(AnyOf("Nn"), String("ull")), push(null));
     }
 
-    @MemoMismatches
     protected Rule PctDigit() {
-        return FirstOf(CharRange('A', 'F'), Digit());
+        return FirstOf(UpperHexChar(), Digit());
     }
 
     @SuppressSubnodes
@@ -252,7 +268,6 @@ public class ArgumentParser extends BaseParser<Object> {
         return Sequence(Argument(), EOI);
     }
 
-    @MemoMismatches
     protected Rule Sign() {
         return FirstOf(CharRange('a', 'z'), CharRange('A', 'Z'), Digit(), AnyOf("-+."));
     }
@@ -281,7 +296,7 @@ public class ArgumentParser extends BaseParser<Object> {
         return Sequence(
                 Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit(),
                         Ch('T'), Digit(), Digit(), Ch(':'), Digit(), Digit(), Ch(':'), Digit(), Digit(),
-                        Ch('.'), Digit(), Digit(), Digit(), FirstOf(Ch('Z'), Sequence(AnyOf("-+"), Digit(), Digit(),
+                        Ch('.'), Digit(), Digit(), Digit(), FirstOf(Ch('Z'), Sequence(AlgebraicSign(), Digit(), Digit(),
                                 Ch(':'), Digit(), Digit(), Optional(Ch(':'), Digit(), Digit())))),
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
@@ -296,6 +311,11 @@ public class ArgumentParser extends BaseParser<Object> {
                         }
                     }
                 });
+    }
+
+    @MemoMismatches
+    protected Rule UpperHexChar() {
+        return CharRange('A', 'F');
     }
 
 }
