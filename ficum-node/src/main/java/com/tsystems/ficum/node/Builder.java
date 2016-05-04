@@ -15,10 +15,17 @@ public class Builder {
 
     private DefinedBuilder definedBuilder;
 
+    private Builder parent;
+
     private Builder() {
         infixStack = new ArrayDeque<Object>();
-        unbalancedBuilder = new UnbalancedBuilder();
+        unbalancedBuilder = new UnbalancedBuilder(this);
         definedBuilder = new DefinedBuilder();
+    }
+
+    private Builder(Builder parent) {
+        this();
+        this.parent = parent;
     }
 
     /**
@@ -56,11 +63,11 @@ public class Builder {
         return null;
     }
 
-    protected static Deque<Object> infixToPostfix(Iterable<Object> infix) {
+    protected static Deque<Object> infixToPostfix(Iterable<Object> infixStack) {
         Deque<Object> output = new ArrayDeque<Object>();
         Deque<Operator> operatorStack = new ArrayDeque<Operator>();
 
-        for (Object element : infix) {
+        for (Object element : infixStack) {
             if (element instanceof Constraint) {
                 output.push(element);
             }
@@ -129,29 +136,6 @@ public class Builder {
         return new Builder().unbalancedBuilder;
     }
 
-    private int countOpenSub() {
-        int count = 0;
-        for (Object object : infixStack) {
-            if (object instanceof Operator) {
-                Operator op = (Operator) object;
-
-                switch (op) {
-                case LEFT:
-                    count++;
-                    break;
-
-                case RIGHT:
-                    count--;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        }
-        return count;
-    }
-
     public class DefinedBuilder {
 
         /**
@@ -170,7 +154,7 @@ public class Builder {
          * @return {@link Node} root node of the tree
          */
         public Node build() {
-            if (countOpenSub() > 0) {
+            if (parent != null) {
                 throw new IllegalStateException("Can not build! Close subexpression first.");
             }
             return eval(infixToPostfix(reverse(infixStack)));
@@ -183,11 +167,15 @@ public class Builder {
          * @return {@link Builder} this builder object
          */
         public DefinedBuilder endsub() {
-            if (countOpenSub() <= 0) {
+            if (parent == null) {
                 throw new IllegalStateException("No open subexpression found!");
             }
-            infixStack.push(Operator.RIGHT);
-            return this;
+            parent.infixStack.push(Operator.LEFT);
+            while (!infixStack.isEmpty()) {
+                parent.infixStack.push(infixStack.removeLast());
+            }
+            parent.infixStack.push(Operator.RIGHT);
+            return parent.definedBuilder;
         }
 
         /**
@@ -203,6 +191,11 @@ public class Builder {
     }
 
     public class UnbalancedBuilder {
+        private Builder builder;
+
+        public UnbalancedBuilder(Builder builder) {
+            this.builder = builder;
+        }
 
         /**
          * Add a {@link Constraint} to the stack
@@ -251,8 +244,7 @@ public class Builder {
          * @return {@link Builder} this builder object
          */
         public UnbalancedBuilder sub() {
-            infixStack.push(Operator.LEFT);
-            return this;
+            return new Builder(builder).unbalancedBuilder;
         }
 
     }
