@@ -292,6 +292,17 @@ public class BuilderTest {
         Assert.assertEquals(1l, constraint.getArgument());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testSubCloseConstraint() {
+        Builder.start().constraint("first", Comparison.EQUALS, 1L).endsub().build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testSubOpenConstraint() {
+        Builder.start().constraint("first", Comparison.EQUALS, 1L).or().sub()
+                .constraint("second", Comparison.NOT_EQUALS, 2L).build();
+    }
+
     @Test()
     public void testSubPrecededConstraint() {
         Node root = Builder.start().sub().constraint("first", Comparison.EQUALS, 1L).or()
