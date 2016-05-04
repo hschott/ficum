@@ -27,7 +27,7 @@ import org.parboiled.support.StringVar;
 @BuildParseTree
 public class ArgumentParser extends BaseParser<Object> {
 
-    private static final Set<Class<?>> baseTypes = new HashSet<Class<?>>();
+    private static final Set<Class<? extends Comparable<?>>> baseTypes = new HashSet<Class<? extends Comparable<?>>>();
 
     static {
         baseTypes.add(Character.class);
@@ -46,7 +46,7 @@ public class ArgumentParser extends BaseParser<Object> {
     protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
             .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
 
-    public static Collection<Class<?>> getBaseTypes() {
+    public static Collection<Class<? extends Comparable<?>>> getBaseTypes() {
         return Collections.unmodifiableCollection(baseTypes);
     }
 

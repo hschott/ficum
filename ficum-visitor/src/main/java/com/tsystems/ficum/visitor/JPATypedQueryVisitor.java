@@ -4,6 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -28,6 +32,8 @@ import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
+import org.joda.time.ReadableInstant;
+import org.joda.time.ReadablePartial;
 
 import com.tsystems.ficum.node.AbstractVisitor;
 import com.tsystems.ficum.node.Comparison;
@@ -51,7 +57,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     private boolean distinct = true;
 
-    private Set<Class<?>> mappedTypes = new HashSet<Class<?>>();
+    private Set<Class<? extends Comparable<?>>> mappedTypes = new HashSet<Class<? extends Comparable<?>>>();
 
     public JPATypedQueryVisitor() {
         super();
@@ -64,17 +70,29 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         mappedTypes.add(String.class);
         mappedTypes.add(Character.class);
         mappedTypes.add(Boolean.class);
-        mappedTypes.add(Number.class);
+        mappedTypes.add(Double.class);
+        mappedTypes.add(Integer.class);
+        mappedTypes.add(Float.class);
+        mappedTypes.add(Short.class);
+        mappedTypes.add(Long.class);
+        mappedTypes.add(Byte.class);
+        mappedTypes.add(BigInteger.class);
+        mappedTypes.add(BigDecimal.class);
         mappedTypes.add(Date.class);
+        mappedTypes.add(java.sql.Date.class);
+        mappedTypes.add(Time.class);
+        mappedTypes.add(Timestamp.class);
         mappedTypes.add(Calendar.class);
-        mappedTypes.add(Enum.class);
+        mappedTypes.add(ReadablePartial.class);
+        mappedTypes.add(ReadableInstant.class);
+        mappedTypes.add((Class<? extends Comparable<?>>) Enum.class);
     }
 
     private static boolean containsEscapedChar(String value) {
         return value.contains("\\%") || value.contains("\\\\") || value.contains("\\_");
     }
 
-    public boolean addMappedType(Class<?> mappedType) {
+    public boolean addMappedType(Class<? extends Comparable<?>> mappedType) {
         return mappedTypes.add(mappedType);
     }
 
@@ -265,7 +283,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
     }
 
     private boolean isMappedType(Class<?> clazz) {
-        for (Class<?> mappedType : mappedTypes) {
+        for (Class<? extends Comparable<?>> mappedType : mappedTypes) {
             if (mappedType.isAssignableFrom(clazz)) {
                 return true;
             }
