@@ -7,24 +7,11 @@ import java.util.Deque;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.tsystems.ficum.node.Builder;
-import com.tsystems.ficum.node.Comparison;
-import com.tsystems.ficum.node.Constraint;
-import com.tsystems.ficum.node.ConstraintNode;
-import com.tsystems.ficum.node.LogicalOperationNode;
-import com.tsystems.ficum.node.Node;
-import com.tsystems.ficum.node.Operator;
-
 public class BuilderTest {
-
-    @Test(expected = IllegalStateException.class)
-    public void testAndBeforeConstraint() {
-        Builder.newInstance().and();
-    }
 
     @Test()
     public void testAndOperatorConstraint() {
-        Node root = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).and()
+        Node root = Builder.start().constraint("first", Comparison.EQUALS, 1L).and()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
@@ -50,25 +37,14 @@ public class BuilderTest {
         Assert.assertEquals(2l, rightConstraint.getArgument());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testConstraintAfterConstraint() {
-        Builder.newInstance().constraint("first", Comparison.GREATER_EQUALS, 1).constraint("second", Comparison.EQUALS,
-                1);
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testEndsubBeforeSub() {
-        Builder.newInstance().sub().endsub();
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testIncompleteComparisonConstraint() {
-        Builder.newInstance().constraint("first", null, 1L).build();
+        Builder.start().constraint("first", null, 1L).build();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testIncompleteSelectorConstraint() {
-        Builder.newInstance().constraint(null, Comparison.EQUALS, 1L).build();
+        Builder.start().constraint(null, Comparison.EQUALS, 1L).build();
     }
 
     @Test()
@@ -209,8 +185,7 @@ public class BuilderTest {
 
     @Test()
     public void testIterableComparableConstraint() {
-        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1, 2.2, 3.3f, "x.x");
-        Node root = builder.build();
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, 1, 2.2, 3.3f, "x.x").build();
         Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
 
         @SuppressWarnings("unchecked")
@@ -221,8 +196,7 @@ public class BuilderTest {
 
     @Test()
     public void testIterableDoubleConstraint() {
-        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1.1, 2.2, 3.3);
-        Node root = builder.build();
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, 1.1, 2.2, 3.3).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
 
         @SuppressWarnings("unchecked")
@@ -231,17 +205,18 @@ public class BuilderTest {
         Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
-    @Test(expected = IllegalArgumentException.class)
     public void testIterableFewConstraint() {
         Double[] array = { 1.1 };
-        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, array);
-        builder.build();
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, array).build();
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        Double expected = 1.1;
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
     @Test()
     public void testIterableIntegerConstraint() {
-        Builder builder = Builder.newInstance().constraint("first", Comparison.WITHIN, 1, 2, 3);
-        Node root = builder.build();
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, 1, 2, 3).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(ConstraintNode.class));
 
         @SuppressWarnings("unchecked")
@@ -252,10 +227,9 @@ public class BuilderTest {
 
     @Test()
     public void testNaturalPrecededConstraint() {
-        Builder builder = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).or()
+        Node root = Builder.start().constraint("first", Comparison.EQUALS, 1L).or()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).and()
-                .constraint("third", Comparison.GREATER_EQUALS, 3L);
-        Node root = builder.build();
+                .constraint("third", Comparison.GREATER_EQUALS, 3L).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
         LogicalOperationNode orNode = (LogicalOperationNode) root;
@@ -278,14 +252,9 @@ public class BuilderTest {
         Assert.assertTrue(andNode.getRight().getClass().isAssignableFrom(ConstraintNode.class));
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testOrBeforeConstraint() {
-        Builder.newInstance().or();
-    }
-
     @Test()
     public void testOrOperatorConstraint() {
-        Node root = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).or()
+        Node root = Builder.start().constraint("first", Comparison.EQUALS, 1L).or()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
@@ -313,7 +282,7 @@ public class BuilderTest {
 
     @Test()
     public void testSimpleConstraint() {
-        Node n = Builder.newInstance().constraint("first", Comparison.EQUALS, 1L).build();
+        Node n = Builder.start().constraint("first", Comparison.EQUALS, 1L).build();
         Assert.assertTrue(n.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> constraint = (ConstraintNode<?>) n;
@@ -323,17 +292,11 @@ public class BuilderTest {
         Assert.assertEquals(1l, constraint.getArgument());
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testSubAfterConstraint() {
-        Builder.newInstance().constraint("first", Comparison.GREATER_EQUALS, 1).sub();
-    }
-
     @Test()
     public void testSubPrecededConstraint() {
-        Builder builder = Builder.newInstance().sub().constraint("first", Comparison.EQUALS, 1L).or()
+        Node root = Builder.start().sub().constraint("first", Comparison.EQUALS, 1L).or()
                 .constraint("second", Comparison.NOT_EQUALS, 2L).endsub().and()
-                .constraint("third", Comparison.GREATER_EQUALS, 3L);
-        Node root = builder.build();
+                .constraint("third", Comparison.GREATER_EQUALS, 3L).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
         LogicalOperationNode andNode = (LogicalOperationNode) root;

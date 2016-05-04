@@ -11,10 +11,14 @@ public class Builder {
 
     private Deque<Object> infixStack;
 
-    private boolean halfopen = true;
+    private UnbalancedBuilder unbalancedBuilder;
+
+    private DefinedBuilder definedBuilder;
 
     private Builder() {
         infixStack = new ArrayDeque<Object>();
+        unbalancedBuilder = new UnbalancedBuilder();
+        definedBuilder = new DefinedBuilder();
     }
 
     /**
@@ -108,15 +112,6 @@ public class Builder {
         return output;
     }
 
-    /**
-     * Creates a new instance of the builder.
-     *
-     * @return {@link Builder} new builder instance
-     */
-    public static Builder newInstance() {
-        return new Builder();
-    }
-
     protected static Deque<Object> reverse(Iterable<Object> stack) {
         Deque<Object> deque = new ArrayDeque<Object>();
         for (Object element : stack) {
@@ -126,77 +121,12 @@ public class Builder {
     }
 
     /**
-     * Add an AND {@link Operator} to the stack
+     * Creates a new instance of the builder.
      *
-     * @return {@link Builder} this builder object
+     * @return new builder instance
      */
-    public Builder and() {
-        if (halfopen) {
-            throw new IllegalStateException("Can not add operator! Expected 'constraint()' or 'sub()'.");
-        }
-        infixStack.push(Operator.AND);
-        halfopen = true;
-        return this;
-    }
-
-    /**
-     * Build a {@link Node} tree
-     *
-     * @return {@link Node} root node of the tree
-     */
-    public Node build() {
-        if (countOpenSub() > 0) {
-            throw new IllegalStateException("Can not build! Close subexpression first.");
-        }
-        if (halfopen) {
-            throw new IllegalStateException("Can not build! Add constraint to complete expression.");
-        }
-        return eval(infixToPostfix(reverse(infixStack)));
-    }
-
-    /**
-     * Add a {@link Constraint} to the stack
-     *
-     * @param selector
-     *            identifier for an field this constraint applies to
-     * @param comparison
-     *            {@link Comparison} to apply
-     * @param argument
-     *            {@link Comparable} to process against the value of the
-     *            selected field
-     * @return {@link Builder} this builder object
-     */
-    public Builder constraint(String selector, Comparison comparison, Comparable<?> argument) {
-        if (!halfopen) {
-            throw new IllegalStateException("Can not add constraint. Expected 'and()' or 'or()'.");
-        }
-        infixStack.push(new Constraint<Comparable<?>>(selector, comparison, argument));
-        halfopen = false;
-        return this;
-    }
-
-    /**
-     * Add a {@link Constraint} to the stack
-     *
-     * @param selector
-     *            identifier for an field this constraint applies to
-     * @param comparison
-     *            {@link Comparison} to apply
-     * @param argument
-     *            Array of Comparable to process against the value of the
-     *            selected field
-     * @return {@link Builder} this builder object
-     */
-    public Builder constraint(String selector, Comparison comparison, Comparable<?>... argument) {
-        if (argument.length < 2) {
-            throw new IllegalArgumentException("Comparable argument array must have at least 2 members.");
-        }
-        if (!halfopen) {
-            throw new IllegalStateException("Can not add constraint. Expected 'and()' or 'or()'.");
-        }
-        infixStack.push(new Constraint<Iterable<Comparable<?>>>(selector, comparison, Arrays.asList(argument)));
-        halfopen = false;
-        return this;
+    public static UnbalancedBuilder start() {
+        return new Builder().unbalancedBuilder;
     }
 
     private int countOpenSub() {
@@ -222,49 +152,109 @@ public class Builder {
         return count;
     }
 
-    /**
-     * Add an RIGHT {@link Operator} to the stack. Think of it as a right
-     * parenthesis.
-     *
-     * @return {@link Builder} this builder object
-     */
-    public Builder endsub() {
-        if (halfopen) {
-            throw new IllegalStateException("Can not close subexpression! Expected 'constraint()'.");
+    public class DefinedBuilder {
+
+        /**
+         * Add an AND {@link Operator} to the stack
+         *
+         * @return {@link Builder} this builder object
+         */
+        public UnbalancedBuilder and() {
+            infixStack.push(Operator.AND);
+            return unbalancedBuilder;
         }
-        if (countOpenSub() <= 0) {
-            throw new IllegalStateException("No open subexpression found!");
+
+        /**
+         * Build a {@link Node} tree
+         *
+         * @return {@link Node} root node of the tree
+         */
+        public Node build() {
+            if (countOpenSub() > 0) {
+                throw new IllegalStateException("Can not build! Close subexpression first.");
+            }
+            return eval(infixToPostfix(reverse(infixStack)));
         }
-        infixStack.push(Operator.RIGHT);
-        return this;
+
+        /**
+         * Add an RIGHT {@link Operator} to the stack. Think of it as a right
+         * parenthesis.
+         *
+         * @return {@link Builder} this builder object
+         */
+        public DefinedBuilder endsub() {
+            if (countOpenSub() <= 0) {
+                throw new IllegalStateException("No open subexpression found!");
+            }
+            infixStack.push(Operator.RIGHT);
+            return this;
+        }
+
+        /**
+         * Add an OR {@link Operator} to the stack
+         *
+         * @return {@link Builder} this builder object
+         */
+        public UnbalancedBuilder or() {
+            infixStack.push(Operator.OR);
+            return unbalancedBuilder;
+        }
+
     }
 
-    /**
-     * Add an OR {@link Operator} to the stack
-     *
-     * @return {@link Builder} this builder object
-     */
-    public Builder or() {
-        if (halfopen) {
-            throw new IllegalStateException("Can not add operator! Expected 'constraint()'.");
-        }
-        infixStack.push(Operator.OR);
-        halfopen = true;
-        return this;
-    }
+    public class UnbalancedBuilder {
 
-    /**
-     * Add an LEFT {@link Operator} to the stack. Think of it as a left
-     * parenthesis.
-     *
-     * @return {@link Builder} this builder object
-     */
-    public Builder sub() {
-        if (!halfopen) {
-            throw new IllegalStateException("Can not open subexpression! Expected 'and()' or 'or()'.");
+        /**
+         * Add a {@link Constraint} to the stack
+         *
+         * @param selector
+         *            identifier for an field this constraint applies to
+         * @param comparison
+         *            {@link Comparison} to apply
+         * @param argument
+         *            {@link Comparable} to process against the value of the
+         *            selected field
+         * @return {@link Builder} this builder object
+         */
+        public DefinedBuilder constraint(String selector, Comparison comparison, Comparable<?> argument) {
+            infixStack.push(new Constraint<Comparable<?>>(selector, comparison, argument));
+            return definedBuilder;
         }
-        infixStack.push(Operator.LEFT);
-        return this;
+
+        /**
+         * Add a {@link Constraint} to the stack
+         *
+         * @param selector
+         *            identifier for an field this constraint applies to
+         * @param comparison
+         *            {@link Comparison} to apply
+         * @param argument
+         *            Array of Comparable to process against the value of the
+         *            selected field
+         * @return {@link Builder} this builder object
+         */
+        public DefinedBuilder constraint(String selector, Comparison comparison, Comparable<?>... argument) {
+            if (argument.length == 0) {
+                throw new IllegalArgumentException("Comparable argument array should have at least 2 members.");
+            }
+            if (argument.length == 1) {
+                infixStack.push(new Constraint<Comparable<?>>(selector, comparison, argument[0]));
+            }
+            infixStack.push(new Constraint<Iterable<Comparable<?>>>(selector, comparison, Arrays.asList(argument)));
+            return definedBuilder;
+        }
+
+        /**
+         * Add an LEFT {@link Operator} to the stack. Think of it as a left
+         * parenthesis.
+         *
+         * @return {@link Builder} this builder object
+         */
+        public UnbalancedBuilder sub() {
+            infixStack.push(Operator.LEFT);
+            return this;
+        }
+
     }
 
 }

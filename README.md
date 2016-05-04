@@ -137,7 +137,7 @@ It is also possible to build the node tree with an API and from the node tree a 
 The Builder works in infix notation just as you would write the query as string.
 
 ```java
-Node root = Builder.newInstance().constraint("owner.city", Comparison.EQUALS, "Madison").and()
+Node root = Builder.start().constraint("owner.city", Comparison.EQUALS, "Madison").and()
         .constraint("type", Comparison.EQUALS, "dog").build();
 String query = new QueryPrinterVisitor().start(root);
 ```

@@ -22,6 +22,10 @@ import com.tsystems.ficum.node.Constraint;
 public class ConstraintParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintParserTest.class);
 
+    private static final String[] allowedPaths = { "first", "second", "first.second", "first.second.third" };
+    private static final ConstraintParser parser = Parboiled.createParser(ConstraintParser.class,
+            (Object) allowedPaths);
+
     private TracingParseRunner<Constraint<?>> parseRunner;
 
     private StringBuilderSink sink;
@@ -53,9 +57,6 @@ public class ConstraintParserTest {
 
     @Before
     public void setUp() {
-        String[] allowedPaths = { "first", "second", "first.second", "first.second.third" };
-        ConstraintParser parser = Parboiled.createParser(ConstraintParser.class, (Object) allowedPaths);
-
         sink = new StringBuilderSink();
         parseRunner = new TracingParseRunner<Constraint<?>>(parser.root()).withLog(sink);
     }

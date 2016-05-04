@@ -13,7 +13,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderBoolean() {
         String expected = "first==true,second==false";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, true).and()
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, true).and()
                 .constraint("second", Comparison.EQUALS, false).build();
         String actual = new QueryPrinterVisitor().start(node);
 
@@ -26,7 +26,7 @@ public class QueryPrinterVistorTest {
 
         byte byteVar = 127;
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, byteVar).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, byteVar).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -36,7 +36,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderCharacter() {
         String expected = "first=gt='H'";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 'H').build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 'H').build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -46,7 +46,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderDateTime() {
         String expected = "first==-0701-01-02T03:55:56.234-03:00";
 
-        Node node = Builder.newInstance()
+        Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
                         new DateTime(DateTimeZone.forOffsetHours(-3)).withYear(-701).withMonthOfYear(1)
                                 .withDayOfMonth(2).withHourOfDay(3).withMinuteOfHour(55).withSecondOfMinute(56)
@@ -61,7 +61,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderDouble() {
         String expected = "first=gt=232.34";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 232.34).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 232.34).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -71,7 +71,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderEnum() {
         String expected = "first=='ET'";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, Aliens.ET).build();
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, Aliens.ET).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -81,7 +81,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderFloat() {
         String expected = "first=gt=23.234f";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 23.234f).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 23.234f).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -91,7 +91,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderInteger() {
         String expected = "first=gt=23234";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 23234).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 23234).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -101,7 +101,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderIterable() {
         String expected = "first=wi=[23,3.5f,7.02,null,true,'hello hello']";
 
-        Node node = Builder.newInstance()
+        Node node = Builder.start()
                 .constraint("first", Comparison.WITHIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
                 .build();
         String actual = new QueryPrinterVisitor().start(node);
@@ -113,7 +113,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderLocalDate() {
         String expected = "first==1986-01-23";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
+        Node node = Builder.start().constraint("first", Comparison.EQUALS,
                 new LocalDate().withYear(1986).withMonthOfYear(1).withDayOfMonth(23)).build();
         String actual = new QueryPrinterVisitor().start(node);
 
@@ -124,7 +124,7 @@ public class QueryPrinterVistorTest {
     public void testBuilderLong() {
         String expected = "first=gt=45l";
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, 45l).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 45l).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -133,7 +133,7 @@ public class QueryPrinterVistorTest {
     @Test
     public void testBuilderNull() {
         String expected = "first!=null";
-        Node node = Builder.newInstance().constraint("first", Comparison.NOT_EQUALS, (Comparable<?>) null).build();
+        Node node = Builder.start().constraint("first", Comparison.NOT_EQUALS, (Comparable<?>) null).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -145,7 +145,7 @@ public class QueryPrinterVistorTest {
 
         short shortVar = 32767;
 
-        Node node = Builder.newInstance().constraint("first", Comparison.GREATER_THAN, shortVar).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, shortVar).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -153,7 +153,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testDate() {
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
+        Node node = Builder.start().constraint("first", Comparison.EQUALS,
                 new LocalDate().withYear(2015).withMonthOfYear(12).withDayOfMonth(29)).build();
 
         String expected = "first==2015-12-29";
@@ -164,7 +164,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testDateBC() {
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS,
+        Node node = Builder.start().constraint("first", Comparison.EQUALS,
                 new LocalDate().withYear(-650).withMonthOfYear(12).withDayOfMonth(29)).build();
 
         String expected = "first==-0650-12-29";
@@ -175,7 +175,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testNaturalOrder() {
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, 1l).and()
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1l).and()
                 .constraint("second", Comparison.GREATER_THAN, "two").or()
                 .constraint("third", Comparison.LESS_EQUALS, 3.0f).build();
 
@@ -187,7 +187,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testNestedPreceded() {
-        Node node = Builder.newInstance().constraint("first", Comparison.EQUALS, 1l).and().sub().sub()
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1l).and().sub().sub()
                 .constraint("second", Comparison.GREATER_THAN, "two").or()
                 .constraint("third", Comparison.LESS_EQUALS, 3.0f).endsub().or()
                 .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
@@ -201,7 +201,7 @@ public class QueryPrinterVistorTest {
     @Test
     public void testPrecededOrder() {
 
-        Node node = Builder.newInstance().sub().constraint("first", Comparison.EQUALS, 1l).or()
+        Node node = Builder.start().sub().constraint("first", Comparison.EQUALS, 1l).or()
                 .constraint("second", Comparison.GREATER_THAN, "two").endsub().and().sub()
                 .constraint("third", Comparison.LESS_EQUALS, 3.0f).or()
                 .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
@@ -214,7 +214,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testTimestampBC() {
-        Node node = Builder.newInstance()
+        Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
                         new DateTime(GregorianChronology.getInstance(DateTimeZone.forOffsetHours(0))).withYear(-456)
                                 .withMonthOfYear(3).withDayOfMonth(19).withHourOfDay(18).withMinuteOfHour(34)
@@ -229,7 +229,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testTimestampZoneOffset() {
-        Node node = Builder.newInstance()
+        Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
                         new DateTime(DateTimeZone.forOffsetHours(5)).withYear(2015).withMonthOfYear(12)
                                 .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
@@ -244,7 +244,7 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testTimestampZulu() {
-        Node node = Builder.newInstance()
+        Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
                         new DateTime(DateTimeZone.forOffsetHours(0)).withYear(2015).withMonthOfYear(12)
                                 .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)

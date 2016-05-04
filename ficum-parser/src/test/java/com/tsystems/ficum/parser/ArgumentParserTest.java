@@ -23,10 +23,10 @@ import org.parboiled.support.ParsingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.tsystems.ficum.parser.ArgumentParser;
-
 public class ArgumentParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentParserTest.class);
+
+    private static final ArgumentParser parser = Parboiled.createParser(ArgumentParser.class);
 
     private TracingParseRunner<Comparable<?>> parseRunner;
 
@@ -64,7 +64,6 @@ public class ArgumentParserTest {
 
     @Before
     public void setUp() {
-        ArgumentParser parser = Parboiled.createParser(ArgumentParser.class);
         sink = new StringBuilderSink();
         parseRunner = new TracingParseRunner<Comparable<?>>(parser.root()).withLog(sink);
     }

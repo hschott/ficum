@@ -24,6 +24,9 @@ import com.tsystems.ficum.node.Operator;
 public class ExpressionParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
 
+    private static String[] allowedPaths = { "first", "second", "third", "fourth", "fifth" };
+    private static ConstraintParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedPaths);
+
     private TracingParseRunner<Deque<Object>> parseRunner;
 
     private StringBuilderSink sink;
@@ -59,9 +62,6 @@ public class ExpressionParserTest {
 
     @Before
     public void setUp() {
-        String[] allowedPaths = { "first", "second", "third", "fourth", "fifth" };
-        ConstraintParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedPaths);
-
         sink = new StringBuilderSink();
         parseRunner = new TracingParseRunner<Deque<Object>>(parser.root()).withLog(sink);
     }
