@@ -85,7 +85,6 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
         mappedTypes.add(Calendar.class);
         mappedTypes.add(ReadablePartial.class);
         mappedTypes.add(ReadableInstant.class);
-        mappedTypes.add((Class<? extends Comparable<?>>) Enum.class);
     }
 
     private static boolean containsEscapedChar(String value) {
@@ -284,7 +283,7 @@ public class JPATypedQueryVisitor<T> extends AbstractVisitor<TypedQuery<T>> {
 
     private boolean isMappedType(Class<?> clazz) {
         for (Class<? extends Comparable<?>> mappedType : mappedTypes) {
-            if (mappedType.isAssignableFrom(clazz)) {
+            if (mappedType.isAssignableFrom(clazz) || clazz.isEnum()) {
                 return true;
             }
         }
