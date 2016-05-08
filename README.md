@@ -361,9 +361,9 @@ When a Test contains a wildcard the comparsion is changed from `EQUALS` to `LIKE
 
 The QueryPrinterVisitor is capable of printing out a FICUM query as string. The FICUM Types are handled as arguments in the following ways:
 
-* Boolean, Byte, Short, Integer, Float - value from toString()
+* Boolean, Byte, Short, Integer, Double - value from toString()
 * Long - value from toString() suffixed with `l`
-* Double - value from toString() suffixed with `d`
+* Float - value from toString() suffixed with `f`
 * JodaTime's ReadablePartial or Date and Calendar at midnight - value formated as `yyyy-MM-dd`
 * JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
 * Enum - value from name() surrounded with single quotes
