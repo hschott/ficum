@@ -184,17 +184,17 @@ selector-char  =  ALPHA / DIGIT / "_"
 
 A comparsion yields to True if the argument can be processed against the selector defined entity field value in the following manner:
 
-comparsion | operator       | JPA visitor support | MongoDB visitor support | argument type
-------     | ------         | ------              | ------                  | ------
-==         | EQUALS         | X                   | X                       | any single argument 
-!=         | NOT EQUALS     | X                   | X                       | any single argument
-=ge=       | GREATER EQUALS | X                   | X                       | any single argument
-=le=       | LESS EQUALS    | X                   | X                       | any single argument
-=gt=       | GREATER THAN   | X                   | X                       | any single argument
-=lt=       | LESS THEN      | X                   | X                       | any single argument
-=nr=       | NEAR           |                     | X                       | argument array of 3 or 4 Double values
-=wi=       | WITHIN         |                     | X                       | argument array of 3, 4 or more than 5 Double values
-=ix=       | INTERSECTS     |                     | X                       | argument array of 2, 4 or more than 5 Double values
+comparsion | operator       | argument type                                       | visitor support
+------     | ------         | ------                                              | -----
+==         | EQUALS         | any single argument                                 | any
+!=         | NOT EQUALS     | any single argument                                 | any
+=ge=       | GREATER EQUALS | any single argument                                 | any
+=le=       | LESS EQUALS    | any single argument                                 | any
+=gt=       | GREATER THAN   | any single argument                                 | any
+=lt=       | LESS THEN      | any single argument                                 | any
+=nr=       | NEAR           | argument array of 3 or 4 Double values              | mongodb
+=wi=       | WITHIN         | argument array of 3, 4 or more than 5 Double values | mongodb
+=ix=       | INTERSECTS     | argument array of 2, 4 or more than 5 Double values | mongodb
 
 
 
