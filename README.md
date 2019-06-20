@@ -59,7 +59,7 @@ Add dependencies for FICUM and JPA
 <dependency>
     <groupId>org.hibernate.javax.persistence</groupId>
     <artifactId>hibernate-jpa-2.1-api</artifactId>
-    <version>1.0.0.Final</version>
+    <version>1.0.2.Final</version>
 </dependency>
 ```
 
@@ -93,7 +93,7 @@ Add dependencies for FICUM and MongoDB
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver</artifactId>
-    <version>3.2.0</version>
+    <version>3.10.2</version>
 </dependency>
 ```
 
@@ -128,7 +128,7 @@ Add dependencies for FICUM and Hazelcast
 <dependency>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-client</artifactId>
-    <version>3.6.2</version>
+    <version>3.12.1</version>
 </dependency>
 ```
 
