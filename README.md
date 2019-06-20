@@ -35,18 +35,24 @@ String input = "owner.city=='Madison',type=='dog'";
 // and parse the query into a node tree
 Node root = ParseHelper.parse(input, allowedSelectorNames);
 
+CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+CriteriaQuery cq = criteriaBuilder.createQuery(Pet.class);
+Root<Pet> root = cq.from(Pet.class);
+
 // run the JPA visitor on the node tree
-JPATypedQueryVisitor<Pet> visitor = new JPATypedQueryVisitor<Pet>(Pet.class, entityManager);
-TypedQuery<Pet> query = visitor.start(root);
+JPAPredicateVisitor<Pet> visitor = new JPAPredicateVisitor<Pet>(Pet.class, root, criteriaBuilder);
+Predicate predicate = visitor.start(root);
 
 // and finally get a list of queried entities
-List<Pet> results = query.getResultList();
+List<Pet> results = entityManager.createQuery(
+                                cq.select(root)
+                                .where(predicate)).getResultList();
 ```
 Add dependencies for FICUM and JPA
 
 ```xml
 <dependency>
-    <groupId>com.tsystems.ficum</groupId>
+    <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
     <version>0.4.0</version>
 </dependency>
@@ -80,7 +86,7 @@ Add dependencies for FICUM and MongoDB
 
 ```xml
 <dependency>
-    <groupId>com.tsystems.ficum</groupId>
+    <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
     <version>0.4.0</version>
 </dependency>
@@ -115,7 +121,7 @@ Add dependencies for FICUM and Hazelcast
 
 ```xml
 <dependency>
-    <groupId>com.tsystems.ficum</groupId>
+    <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
     <version>0.4.0</version>
 </dependency>
