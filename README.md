@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bitgrip/ficum.svg?branch=master)](https://travis-ci.org/bitgrip/ficum) [![Maven Central](https://img.shields.io/maven-central/v/de.bitgrip/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Cde.bitgrip.ficum) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/396aba3f3ecc4038b92e401081ca3e33)](https://www.codacy.com/app/bitgrip-user/ficum?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bitgrip/ficum&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/bitgrip/ficum.svg?branch=master)](https://travis-ci.org/bitgrip/ficum) [![Maven Central](https://img.shields.io/maven-central/v/de.bitgrip/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Cde.bitgrip.ficum)
 # FICUM - RESTful Dynamic Filters for JPA, MongoDB and Hazelcast
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
