@@ -11,17 +11,18 @@
   <name>FICUM - Dynamic Filters</name>
   <description>A query DSL and parser for real dynamic queries.</description>
 
-  <url>https://github.com/hschott/ficum</url>
+  <url>https://github.com/bitgrip/ficum</url>
   <developers>
     <developer>
       <name>Holger Balow-Schott</name>
-      <organizationUrl>https://github.com/hschott/ficum</organizationUrl>
+      <organization>bitgrip GmbH</organization>
+      <organizationUrl>https://github.com/bitgrip</organizationUrl>
       <timezone>+1</timezone>
     </developer>
   </developers>
   <issueManagement>
     <system>GitHub</system>
-    <url>https://github.com/hschott/ficum/issues</url>
+    <url>https://github.com/bitgrip/ficum/issues</url>
   </issueManagement>
   <licenses>
     <license>
@@ -30,9 +31,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://github.com/hschott/ficum</connection>
-    <developerConnection>scm:git:https://github.com/hschott/ficum</developerConnection>
-    <url>https://github.com/hschott/ficum</url>
+    <connection>scm:git:https://github.com/bitgrip/ficum</connection>
+    <developerConnection>scm:git:https://github.com/bitgrip/ficum</developerConnection>
+    <url>https://github.com/bitgrip/ficum</url>
     <tag>HEAD</tag>
   </scm>
   <modules>
