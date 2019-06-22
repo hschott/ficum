@@ -4,7 +4,7 @@
 
   <groupId>de.bitgrip.ficum</groupId>
   <artifactId>ficum</artifactId>
-  <version>0.7.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>FICUM - Dynamic Filters</name>
@@ -89,7 +89,7 @@
           </executions>
           <configuration>
             <includes>
-              <include>com/tsystems/ficum/**</include>
+              <include>de/bitgrip/ficum/**</include>
             </includes>
           </configuration>
         </plugin>
