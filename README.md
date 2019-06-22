@@ -1,5 +1,5 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=de.bitgrip.ficum%3Aficum&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.bitgrip.ficum%3Aficum) [![Build Status](https://travis-ci.org/bitgrip/ficum.svg?branch=master)](https://travis-ci.org/bitgrip/ficum) [![Maven Central](https://img.shields.io/maven-central/v/de.bitgrip/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Cde.bitgrip.ficum)
-# FICUM - RESTful Dynamic Filters for JPA, MongoDB and Hazelcast
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=de.bitgrip.ficum%3Aficum&metric=alert_status)](https://sonarcloud.io/dashboard?id=de.bitgrip.ficum%3Aficum) [![Build Status](https://travis-ci.org/bitgrip/ficum.svg?branch=master)](https://travis-ci.org/bitgrip/ficum) [![Maven Central](https://img.shields.io/maven-central/v/de.bitgrip/ficum.svg)](http://search.maven.org/#search%7Cga%7C1%7Cde.bitgrip.ficum) 
+# FICUM - Dynamic Filters for JPA, MongoDB and Hazelcast
 
 Are you tired of writing finder methods for every single use case? Do you have to compile, test and deploy your complete service for just a new finder method?
 
@@ -10,7 +10,10 @@ FICUM is a simple query language that orientates at [FIQL](https://tools.ietf.or
 
 It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-search.html), a blog entry by [Chris Koele](http://koelec.blogspot.de/2012/06/filter-expressions-in-rest-urls.html) and [rsql-parser](https://github.com/jirutka/rsql-parser).
 
-### tl;dc
+
+### Usage
+
+FICUM is build of three main components. A parser, a builder and a visitors module.
 
 ```
                                      Builder API
@@ -19,16 +22,27 @@ It is inspired by [Apache CXF JAX-RS Search](http://cxf.apache.org/docs/jax-rs-s
                                                       |
                   +----------+                  +-----v-----+                 +-----------+  Predicate
 Query Literal     |          |   Infix Stack    |           |    Node Tree    |           |  or Query Literal
-+---------------- >  PARSER  +------------------>  BUILDER  +----------------->  VISITOR  +------------>
++---------------- >  PARSER  +------------------>  BUILDER  +----------------->  VISITORS +------------>
                   |          |                  |           |                 |           |
                   +----------+                  +-----------+                 +-----------+
 ```
+
+The parser is made with [parboiled](https://github.com/sirthias/parboiled/wiki). The parser and the builder api both produce an [infix stack](https://en.wikipedia.org/wiki/Infix_notation) from it's input. This infix stack is transformed into an [abstract node tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) which serves as input for the visitors.
+
+### Visitors
+
+The visitors transform the abstract node tree into specific filter predicates for JPA, MongoDB or Hazelcast. The field describing selectors are restricted by default. Allowed selector must be passed as string array argument to the desired visitor.
+
+**as RESTful request parameter**
+
+The query literal could be passed in via uriencoded query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
+When utilizing a mapper between the entity layer and the transport object layer then the field names may differer between the layers. Therefore, with every visitor you can define a mapping of input selectors to entity field names.
 
 **with JPA**
 
 ```java
 // define selector names allowed to be used in query string
-String[] allowedSelectorNames = { "owner.city" , "type"};
+String[] allowedSelectorNames = { "city" , "type"};
 
 // define the query
 String input = "owner.city=='Madison',type=='dog'";
@@ -41,6 +55,8 @@ Root<Pet> root = cq.from(Pet.class);
 
 // run the JPA visitor on the node tree
 JPAPredicateVisitor<Pet> visitor = new JPAPredicateVisitor<Pet>(Pet.class, root, criteriaBuilder);
+visitor.addSelectorToFieldMapping("city","owner.city");
+
 Predicate predicate = visitor.start(root);
 
 // and finally get a list of queried entities
@@ -132,10 +148,6 @@ Add dependencies for FICUM and Hazelcast
 </dependency>
 ```
 
-
-**as RESTful request parameter**
-
-The query could be passed in via uriencoded query parameter `/pets?q=owner.city%3D%3D'Madison'%2Ctype%3D%3D'dog'`.
 
 **with Builder**
 
