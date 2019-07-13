@@ -303,6 +303,9 @@ literal         | value
 '0XD58C'        | Ռ
 'Hello%20world' | Hello world
 
+### UUID
+
+A UUID is parsed from a RFC 4122 string representation and results in a `java.util.UUID` object.
 
 
 ## FICUM JPA TypedQuery Visitor
@@ -405,8 +408,9 @@ selector       =  1*selector-char
 selector-char  =  ALPHA / DIGIT / "_"
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
 args-array     =  "[" argument *( "," argument ) "]"
-argument       =  date-arg / boolean-arg / null-arg / number-arg / text-arg
+argument       =  date-arg / uuid-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+uuid-arg       =  8*HEXDIG "-" 4*HEXDIG "-" 4*HEXDIG "-" 4*HEXDIG "-" 12*HEXDIG
 boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"
 null-arg       =  "null" / "Null"
 text-arg       =  ( "'"  ) *( pct-encoded / hex-encoded / CHAR ) ( "'"  )
