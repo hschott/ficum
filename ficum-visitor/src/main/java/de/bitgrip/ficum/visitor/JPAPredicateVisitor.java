@@ -175,10 +175,10 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
 
         switch (comparison) {
             case IN:
-                return criteriaBuilder.isTrue(path.in(argument));
+                return path.in(argument);
 
             case NIN:
-                return criteriaBuilder.isFalse(path.in(argument));
+                return criteriaBuilder.not(path.in(argument));
 
             default:
                 return null;
