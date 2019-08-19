@@ -1,12 +1,5 @@
 package de.bitgrip.ficum.visitor;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-
-import org.bson.conversions.Bson;
-
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.mongodb.client.model.Filters;
@@ -14,11 +7,13 @@ import com.mongodb.client.model.geojson.LineString;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Polygon;
 import com.mongodb.client.model.geojson.Position;
-import de.bitgrip.ficum.node.AbstractVisitor;
-import de.bitgrip.ficum.node.Comparison;
-import de.bitgrip.ficum.node.ConstraintNode;
-import de.bitgrip.ficum.node.Node;
-import de.bitgrip.ficum.node.OperationNode;
+import de.bitgrip.ficum.node.*;
+import org.bson.conversions.Bson;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 
 public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
@@ -60,89 +55,96 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         return pred;
     }
 
-    private Bson doBuildGeoSpatialPredicate(Comparison comparison, String fieldName, List<Double> arguments) {
+    private Bson doBuildPredicate(Comparison comparison, String fieldName, List<Comparable> comparables) {
+        List<Double> geoargs = sanatizeToDouble(comparables);
         switch (comparison) {
-        case NEAR:
-            if (arguments.size() == 3) {
-                return Filters.nearSphere(fieldName, new Point(new Position(arguments.get(0), arguments.get(1))),
-                        arguments.get(2), null);
+            case NEAR:
+                if (geoargs.size() == 3) {
+                    return Filters.nearSphere(fieldName, new Point(new Position(geoargs.get(0), geoargs.get(1))),
+                            geoargs.get(2), null);
 
-            } else if (arguments.size() == 4) {
-                return Filters.nearSphere(fieldName, new Point(new Position(arguments.get(0), arguments.get(1))),
-                        arguments.get(2), arguments.get(3));
+                } else if (geoargs.size() == 4) {
+                    return Filters.nearSphere(fieldName, new Point(new Position(geoargs.get(0), geoargs.get(1))),
+                            geoargs.get(2), geoargs.get(3));
 
-            }
-            break;
-
-        case WITHIN:
-            switch (arguments.size()) {
-            case 0:
-            case 1:
-            case 2:
+                }
                 break;
 
-            case 3:
-                return Filters.geoWithinCenterSphere(fieldName, arguments.get(0), arguments.get(1), arguments.get(2));
+            case WITHIN:
+                switch (geoargs.size()) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
 
-            case 4:
-                return Filters.geoWithinBox(fieldName, arguments.get(0), arguments.get(1), arguments.get(2),
-                        arguments.get(3));
+                    case 3:
+                        return Filters.geoWithinCenterSphere(fieldName, geoargs.get(0), geoargs.get(1), geoargs.get(2));
 
-            default:
-                @SuppressWarnings("unchecked")
-                Polygon geometry = new Polygon(toPositions(arguments, true));
-                return Filters.geoWithin(fieldName, geometry);
-            }
-            break;
+                    case 4:
+                        return Filters.geoWithinBox(fieldName, geoargs.get(0), geoargs.get(1), geoargs.get(2),
+                                geoargs.get(3));
 
-        case INTERSECT:
-            switch (arguments.size()) {
-            case 0:
-            case 1:
-            case 3:
+                    default:
+                        @SuppressWarnings("unchecked")
+                        Polygon geometry = new Polygon(toPositions(geoargs, true));
+                        return Filters.geoWithin(fieldName, geometry);
+                }
                 break;
 
-            case 2:
-                return Filters.geoIntersects(fieldName, new Point(new Position(arguments.get(0), arguments.get(1))));
+            case INTERSECT:
+                switch (geoargs.size()) {
+                    case 0:
+                    case 1:
+                    case 3:
+                        break;
 
-            case 4:
-                return Filters.geoIntersects(fieldName, new LineString(toPositions(arguments, false)));
+                    case 2:
+                        return Filters.geoIntersects(fieldName, new Point(new Position(geoargs.get(0), geoargs.get(1))));
+
+                    case 4:
+                        return Filters.geoIntersects(fieldName, new LineString(toPositions(geoargs, false)));
+
+                    default:
+                        @SuppressWarnings("unchecked")
+                        Polygon geometry = new Polygon(toPositions(geoargs, true));
+                        return Filters.geoIntersects(fieldName, geometry);
+                }
+                break;
+
+            case IN:
+                return Filters.in(fieldName, comparables);
+
+            case NIN:
+                return Filters.nin(fieldName, comparables);
 
             default:
-                @SuppressWarnings("unchecked")
-                Polygon geometry = new Polygon(toPositions(arguments, true));
-                return Filters.geoIntersects(fieldName, geometry);
-            }
-            break;
-
-        default:
-            break;
+                break;
         }
         return null;
     }
 
     private Bson doBuildPredicate(Comparison comparison, String fieldName, Comparable<?> argument) {
         switch (comparison) {
-        case GREATER_THAN:
-            return Filters.gt(fieldName, argument);
+            case GREATER_THAN:
+                return Filters.gt(fieldName, argument);
 
-        case EQUALS:
-            return buildEquals(fieldName, argument);
+            case EQUALS:
+                return buildEquals(fieldName, argument);
 
-        case NOT_EQUALS:
-            return buildNotEquals(fieldName, argument);
+            case NOT_EQUALS:
+                return buildNotEquals(fieldName, argument);
 
-        case LESS_THAN:
-            return Filters.lt(fieldName, argument);
+            case LESS_THAN:
+                return Filters.lt(fieldName, argument);
 
-        case LESS_EQUALS:
-            return Filters.lte(fieldName, argument);
+            case LESS_EQUALS:
+                return Filters.lte(fieldName, argument);
 
-        case GREATER_EQUALS:
-            return Filters.gte(fieldName, argument);
+            case GREATER_EQUALS:
+                return Filters.gte(fieldName, argument);
 
-        default:
-            return null;
+            default:
+                return null;
         }
     }
 
@@ -174,6 +176,11 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         return positions;
     }
 
+    private List<Double> sanatizeToDouble(List<Comparable> arguments) {
+        Iterator<Double> value = Iterators.filter(arguments.iterator(), Double.class);
+        return Lists.newArrayList(value);
+    }
+
     public void visit(ConstraintNode<?> node) {
         Object argument = node.getArgument();
         String fieldName = getMappedField(node.getSelector());
@@ -187,9 +194,8 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             }
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
-        } else if (argument instanceof Iterable) {
-            Iterator<Double> value = Iterators.filter(((Iterable<?>) argument).iterator(), Double.class);
-            pred = doBuildGeoSpatialPredicate(node.getComparison(), fieldName, Lists.newArrayList(value));
+        } else if (argument instanceof List) {
+            pred = doBuildPredicate(node.getComparison(), fieldName, sanatizeToComparable((List) argument));
         } else {
             throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
         }
@@ -207,24 +213,24 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
         Bson pred = null;
         switch (node.getOperator()) {
-        case AND:
-            pred = Filters.and(filters.get(0), filters.get(1));
-            break;
+            case AND:
+                pred = Filters.and(filters.get(0), filters.get(1));
+                break;
 
-        case OR:
-            pred = Filters.or(filters.get(0), filters.get(1));
-            break;
+            case OR:
+                pred = Filters.or(filters.get(0), filters.get(1));
+                break;
 
-        case NAND:
-            pred = Filters.or(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
-            break;
+            case NAND:
+                pred = Filters.or(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
+                break;
 
-        case NOR:
-            pred = Filters.and(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
-            break;
+            case NOR:
+                pred = Filters.and(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
+                break;
 
-        default:
-            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+            default:
+                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
         filters.clear();

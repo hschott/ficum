@@ -91,7 +91,7 @@ public class JPAPredicateVisitorTest {
 
   @Test
   public void testCollectionLikeString() {
-    String input = "nicknames=='*ucky'";
+    String input = "nicknames=='*u*'";
     Node node = ParseHelper.parse(input, allowedSelectorNames);
 
     Predicate predicate = petVisitor.start(node);
@@ -99,7 +99,7 @@ public class JPAPredicateVisitorTest {
 
     List<Pet> results = query.getResultList();
 
-    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(2, results.size());
   }
 
   @Test
@@ -247,6 +247,34 @@ public class JPAPredicateVisitorTest {
     List<Pet> results = query.getResultList();
 
     Assert.assertEquals(2, results.size());
+  }
+
+  @Test
+  public void testInPredicate() {
+    String input = "name=in=['Leo','Iggy']";
+
+    Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+    Predicate predicate = petVisitor.start(node);
+    TypedQuery<Pet> query = getTypedQuery(predicate);
+
+    List<Pet> results = query.getResultList();
+
+    Assert.assertEquals(2, results.size());
+  }
+
+  @Test
+  public void testNinPredicate() {
+    String input = "name=nin=['Leo','Iggy']";
+
+    Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+    Predicate predicate = petVisitor.start(node);
+    TypedQuery<Pet> query = getTypedQuery(predicate);
+
+    List<Pet> results = query.getResultList();
+
+    Assert.assertEquals(11, results.size());
   }
 
   @Test

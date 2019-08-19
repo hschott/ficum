@@ -1,6 +1,11 @@
 package de.bitgrip.ficum.node;
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
+
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractVisitor<T> implements Visitor<T> {
@@ -48,4 +53,8 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
         }
     }
 
+    protected List<Comparable> sanatizeToComparable(List<?> arguments) {
+        Iterator<Comparable> value = Iterators.filter(arguments.iterator(), Comparable.class);
+        return Lists.newArrayList(value);
+    }
 }

@@ -210,6 +210,8 @@ comparsion | operator       | argument type                                     
 =le=       | LESS EQUALS    | any single argument                                 | any
 =gt=       | GREATER THAN   | any single argument                                 | any
 =lt=       | LESS THEN      | any single argument                                 | any
+=in=       | IN             | argument array                                      | any
+=nin=      | NOT IN         | argument array                                      | any
 =nr=       | NEAR           | argument array of 3 or 4 Double values              | mongodb
 =wi=       | WITHIN         | argument array of 3, 4 or more than 5 Double values | mongodb
 =ix=       | INTERSECTS     | argument array of 2, 4 or more than 5 Double values | mongodb
@@ -217,7 +219,7 @@ comparsion | operator       | argument type                                     
 
 
 ```
-comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
+comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=in=" / "=nin=" / "=nr=" / "=wi=" / "=ix="
 ```
 
 An argument can be one of 5 main types.
@@ -406,7 +408,7 @@ constraint     =  selector comparison ( argument / args-array )
 selector       =  1*selector-char
                   [ 1*( "." 1*selector-char ) ]
 selector-char  =  ALPHA / DIGIT / "_"
-comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=nr=" / "=wi=" / "=ix="
+comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=in=" / "=nin=" / "=nr=" / "=wi=" / "=ix="
 args-array     =  "[" argument *( "," argument ) "]"
 argument       =  date-arg / uuid-arg / boolean-arg / null-arg / number-arg / text-arg
 date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
