@@ -1,16 +1,12 @@
 package de.bitgrip.ficum.visitor;
 
+import com.hazelcast.query.Predicate;
+import com.hazelcast.query.Predicates;
+import de.bitgrip.ficum.node.*;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import com.hazelcast.query.Predicate;
-import com.hazelcast.query.Predicates;
-import de.bitgrip.ficum.node.AbstractVisitor;
-import de.bitgrip.ficum.node.Comparison;
-import de.bitgrip.ficum.node.ConstraintNode;
-import de.bitgrip.ficum.node.Node;
-import de.bitgrip.ficum.node.OperationNode;
 
 public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> {
 
@@ -54,26 +50,39 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
 
     private Predicate<?, ?> doBuildPredicate(Comparison comparison, String fieldName, Comparable<?> argument) {
         switch (comparison) {
-        case GREATER_THAN:
-            return Predicates.greaterThan(fieldName, argument);
+            case GREATER_THAN:
+                return Predicates.greaterThan(fieldName, argument);
 
-        case EQUALS:
-            return buildEquals(fieldName, argument);
+            case EQUALS:
+                return buildEquals(fieldName, argument);
 
-        case NOT_EQUALS:
-            return buildNotEquals(fieldName, argument);
+            case NOT_EQUALS:
+                return buildNotEquals(fieldName, argument);
 
-        case LESS_THAN:
-            return Predicates.lessThan(fieldName, argument);
+            case LESS_THAN:
+                return Predicates.lessThan(fieldName, argument);
 
-        case LESS_EQUALS:
-            return Predicates.lessEqual(fieldName, argument);
+            case LESS_EQUALS:
+                return Predicates.lessEqual(fieldName, argument);
 
-        case GREATER_EQUALS:
-            return Predicates.greaterEqual(fieldName, argument);
+            case GREATER_EQUALS:
+                return Predicates.greaterEqual(fieldName, argument);
 
-        default:
-            return null;
+            default:
+                return null;
+        }
+    }
+
+    private Predicate<?, ?> doBuildPredicate(Comparison comparison, String fieldName, List<Comparable> arguments) {
+        switch (comparison) {
+            case IN:
+                return Predicates.in(fieldName, arguments.toArray(new Comparable[arguments.size()]));
+
+            case NIN:
+                return Predicates.not(Predicates.in(fieldName, arguments.toArray(new Comparable[arguments.size()])));
+
+            default:
+                return null;
         }
     }
 
@@ -97,8 +106,10 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
             if (argument instanceof Calendar) {
                 value = ((Calendar) value).getTime();
             }
-
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
+
+        } else if (argument instanceof List) {
+            pred = doBuildPredicate(node.getComparison(), fieldName, sanatizeToComparable((List) argument));
 
         } else {
             throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
@@ -117,24 +128,24 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
 
         Predicate<?, ?> pred = null;
         switch (node.getOperator()) {
-        case AND:
-            pred = Predicates.and(filters.get(0), filters.get(1));
-            break;
+            case AND:
+                pred = Predicates.and(filters.get(0), filters.get(1));
+                break;
 
-        case OR:
-            pred = Predicates.or(filters.get(0), filters.get(1));
-            break;
+            case OR:
+                pred = Predicates.or(filters.get(0), filters.get(1));
+                break;
 
-        case NAND:
-            pred = Predicates.or(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
-            break;
+            case NAND:
+                pred = Predicates.or(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
+                break;
 
-        case NOR:
-            pred = Predicates.and(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
-            break;
+            case NOR:
+                pred = Predicates.and(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
+                break;
 
-        default:
-            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+            default:
+                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
         filters.clear();

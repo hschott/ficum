@@ -7,7 +7,7 @@ import java.util.Map;
 public enum Comparison {
 
     EQUALS("=="), NOT_EQUALS("!="), GREATER_EQUALS("=ge="), LESS_EQUALS("=le="), GREATER_THAN("=gt="), LESS_THAN(
-            "=lt="), NEAR("=nr="), WITHIN("=wi="), INTERSECT("=ix=");
+            "=lt="), IN("=in="), NIN("=nin="), NEAR("=nr="), WITHIN("=wi="), INTERSECT("=ix=");
 
     private static final Map<String, Comparison> lookup = new HashMap<String, Comparison>();
 

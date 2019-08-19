@@ -170,6 +170,26 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Test
+    public void testInPredicate() {
+        String input = "borough=in=['Queens','Manhattan']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(3475, getMap().values(query).size());
+    }
+
+    @Test
+    public void testNinPredicate() {
+        String input = "borough=nin=['Queens','Manhattan']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(1524, getMap().values(query).size());
+    }
+
+    @Test
     public void testPrecededOrPredicate() {
         String input = "(name=='*Kitchen';name=='*Cafe'),borough=='Manhattan'";
 

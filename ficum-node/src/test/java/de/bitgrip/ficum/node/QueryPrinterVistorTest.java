@@ -98,11 +98,35 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
-    public void testBuilderIterable() {
+    public void testBuilderWithinIterable() {
         String expected = "first=wi=[23,3.5f,7.02,null,true,'hello hello']";
 
         Node node = Builder.start()
                 .constraint("first", Comparison.WITHIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderInIterable() {
+        String expected = "first=in=[23,3.5f,7.02,null,true,'hello hello']";
+
+        Node node = Builder.start()
+                .constraint("first", Comparison.IN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderNinIterable() {
+        String expected = "first=nin=[23,3.5f,7.02,null,true,'hello hello']";
+
+        Node node = Builder.start()
+                .constraint("first", Comparison.NIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
                 .build();
         String actual = new QueryPrinterVisitor().start(node);
 

@@ -205,12 +205,23 @@ public class BuilderTest {
         Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
-    public void testIterableFewConstraint() {
+    @Test()
+    public void testIterableFewDoubleConstraint() {
         Double[] array = { 1.1 };
         Node root = Builder.start().constraint("first", Comparison.WITHIN, array).build();
         @SuppressWarnings("unchecked")
         ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
         Double expected = 1.1;
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+    }
+
+    @Test()
+    public void testIterableFewStringConstraint() {
+        String[] array = { "hello" };
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, array).build();
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        String expected = "hello";
         Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
@@ -222,6 +233,16 @@ public class BuilderTest {
         @SuppressWarnings("unchecked")
         ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
         Integer[] expected = { 1, 2, 3 };
+        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+    }
+
+    @Test()
+    public void testIterableFewIntegerConstraint() {
+        Integer[] array = { 1 };
+        Node root = Builder.start().constraint("first", Comparison.WITHIN, array).build();
+        @SuppressWarnings("unchecked")
+        ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
+        Integer expected = 1;
         Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
     }
 
