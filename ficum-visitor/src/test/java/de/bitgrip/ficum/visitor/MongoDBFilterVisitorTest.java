@@ -1,22 +1,5 @@
 package de.bitgrip.ficum.visitor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -24,6 +7,18 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import de.bitgrip.ficum.node.Node;
 import de.bitgrip.ficum.parser.ParseHelper;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = MongoDBFilterVisitorTest.class)
@@ -33,8 +28,8 @@ public class MongoDBFilterVisitorTest {
 
     private MongoDBFilterVisitor visitor;
 
-    private String[] allowedSelectorNames = { "name", "borough", "cuisine", "address.location", "address.street",
-            "grades.date", "grades.score" };
+    private String[] allowedSelectorNames = {"name", "borough", "cuisine", "address.location", "address.street", "address.zipcode",
+            "grades.date", "grades.score"};
 
     private MongoDatabase db;
 
@@ -51,18 +46,15 @@ public class MongoDBFilterVisitorTest {
 
         MongoDatabase database = setup.getDatabase("ficum");
         MongoCollection<Document> collection = database.getCollection("restaurants");
-        if (collection.count() < 4999) {
-            collection.drop();
+        collection.drop();
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                collection.insertOne(Document.parse(line));
-            }
-            reader.close();
-
-            collection.createIndex(new Document("address.location", "2dsphere"), new IndexOptions().background(false));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            collection.insertOne(Document.parse(line));
         }
-        setup.close();
+        reader.close();
+
+        collection.createIndex(new Document("address.location", "2dsphere"), new IndexOptions().background(false));
     }
 
     @Before
@@ -264,6 +256,27 @@ public class MongoDBFilterVisitorTest {
 
         Assert.assertEquals(249, getCollection(db).count(query));
     }
+
+    @Test
+    public void testValueIsNull() {
+        String input = "address.zipcode==null";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(1, getCollection(db).count(query));
+    }
+
+    @Test
+    public void testValueIsNotNull() {
+        String input = "address.zipcode!=null";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(4998, getCollection(db).count(query));
+    }
+
 
     @Test
     public void testInPredicate() {

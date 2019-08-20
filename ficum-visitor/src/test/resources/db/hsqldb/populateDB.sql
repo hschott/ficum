@@ -40,7 +40,7 @@ INSERT INTO pets VALUES (4, 'Jewel', '2010-03-07', 2, 3);
 INSERT INTO pets VALUES (5, 'Iggy', '2010-11-30', 3, 4);
 INSERT INTO pets VALUES (6, 'George', '2010-01-20', 4, 5);
 INSERT INTO pets VALUES (7, 'Samantha', '2012-09-04', 1, 6);
-INSERT INTO pets VALUES (8, 'Max', '2012-09-04', 1, 6);
+INSERT INTO pets VALUES (8, 'Max', null, 1, 6);
 INSERT INTO pets VALUES (9, 'Chuck', '2011-08-06', 5, 7);
 INSERT INTO pets VALUES (10, 'Mulligan', '2007-02-24', 2, 8);
 INSERT INTO pets VALUES (11, 'Freddy', '2010-03-09', 5, 9);

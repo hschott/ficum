@@ -72,7 +72,9 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate buildEquals(Object value, Expression<? extends Comparable> path) {
         Predicate pred;
-        if (path.getJavaType().equals(String.class)) {
+        if (value == null) {
+            pred = path.isNull();
+        } else if (path.getJavaType().equals(String.class)) {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
@@ -94,7 +96,9 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate buildNotEquals(Object value, Expression<? extends Comparable> path) {
         Predicate pred;
-        if (path.getJavaType().equals(String.class)) {
+        if (value == null) {
+            pred = path.isNotNull();
+        } else if (path.getJavaType().equals(String.class)) {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
@@ -331,9 +335,12 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
 
         } else if (argument instanceof List) {
             pred = doBuildPredicate(node.getComparison(), path.as(clazz), sanatizeToComparable((List) argument));
+        } else if (argument == null) {
+            pred = doBuildPredicate(node.getComparison(), path.as(clazz), (Comparable<?>) null);
         } else {
             throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
         }
+
         if (pred != null) {
             predicates.add(pred);
         } else {

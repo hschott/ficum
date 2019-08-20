@@ -196,6 +196,8 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
         } else if (argument instanceof List) {
             pred = doBuildPredicate(node.getComparison(), fieldName, sanatizeToComparable((List) argument));
+        } else if (argument == null) {
+            pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
         } else {
             throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
         }

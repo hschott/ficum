@@ -41,7 +41,7 @@ public class HazelcastPredicateVisitorTest {
 
     private HazelcastPredicateVisitor visitor;
 
-    private String[] allowedSelectorNames = { "name", "borough", "address.street", "grade.date", "grade.score" };
+    private String[] allowedSelectorNames = { "name", "borough", "address.street", "address.zipcode", "grade.date", "grade.score" };
 
     private static HazelcastInstance getHazelcastInstance() {
         Config config = new Config();
@@ -120,6 +120,26 @@ public class HazelcastPredicateVisitorTest {
         Predicate<?, ?> query = visitor.start(node);
 
         Assert.assertEquals(306, getMap().values(query).size());
+    }
+
+    @Test
+    public void testValueIsNull() {
+        String input = "address.zipcode==null";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(1, getMap().values(query).size());
+    }
+
+    @Test
+    public void testValueIsNotNull() {
+        String input = "address.zipcode!=null";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(4998, getMap().values(query).size());
     }
 
     @Test
