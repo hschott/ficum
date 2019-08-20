@@ -125,7 +125,7 @@ public class JPAPredicateVisitorTest {
 
     List<Pet> results = query.getResultList();
 
-    Assert.assertEquals(2, results.size());
+    Assert.assertEquals(1, results.size());
   }
 
   @Test
@@ -175,6 +175,32 @@ public class JPAPredicateVisitorTest {
     Node node = ParseHelper.parse(input, allowedSelectorNames);
 
     petVisitor.start(node);
+  }
+
+  @Test
+  public void testValueIsNull() {
+    String input = "born==null";
+    Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+    Predicate predicate = petVisitor.start(node);
+    TypedQuery<Pet> query = getTypedQuery(predicate);
+
+    List<Pet> results = query.getResultList();
+
+    Assert.assertEquals(1, results.size());
+  }
+
+  @Test
+  public void testValueIsNotNull() {
+    String input = "born!=null";
+    Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+    Predicate predicate = petVisitor.start(node);
+    TypedQuery<Pet> query = getTypedQuery(predicate);
+
+    List<Pet> results = query.getResultList();
+
+    Assert.assertEquals(12, results.size());
   }
 
   @Test
@@ -287,7 +313,7 @@ public class JPAPredicateVisitorTest {
 
     List<Pet> results = query.getResultList();
 
-    Assert.assertEquals(2, results.size());
+    Assert.assertEquals(1, results.size());
   }
 
 
