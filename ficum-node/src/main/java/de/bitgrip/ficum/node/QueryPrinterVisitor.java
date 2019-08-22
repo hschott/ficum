@@ -1,19 +1,15 @@
 package de.bitgrip.ficum.node;
 
+import org.joda.time.*;
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.format.ISODateTimeFormat;
+import java.util.UUID;
 
 /**
  * A Visitor that prints the Node tree as FICUM query dsl.
- *
  */
 public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
@@ -43,6 +39,9 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             buffer.append(argument).append('l');
 
         } else if (argument instanceof Double) {
+            buffer.append(argument);
+
+        } else if (argument instanceof UUID) {
             buffer.append(argument);
 
         } else if (argument instanceof Date) {
@@ -105,30 +104,30 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
     public void visit(OperationNode node) {
         switch (node.getOperator()) {
-        case AND:
-        case NOR:
-            preceded = node.getOperator().preceded;
-            node.getLeft().accept(this);
-            output.append(node.getOperator().getSign());
-            node.getRight().accept(this);
-            preceded = false;
+            case AND:
+            case NOR:
+                preceded = node.getOperator().preceded;
+                node.getLeft().accept(this);
+                output.append(node.getOperator().getSign());
+                node.getRight().accept(this);
+                preceded = false;
 
-            break;
+                break;
 
-        case OR:
-        case NAND:
-            if (preceded)
-                output.append('(');
-            node.getLeft().accept(this);
-            output.append(node.getOperator().getSign());
-            node.getRight().accept(this);
-            if (preceded)
-                output.append(')');
+            case OR:
+            case NAND:
+                if (preceded)
+                    output.append('(');
+                node.getLeft().accept(this);
+                output.append(node.getOperator().getSign());
+                node.getRight().accept(this);
+                if (preceded)
+                    output.append(')');
 
-            break;
+                break;
 
-        default:
-            throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+            default:
+                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
     }
