@@ -7,6 +7,8 @@ import org.joda.time.chrono.GregorianChronology;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
+
 public class QueryPrinterVistorTest {
 
     @Test
@@ -59,9 +61,9 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderDouble() {
-        String expected = "first=gt=232.34";
+        String expected = "first=gt=2.3234E12";
 
-        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 232.34).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 2.3234e+12).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -72,6 +74,17 @@ public class QueryPrinterVistorTest {
         String expected = "first=='ET'";
 
         Node node = Builder.start().constraint("first", Comparison.EQUALS, Aliens.ET).build();
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBuilderUuid() {
+        UUID uuid = UUID.randomUUID();
+        String expected = "first==" + uuid.toString();
+
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, uuid).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
