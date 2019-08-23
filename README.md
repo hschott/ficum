@@ -17,14 +17,14 @@ FICUM is build of three main components. A parser, a builder and a visitors modu
 
 ```
                                      Builder API
-                                     +----------------+
-                                                      |
-                                                      |
-                  +----------+                  +-----v-----+                 +-----------+  Predicate
-Query Literal     |          |   Infix Stack    |           |    Node Tree    |           |  or Query Literal
-+---------------- >  PARSER  +------------------>  BUILDER  +----------------->  VISITORS +------------>
-                  |          |                  |           |                 |           |
-                  +----------+                  +-----------+                 +-----------+
+                                     +------------+
+                                                  |
+                                                  |
+                +----------+                +-----v-----+             +-----------+  Predicate or
+Query Literal   |          |   Infix Stack  |           |  Node Tree  |           |  Query Literal
++-------------- >  PARSER  +---------------->  BUILDER  +------------->  VISITORS +-------------->
+                |          |                |           |             |           |
+                +----------+                +-----------+             +-----------+
 ```
 
 The parser is made with [parboiled](https://github.com/sirthias/parboiled/wiki). The parser and the builder api both produce an [infix stack](https://en.wikipedia.org/wiki/Infix_notation) from it's input. This infix stack is transformed into an [abstract node tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) which serves as input for the visitors.
