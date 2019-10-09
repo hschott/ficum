@@ -246,11 +246,11 @@ The argument's type is negotiated from it's content by a few rules.
 
 ### Date
 
-A date or timestamp is parsed from ISO 8601 string representation and results in a `java.util.Calendar` object.
+A date or timestamp is parsed from ISO 8601 string representation.
 
-A simple date without time part will be parsed from the format `yyyy-MM-dd`.
+A simple date without time part will be parsed from the format `yyyy-MM-dd` and results in a `java.time.LocalDate` object.
 
-A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
+A timestamp will be parsed from the format `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`and results in a `java.time.OffsetDateTime` object. The timezone offset value can be either `Z` for UTC or a time value in negative or positive hours, minutes and optional seconds.
 
 **Examples:**
 
