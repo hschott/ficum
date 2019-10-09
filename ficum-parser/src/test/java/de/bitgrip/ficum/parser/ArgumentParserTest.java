@@ -1,5 +1,6 @@
 package de.bitgrip.ficum.parser;
 
+import de.bitgrip.ficum.node.AbstractVisitor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.UUID;
 
 public class ArgumentParserTest {
@@ -454,32 +456,32 @@ public class ArgumentParserTest {
 
     @Test()
     public void testTimestamp() {
-        OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.ofHours(3));
-        String input = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
+        OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.ofHours(3)).truncatedTo(ChronoUnit.MILLIS);
+        String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
     }
 
     @Test()
     public void testTimestampAD10000() {
-        OffsetDateTime dateTime = OffsetDateTime.now().plus(10000, ChronoUnit.YEARS);
-        String input = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
+        OffsetDateTime dateTime = OffsetDateTime.now().plus(10000, ChronoUnit.YEARS).truncatedTo(ChronoUnit.MILLIS);
+        String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
     }
 
     @Test()
     public void testTimestampBC() {
-        OffsetDateTime dateTime = OffsetDateTime.now().minus(2500, ChronoUnit.YEARS);
-        String input = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
+        OffsetDateTime dateTime = OffsetDateTime.now().minus(2500, ChronoUnit.YEARS).truncatedTo(ChronoUnit.MILLIS);
+        String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
     }
 
     @Test()
     public void testTimestampZulu() {
-        OffsetDateTime dateTime = OffsetDateTime.now(ZoneId.of("Z"));
-        String input = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
+        OffsetDateTime dateTime = OffsetDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.MILLIS);
+        String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
     }
