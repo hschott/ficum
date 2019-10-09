@@ -25,7 +25,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
             .appendValue(SECOND_OF_MINUTE, 2)
             .appendFraction(MILLI_OF_SECOND, 3, 3, true)
             .appendOffsetId()
-            .toFormatter(Locale.US);
+            .toFormatter(Locale.ROOT);
 
     private boolean alwaysWildcard = false;
 
