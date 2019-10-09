@@ -80,7 +80,7 @@ public class MongoDBFilterVisitorTest {
         Bson query = visitor.start(node);
         visitor.setAlwaysWildcard(false);
 
-        Assert.assertEquals(53, getCollection(db).count(query));
+        Assert.assertEquals(53, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection(db).count(query));
+        Assert.assertEquals(2, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -100,7 +100,17 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(11, getCollection(db).count(query));
+        Assert.assertEquals(11, getCollection(db).countDocuments(query));
+    }
+
+    @Test
+    public void testDateTimePredicate() {
+        String input = "grades.date=ge=2015-01-01T00:00:00.000Z,grades.score=lt=1";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(11, getCollection(db).countDocuments(query));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -110,7 +120,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection(db).count(query));
+        Assert.assertEquals(2, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -120,7 +130,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2, getCollection(db).count(query));
+        Assert.assertEquals(2, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -130,7 +140,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection(db).count(query));
+        Assert.assertEquals(24, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -140,7 +150,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1, getCollection(db).count(query));
+        Assert.assertEquals(1, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -150,7 +160,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection(db).count(query));
+        Assert.assertEquals(24, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -180,7 +190,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(10, getCollection(db).count(query));
+        Assert.assertEquals(10, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -190,7 +200,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4, getCollection(db).count(query));
+        Assert.assertEquals(4, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -200,7 +210,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(24, getCollection(db).count(query));
+        Assert.assertEquals(24, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -210,14 +220,14 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2574, getCollection(db).count(query));
+        Assert.assertEquals(2574, getCollection(db).countDocuments(query));
 
         input = "borough=='Manhattan';name=='*Cafe'";
 
         node = ParseHelper.parse(input, allowedSelectorNames);
         query = visitor.start(node);
 
-        Assert.assertEquals(2574, getCollection(db).count(query));
+        Assert.assertEquals(2574, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -227,14 +237,14 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4750, getCollection(db).count(query));
+        Assert.assertEquals(4750, getCollection(db).countDocuments(query));
 
         input = "name!='*Kitchen',name!='*Cafe'";
 
         node = ParseHelper.parse(input, allowedSelectorNames);
         query = visitor.start(node);
 
-        Assert.assertEquals(4750, getCollection(db).count(query));
+        Assert.assertEquals(4750, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -244,7 +254,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(2511, getCollection(db).count(query));
+        Assert.assertEquals(2511, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -254,7 +264,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(249, getCollection(db).count(query));
+        Assert.assertEquals(249, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -264,7 +274,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1, getCollection(db).count(query));
+        Assert.assertEquals(1, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -274,7 +284,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4998, getCollection(db).count(query));
+        Assert.assertEquals(4998, getCollection(db).countDocuments(query));
     }
 
 
@@ -285,7 +295,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(3475, getCollection(db).count(query));
+        Assert.assertEquals(3475, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -295,7 +305,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(1524, getCollection(db).count(query));
+        Assert.assertEquals(1524, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -305,7 +315,7 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(141, getCollection(db).count(query));
+        Assert.assertEquals(141, getCollection(db).countDocuments(query));
     }
 
     @Test
@@ -315,6 +325,6 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(44, getCollection(db).count(query));
+        Assert.assertEquals(44, getCollection(db).countDocuments(query));
     }
 }
