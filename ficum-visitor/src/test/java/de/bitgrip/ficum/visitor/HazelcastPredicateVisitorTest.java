@@ -123,6 +123,16 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Test
+    public void testDateTimePredicate() {
+        String input = "grade.date=ge=2015-01-01T00:00:00.000Z,grade.score=gt=1";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(306, getMap().values(query).size());
+    }
+
+    @Test
     public void testValueIsNull() {
         String input = "address.zipcode==null";
         Node node = ParseHelper.parse(input, allowedSelectorNames);

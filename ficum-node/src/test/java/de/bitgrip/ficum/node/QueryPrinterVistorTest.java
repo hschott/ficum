@@ -1,12 +1,11 @@
 package de.bitgrip.ficum.node;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.chrono.GregorianChronology;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 public class QueryPrinterVistorTest {
@@ -50,10 +49,10 @@ public class QueryPrinterVistorTest {
 
         Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
-                        new DateTime(DateTimeZone.forOffsetHours(-3)).withYear(-701).withMonthOfYear(1)
-                                .withDayOfMonth(2).withHourOfDay(3).withMinuteOfHour(55).withSecondOfMinute(56)
-                                .withMillisOfSecond(234))
-                .build();
+                        OffsetDateTime.of(-701, 1, 2,
+                                3, 55, 56, 234000000,
+                                ZoneOffset.ofHours(-3))).build();
+
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -151,7 +150,7 @@ public class QueryPrinterVistorTest {
         String expected = "first==1986-01-23";
 
         Node node = Builder.start().constraint("first", Comparison.EQUALS,
-                new LocalDate().withYear(1986).withMonthOfYear(1).withDayOfMonth(23)).build();
+                LocalDate.of(1986, 1, 23)).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -191,7 +190,7 @@ public class QueryPrinterVistorTest {
     @Test
     public void testDate() {
         Node node = Builder.start().constraint("first", Comparison.EQUALS,
-                new LocalDate().withYear(2015).withMonthOfYear(12).withDayOfMonth(29)).build();
+                LocalDate.of(2015, 12, 29)).build();
 
         String expected = "first==2015-12-29";
         String actual = new QueryPrinterVisitor().start(node);
@@ -202,7 +201,7 @@ public class QueryPrinterVistorTest {
     @Test
     public void testDateBC() {
         Node node = Builder.start().constraint("first", Comparison.EQUALS,
-                new LocalDate().withYear(-650).withMonthOfYear(12).withDayOfMonth(29)).build();
+                LocalDate.of(-650, 12, 29)).build();
 
         String expected = "first==-0650-12-29";
         String actual = new QueryPrinterVisitor().start(node);
@@ -253,9 +252,9 @@ public class QueryPrinterVistorTest {
     public void testTimestampBC() {
         Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
-                        new DateTime(GregorianChronology.getInstance(DateTimeZone.forOffsetHours(0))).withYear(-456)
-                                .withMonthOfYear(3).withDayOfMonth(19).withHourOfDay(18).withMinuteOfHour(34)
-                                .withSecondOfMinute(12).withMillisOfSecond(0))
+                        OffsetDateTime.of(-456, 3, 19,
+                                18, 34, 12, 0,
+                                ZoneOffset.ofHours(0)))
                 .build();
 
         String expected = "first==-0456-03-19T18:34:12.000Z";
@@ -268,9 +267,9 @@ public class QueryPrinterVistorTest {
     public void testTimestampZoneOffset() {
         Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
-                        new DateTime(DateTimeZone.forOffsetHours(5)).withYear(2015).withMonthOfYear(12)
-                                .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
-                                .withMillisOfSecond(0))
+                        OffsetDateTime.of(2015, 12, 29,
+                                18, 34, 12, 0,
+                                ZoneOffset.ofHours(5)))
                 .build();
 
         String expected = "first==2015-12-29T18:34:12.000+05:00";
@@ -283,9 +282,9 @@ public class QueryPrinterVistorTest {
     public void testTimestampZulu() {
         Node node = Builder.start()
                 .constraint("first", Comparison.EQUALS,
-                        new DateTime(DateTimeZone.forOffsetHours(0)).withYear(2015).withMonthOfYear(12)
-                                .withDayOfMonth(29).withHourOfDay(18).withMinuteOfHour(34).withSecondOfMinute(12)
-                                .withMillisOfSecond(0))
+                        OffsetDateTime.of(2015, 12, 29,
+                                18, 34, 12, 0,
+                                ZoneOffset.ofHours(0)))
                 .build();
 
         String expected = "first==2015-12-29T18:34:12.000Z";

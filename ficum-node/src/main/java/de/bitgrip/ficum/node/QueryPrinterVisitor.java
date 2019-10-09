@@ -1,12 +1,12 @@
 package de.bitgrip.ficum.node;
 
-import org.joda.time.*;
-import org.joda.time.format.ISODateTimeFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.SignStyle;
+import java.util.*;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.UUID;
+import static java.time.temporal.ChronoField.*;
 
 /**
  * A Visitor that prints the Node tree as FICUM query dsl.
@@ -45,19 +45,25 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             buffer.append(argument);
 
         } else if (argument instanceof Date) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime((Date) argument);
-            printCalendar(buffer, cal);
+            OffsetDateTime value = ((Date) argument).toInstant().atOffset(ZoneOffset.UTC);
+            buffer.append(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value));
 
         } else if (argument instanceof Calendar) {
-            Calendar cal = (Calendar) argument;
-            printCalendar(buffer, cal);
+            OffsetDateTime value = OffsetDateTime.ofInstant(Instant.ofEpochMilli(((Calendar) argument).getTimeInMillis()),
+                    ((Calendar) argument).getTimeZone().toZoneId());
+            buffer.append(ISO_OFFSET_DATE_TIME.format(value));
 
-        } else if (argument instanceof ReadablePartial) {
-            buffer.append(ISODateTimeFormat.yearMonthDay().print((ReadablePartial) argument));
+        } else if (argument instanceof LocalDate) {
+            buffer.append(DateTimeFormatter.ISO_LOCAL_DATE.format((LocalDate) argument));
 
-        } else if (argument instanceof ReadableInstant) {
-            buffer.append(ISODateTimeFormat.dateTime().print((ReadableInstant) argument));
+        } else if (argument instanceof LocalDateTime) {
+            buffer.append(ISO_OFFSET_DATE_TIME.format((LocalDateTime) argument));
+
+        } else if (argument instanceof OffsetDateTime) {
+            buffer.append(ISO_OFFSET_DATE_TIME.format((OffsetDateTime) argument));
+
+        } else if (argument instanceof ZonedDateTime) {
+            buffer.append(ISO_OFFSET_DATE_TIME.format((ZonedDateTime) argument));
 
         } else if (argument instanceof Enum) {
             buffer.append('\'').append(((Enum<?>) argument).name()).append('\'');
@@ -78,15 +84,6 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
 
         } else {
             buffer.append('\'').append(argument.toString()).append('\'');
-        }
-    }
-
-    private void printCalendar(StringBuffer buffer, Calendar cal) {
-        if (cal.get(Calendar.HOUR_OF_DAY) == 0 && cal.get(Calendar.MINUTE) == 0 && cal.get(Calendar.SECOND) == 0
-                && cal.get(Calendar.MILLISECOND) == 0) {
-            printArgument(buffer, new LocalDate(cal, DateTimeZone.UTC));
-        } else {
-            printArgument(buffer, new DateTime(cal, DateTimeZone.forTimeZone(cal.getTimeZone())));
         }
     }
 

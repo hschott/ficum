@@ -4,8 +4,11 @@ import com.hazelcast.query.Predicate;
 import com.hazelcast.query.Predicates;
 import de.bitgrip.ficum.node.*;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> {
@@ -103,9 +106,14 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
         if (argument instanceof Comparable<?>) {
             Comparable<?> value = (Comparable<?>) argument;
 
-            if (argument instanceof Calendar) {
-                value = ((Calendar) value).getTime();
+            if (argument instanceof LocalDate) {
+                value = Date.from(((LocalDate) value).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant());
             }
+
+            if (argument instanceof OffsetDateTime) {
+                value = Date.from(((OffsetDateTime) value).toInstant());
+            }
+
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
         } else if (argument instanceof List) {

@@ -3,8 +3,6 @@ package de.bitgrip.ficum.visitor;
 import de.bitgrip.ficum.node.*;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.joda.time.ReadableInstant;
-import org.joda.time.ReadablePartial;
 
 import javax.persistence.criteria.*;
 import java.lang.reflect.Field;
@@ -13,8 +11,10 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
@@ -52,13 +52,10 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         mappedTypes.add(BigInteger.class);
         mappedTypes.add(BigDecimal.class);
         mappedTypes.add(Date.class);
-        mappedTypes.add(java.sql.Date.class);
-        mappedTypes.add(Time.class);
-        mappedTypes.add(Timestamp.class);
         mappedTypes.add(Calendar.class);
-        mappedTypes.add(ReadablePartial.class);
-        mappedTypes.add(ReadableInstant.class);
         mappedTypes.add(UUID.class);
+        mappedTypes.add(OffsetDateTime.class);
+        mappedTypes.add(LocalDate.class);
     }
 
     private static boolean containsEscapedChar(String value) {
@@ -321,12 +318,34 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         if (argument instanceof Comparable<?>) {
             Comparable<?> value = (Comparable<?>) argument;
 
+            // convert from string to enum
             if (value instanceof String && clazz.isEnum()) {
                 value = Enum.valueOf((Class<? extends Enum>) clazz, value.toString());
             }
-            if (value instanceof Calendar && clazz.isAssignableFrom(Date.class)) {
-                Calendar cal = (Calendar) value;
-                value = cal.getTime();
+
+            // convert date and time types
+            if (value instanceof LocalDate && clazz.isAssignableFrom(Date.class)) {
+                value = Date.from(((LocalDate) value).atStartOfDay()
+                        .atZone(ZoneId.of("UTC"))
+                        .toInstant());
+            }
+
+            if (value instanceof LocalDate && clazz.isAssignableFrom(Calendar.class)) {
+                value = GregorianCalendar.from(((LocalDate) value).atStartOfDay()
+                        .atZone(ZoneId.of("UTC")));
+            }
+
+            if (value instanceof LocalDate && clazz.isAssignableFrom(OffsetDateTime.class)) {
+                value = OffsetDateTime.from(((LocalDate) value).atStartOfDay()
+                        .atZone(ZoneId.of("UTC")));
+            }
+
+            if (value instanceof OffsetDateTime && clazz.isAssignableFrom(Date.class)) {
+                value = Date.from(((OffsetDateTime) value).toInstant());
+            }
+
+            if (value instanceof OffsetDateTime && clazz.isAssignableFrom(Calendar.class)) {
+                value = GregorianCalendar.from(((OffsetDateTime) value).toZonedDateTime());
             }
 
             pred = isCollectionSizeCheck(path, value)

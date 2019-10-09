@@ -1,15 +1,5 @@
 package de.bitgrip.ficum.parser;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.*;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.chrono.GJChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
 import org.parboiled.Context;
@@ -18,6 +8,13 @@ import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.MemoMismatches;
 import org.parboiled.annotations.SuppressSubnodes;
 import org.parboiled.support.StringVar;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @BuildParseTree
 public class ArgumentParser extends BaseParser<Object> {
@@ -32,15 +29,10 @@ public class ArgumentParser extends BaseParser<Object> {
         baseTypes.add(Integer.class);
         baseTypes.add(Long.class);
         baseTypes.add(Boolean.class);
-        baseTypes.add(Calendar.class);
+        baseTypes.add(OffsetDateTime.class);
+        baseTypes.add(LocalDate.class);
         baseTypes.add(UUID.class);
     }
-
-    protected static final DateTimeFormatter ISO8601_TIMESTAMP = ISODateTimeFormat.dateTime().withOffsetParsed()
-            .withChronology(GJChronology.getInstance());
-
-    protected static final DateTimeFormatter ISO8601_DATE = ISODateTimeFormat.yearMonthDay()
-            .withChronology(GJChronology.getInstance(DateTimeZone.UTC));
 
     public static Collection<Class<? extends Comparable<?>>> getBaseTypes() {
         return Collections.unmodifiableCollection(baseTypes);
@@ -63,12 +55,12 @@ public class ArgumentParser extends BaseParser<Object> {
     protected Rule Argument() {
         return Sequence(FirstOf(UUIDLiteral(), StringLiteral(), IntegerLiteral(), DoubleLiteral(), FloatLiteral(), DateLiteral(),
                 TimestampLiteral(), BooleanTrue(), BooleanFalse(), NullLiteral()), new Action<Comparable<?>>() {
-                    public boolean run(Context<Comparable<?>> context) {
-                        Comparable<?> argument = context.getValueStack().peek();
-                        return isBaseType(argument);
-                    }
+            public boolean run(Context<Comparable<?>> context) {
+                Comparable<?> argument = context.getValueStack().peek();
+                return isBaseType(argument);
+            }
 
-                });
+        });
     }
 
     @SuppressSubnodes
@@ -85,20 +77,17 @@ public class ArgumentParser extends BaseParser<Object> {
 
     @SuppressSubnodes
     protected Rule DateLiteral() {
-        return Sequence(Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(),
+        return Sequence(Sequence(Optional(AlgebraicSign()), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(),
                 Digit(), TestNot(Ch('T'))), new Action<Comparable<?>>() {
-                    public boolean run(Context<Comparable<?>> context) {
-                        try {
-                            LocalDate parse = ISO8601_DATE.parseLocalDate(match());
-                            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                            cal.clear();
-                            cal.setTimeInMillis(parse.toDateTimeAtStartOfDay(DateTimeZone.UTC).getMillis());
-                            return push(cal);
-                        } catch (Exception e) {
-                            return false;
-                        }
-                    }
-                });
+            public boolean run(Context<Comparable<?>> context) {
+                try {
+                    LocalDate date = DateTimeFormatter.ISO_LOCAL_DATE.parse(match(), LocalDate::from);
+                    return push(date);
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+        });
     }
 
     protected Rule DecimalNumeral() {
@@ -174,11 +163,11 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     protected Rule HexDigit() {
-      return FirstOf(LowerHexChar(), UpperHexChar(), Digit());
+        return FirstOf(LowerHexChar(), UpperHexChar(), Digit());
     }
 
-    protected Rule LowerHexDigit(){
-      return FirstOf(LowerHexChar(), Digit());
+    protected Rule LowerHexDigit() {
+        return FirstOf(LowerHexChar(), Digit());
     }
 
     @SuppressSubnodes
@@ -274,22 +263,23 @@ public class ArgumentParser extends BaseParser<Object> {
 
     /**
      * UUID format: b2cc307c-eb6d-4aca-bc0c-64a7c2f49c86
-     *              8 Hexdigits '-' 4 Hexdigits '-' 4 Hexdigits '-' 4 Hexdigits '-' 12 Hexdigits
+     * 8 Hexdigits '-' 4 Hexdigits '-' 4 Hexdigits '-' 4 Hexdigits '-' 12 Hexdigits
+     *
      * @return
      */
     protected Rule UUIDLiteral() {
-      return Sequence(Sequence(NTimes(8, LowerHexDigit()), Ch('-'), NTimes(4, LowerHexDigit()), Ch('-'),
-              NTimes(4, LowerHexDigit()), Ch('-'), NTimes(4, LowerHexDigit()), Ch('-'), NTimes(12, LowerHexDigit())),
-              new Action<Comparable<?>>() {
-                public boolean run(Context<Comparable<?>> context) {
-                  try {
-                    UUID uuid = UUID.fromString(match());
-                    return push(uuid);
-                  } catch (Exception e) {
-                    return false;
-                  }
-                }
-              });
+        return Sequence(Sequence(NTimes(8, LowerHexDigit()), Ch('-'), NTimes(4, LowerHexDigit()), Ch('-'),
+                NTimes(4, LowerHexDigit()), Ch('-'), NTimes(4, LowerHexDigit()), Ch('-'), NTimes(12, LowerHexDigit())),
+                new Action<Comparable<?>>() {
+                    public boolean run(Context<Comparable<?>> context) {
+                        try {
+                            UUID uuid = UUID.fromString(match());
+                            return push(uuid);
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    }
+                });
     }
 
     protected Rule StringLiteral() {
@@ -314,18 +304,15 @@ public class ArgumentParser extends BaseParser<Object> {
     @SuppressSubnodes
     protected Rule TimestampLiteral() {
         return Sequence(
-                Sequence(Optional(Ch('-')), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit(),
+                Sequence(Optional(AlgebraicSign()), OneOrMore(Digit()), Ch('-'), Digit(), Digit(), Ch('-'), Digit(), Digit(),
                         Ch('T'), Digit(), Digit(), Ch(':'), Digit(), Digit(), Ch(':'), Digit(), Digit(),
-                        Ch('.'), Digit(), Digit(), Digit(), FirstOf(Ch('Z'), Sequence(AlgebraicSign(), Digit(), Digit(),
+                        Ch('.'), Digit(), Digit(), Optional(Digit()), FirstOf(Ch('Z'), Sequence(AlgebraicSign(), Digit(), Digit(),
                                 Ch(':'), Digit(), Digit(), Optional(Ch(':'), Digit(), Digit())))),
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
                         try {
-                            DateTime parse = ISO8601_TIMESTAMP.parseDateTime(match());
-                            Calendar cal = Calendar.getInstance(parse.getZone().toTimeZone());
-                            cal.clear();
-                            cal.setTimeInMillis(parse.getMillis());
-                            return push(cal);
+                            OffsetDateTime dateTime = DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(match(), OffsetDateTime::from);
+                            return push(dateTime);
                         } catch (Exception e) {
                             return false;
                         }
@@ -339,8 +326,8 @@ public class ArgumentParser extends BaseParser<Object> {
     }
 
     @MemoMismatches
-    protected Rule LowerHexChar(){
-      return CharRange('a', 'f');
+    protected Rule LowerHexChar() {
+        return CharRange('a', 'f');
     }
 
 }

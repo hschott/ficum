@@ -10,8 +10,8 @@ import com.mongodb.client.model.geojson.Position;
 import de.bitgrip.ficum.node.*;
 import org.bson.conversions.Bson;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -189,9 +189,10 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         if (argument instanceof Comparable<?>) {
             Comparable<?> value = (Comparable<?>) argument;
 
-            if (argument instanceof Calendar) {
-                value = ((Calendar) value).getTime();
+            if (value instanceof OffsetDateTime) {
+                value = ((OffsetDateTime) value).toLocalDateTime();
             }
+
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
         } else if (argument instanceof List) {

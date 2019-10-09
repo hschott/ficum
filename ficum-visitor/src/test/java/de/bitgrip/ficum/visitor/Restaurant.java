@@ -3,6 +3,7 @@ package de.bitgrip.ficum.visitor;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -115,7 +116,7 @@ public class Restaurant implements Serializable {
     public static class Grade implements Serializable {
         private String grade;
 
-        @JsonDeserialize(using = MongDBDateDeserializer.class)
+        @JsonDeserialize(using = LongToDateDeserializer.class)
         private Date date;
 
         private Integer score;

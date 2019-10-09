@@ -387,8 +387,8 @@ The QueryPrinterVisitor is capable of printing out a FICUM query as string. The 
 * Boolean, Byte, Short, Integer, Double, UUID - value from toString()
 * Long - value from toString() suffixed with `l`
 * Float - value from toString() suffixed with `f`
-* JodaTime's ReadablePartial or Date and Calendar at midnight - value formated as `yyyy-MM-dd`
-* JodaTime's ReadableInstant or Date and Calendar not at midnight - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
+* LocalDate - value formated as `yyyy-MM-dd`
+* LocalDateTime, OffsetDateTime, ZonedDateTime, Date and Calendar - value formated as `yyyy-MM-dd'T'HH:mm:ss.SSSZZ`
 * Enum - value from name() surrounded with single quotes
 * String, Character and any other Comparable - value from toString() surrounded with single quotes
 * Array of previous types - all values as described above enclosed in square brackets and separated by commas, e.g. `[12.5,4.5]`
@@ -411,7 +411,7 @@ selector-char  =  ALPHA / DIGIT / "_"
 comparison     =  "==" / "!=" / "=ge=" / "=le=" / "=gt=" / "=lt=" / "=in=" / "=nin=" / "=nr=" / "=wi=" / "=ix="
 args-array     =  "[" argument *( "," argument ) "]"
 argument       =  date-arg / uuid-arg / boolean-arg / null-arg / number-arg / text-arg
-date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+date-arg       =  date / dateTime ; as defined in ISO 8601 with yyyy-MM-dd or yyyy-MM-dd'T'HH:mm:ss.SSSZZ
 uuid-arg       =  8*HEXDIG "-" 4*HEXDIG "-" 4*HEXDIG "-" 4*HEXDIG "-" 12*HEXDIG
 boolean-arg    =  "yes" / "no" / "true" / "false" / "Yes" / "No" / "True" / "False"
 null-arg       =  "null" / "Null"
