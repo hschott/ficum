@@ -3,6 +3,8 @@ install: true
 
 language: java
 
+jdk: openjdk8
+
 services: mongodb
 
 addons:
