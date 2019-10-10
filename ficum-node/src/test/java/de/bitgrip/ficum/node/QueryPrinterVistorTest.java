@@ -3,9 +3,9 @@ package de.bitgrip.ficum.node;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class QueryPrinterVistorTest {
@@ -188,7 +188,7 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
-    public void testDate() {
+    public void testLocalDate() {
         Node node = Builder.start().constraint("first", Comparison.EQUALS,
                 LocalDate.of(2015, 12, 29)).build();
 
@@ -199,7 +199,7 @@ public class QueryPrinterVistorTest {
     }
 
     @Test
-    public void testDateBC() {
+    public void testLocalDateBC() {
         Node node = Builder.start().constraint("first", Comparison.EQUALS,
                 LocalDate.of(-650, 12, 29)).build();
 
@@ -285,6 +285,64 @@ public class QueryPrinterVistorTest {
                         OffsetDateTime.of(2015, 12, 29,
                                 18, 34, 12, 0,
                                 ZoneOffset.ofHours(0)))
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000Z";
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDate() {
+        LocalDateTime dateTime = LocalDateTime.of(2015, 12, 29,
+                18, 34, 12, 0);
+        Node node = Builder.start()
+                .constraint("first", Comparison.EQUALS,
+                        Date.from(dateTime.toInstant(ZoneOffset.systemDefault().getRules().getOffset(dateTime))))
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000" + ZoneOffset.systemDefault().getRules().getOffset(dateTime);
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testLocalDateTime() {
+        LocalDateTime dateTime = LocalDateTime.of(2015, 12, 29,
+                18, 34, 12, 0);
+        Node node = Builder.start()
+                .constraint("first", Comparison.EQUALS,
+                        dateTime)
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000" + ZoneOffset.systemDefault().getRules().getOffset(dateTime);
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCalendar() {
+        Node node = Builder.start()
+                .constraint("first", Comparison.EQUALS,
+                        GregorianCalendar.from(ZonedDateTime.of(2015, 12, 29,
+                                18, 34, 12, 0, ZoneId.of("Z"))))
+                .build();
+
+        String expected = "first==2015-12-29T18:34:12.000Z";
+        String actual = new QueryPrinterVisitor().start(node);
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testZonedDateTime() {
+        Node node = Builder.start()
+                .constraint("first", Comparison.EQUALS,
+                        ZonedDateTime.of(2015, 12, 29,
+                                18, 34, 12, 0, ZoneId.of("Z")))
                 .build();
 
         String expected = "first==2015-12-29T18:34:12.000Z";

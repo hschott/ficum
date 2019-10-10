@@ -21,7 +21,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -120,6 +119,19 @@ public class JPAPredicateVisitorTest {
     @Test
     public void testFieldDate() {
         String input = "birthDate=gt=2012-08-31";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testFieldOffsetDateTime() {
+        String input = "birthDate=gt=2012-08-31T00:00:00.000Z";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
         Predicate predicate = petVisitor.start(node);
@@ -318,5 +330,43 @@ public class JPAPredicateVisitorTest {
         Assert.assertEquals(1, results.size());
     }
 
+    @Test
+    public void testLessThan() {
+        String input = "born=lt=2012-08-31";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(11, results.size());
+    }
+
+    @Test
+    public void testGreaterEquals() {
+        String input = "born=ge=2010-03-09";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(9, results.size());
+    }
+
+    @Test
+    public void testLessEquals() {
+        String input = "born=le=2010-04-09";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(4, results.size());
+    }
 
 }

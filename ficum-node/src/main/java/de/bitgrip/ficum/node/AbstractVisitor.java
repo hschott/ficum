@@ -11,7 +11,7 @@ import java.util.*;
 import static java.time.temporal.ChronoField.*;
 
 public abstract class AbstractVisitor<T> implements Visitor<T> {
-    public static DateTimeFormatter ISO_OFFSET_DATE_TIME = new DateTimeFormatterBuilder()
+    public static final DateTimeFormatter ISO_OFFSET_DATE_TIME = new DateTimeFormatterBuilder()
             .appendValue(YEAR, 4, 10, SignStyle.EXCEEDS_PAD)
             .appendLiteral('-')
             .appendValue(MONTH_OF_YEAR, 2)
@@ -26,7 +26,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
             .appendFraction(MILLI_OF_SECOND, 3, 3, true)
             .appendOffsetId()
             .toFormatter(Locale.ROOT);
-
+    
     private boolean alwaysWildcard = false;
 
     private Map<String, String> selectorToFieldMapping = new HashMap<String, String>();
