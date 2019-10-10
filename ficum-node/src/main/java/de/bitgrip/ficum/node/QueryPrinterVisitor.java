@@ -2,11 +2,10 @@ package de.bitgrip.ficum.node;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.SignStyle;
-import java.util.*;
-
-import static java.time.temporal.ChronoField.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.UUID;
 
 /**
  * A Visitor that prints the Node tree as FICUM query dsl.
@@ -45,8 +44,8 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             buffer.append(argument);
 
         } else if (argument instanceof Date) {
-            OffsetDateTime value = ((Date) argument).toInstant().atOffset(ZoneOffset.UTC);
-            buffer.append(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value));
+            ZonedDateTime value = ((Date) argument).toInstant().atZone(ZoneOffset.systemDefault());
+            buffer.append(ISO_OFFSET_DATE_TIME.format(value));
 
         } else if (argument instanceof Calendar) {
             OffsetDateTime value = OffsetDateTime.ofInstant(Instant.ofEpochMilli(((Calendar) argument).getTimeInMillis()),
@@ -57,7 +56,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
             buffer.append(DateTimeFormatter.ISO_LOCAL_DATE.format((LocalDate) argument));
 
         } else if (argument instanceof LocalDateTime) {
-            buffer.append(ISO_OFFSET_DATE_TIME.format((LocalDateTime) argument));
+            buffer.append(ISO_OFFSET_DATE_TIME.format(((LocalDateTime) argument).atZone(ZoneOffset.systemDefault())));
 
         } else if (argument instanceof OffsetDateTime) {
             buffer.append(ISO_OFFSET_DATE_TIME.format((OffsetDateTime) argument));

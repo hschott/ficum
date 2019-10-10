@@ -11,7 +11,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -30,10 +29,6 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     private List<Predicate> predicates;
 
     private Set<Class<? extends Comparable<?>>> mappedTypes = new HashSet<Class<? extends Comparable<?>>>();
-
-    public JPAPredicateVisitor() {
-        super();
-    }
 
     public JPAPredicateVisitor(Class<T> queryClass, Root<T> root, CriteriaBuilder criteriaBuilder) {
         super();
@@ -277,30 +272,7 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         return false;
     }
 
-
-    public void setQueryClass(Class<T> queryClass) {
-        this.queryClass = queryClass;
-    }
-
-    public void setCriteriaBuilder(CriteriaBuilder criteriaBuilder) {
-        this.criteriaBuilder = criteriaBuilder;
-    }
-
-    public void setRoot(Root<T> root) {
-        this.root = root;
-    }
-
     public Predicate start(Node node) {
-        if (queryClass == null) {
-            throw new IllegalStateException("QueryClass can not be null.");
-        }
-        if (criteriaBuilder == null) {
-            throw new IllegalStateException("CriteriaBuilder can not be null.");
-        }
-        if (root == null) {
-            throw new IllegalStateException("Root can not be null.");
-        }
-
         predicates = new ArrayList<>();
         node.accept(this);
         return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
