@@ -304,6 +304,19 @@ public class JPAPredicateVisitorTest {
     }
 
     @Test
+    public void testInPredicateWithNestedEnum() {
+        String input = "visits.type=in=['SCHEDULED','EMERGENCY']";
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(3, results.size());
+    }
+
+    @Test
     public void testNinPredicate() {
         String input = "name=nin=['Leo','Iggy']";
 
