@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * <p>Generic Converter which is able to Convert a String to a Ficum Node</p>
  * <p>
- * (w) marcelmuller<br/>
+ * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
  * </p>
  */

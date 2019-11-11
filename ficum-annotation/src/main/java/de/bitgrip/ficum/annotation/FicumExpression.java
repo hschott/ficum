@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * <p>FicumExpression which marks, that the parameter is a FicumExpression with defined allowedSectorNames.</p>
  * <p>
- * (w) marcelmuller<br/>
+ * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
  * </p>
  */
