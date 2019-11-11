@@ -10,7 +10,7 @@
   <parent>
     <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-converter</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
