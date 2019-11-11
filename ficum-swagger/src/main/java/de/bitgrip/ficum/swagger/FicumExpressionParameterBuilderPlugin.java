@@ -16,7 +16,7 @@ import java.util.Optional;
  * Additionally it adds all allowedValues which are configured by FicumExpression to formatDescription
  * </p>
  * <p>
- * (w) marcelmuller<br/>
+ * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
  * </p>
  */

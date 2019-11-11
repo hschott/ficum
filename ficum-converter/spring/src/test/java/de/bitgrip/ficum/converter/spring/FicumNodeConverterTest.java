@@ -11,7 +11,7 @@ import org.springframework.core.convert.TypeDescriptor;
 /**
  * <p>Tests for GenericFicumConverter</p>
  * <p>
- * (w) marcelmuller<br/>
+ * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
  * </p>
  */

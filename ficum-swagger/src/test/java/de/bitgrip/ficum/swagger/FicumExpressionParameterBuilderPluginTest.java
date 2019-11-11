@@ -20,7 +20,7 @@ import springfox.documentation.spi.service.contexts.ParameterContext;
 /**
  * <p>Test for FicumExpressionParameterBuilder</p>
  * <p>
- * (w) marcelmuller<br/>
+ * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
  * </p>
  */
