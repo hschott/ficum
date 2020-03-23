@@ -125,7 +125,7 @@ String input = "owner.city=='Madison',type=='dog'";
 // and parse the query into a node tree
 Node root = ParseHelper.parse(input, allowedSelectorNames);
 
-// run the JPA visitor on the node tree
+// run the Hazelcast visitor on the node tree
 HazelcastPredicateVisitor visitor = new HazelcastPredicateVisitor();
 Predicate<?, ?> query = visitor.start(root);
 
@@ -226,7 +226,7 @@ An argument can be one of 5 main types.
 **Text, Datetime, Number, Boolean and Null.**
 
 ```
-argument       =  text-arg / date-arg / number-arg / boolean-arg / null-arg
+argument       =  date-arg / uuid-arg / boolean-arg / null-arg / number-arg / text-arg
 ```
 
 **Examples:**
