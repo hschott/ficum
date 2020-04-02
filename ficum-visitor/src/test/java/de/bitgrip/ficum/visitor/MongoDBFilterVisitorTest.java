@@ -94,6 +94,26 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Test
+    public void testAndPredicateConcatenation() {
+        String input = "borough=='Manhattan',address.street=='11 Avenue',name=='Mcquaids Public House'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(1, getCollection(db).countDocuments(query));
+    }
+
+    @Test
+    public void testAndPredicateOrPredicateConcatenation() {
+        String input = "borough=='Manhattan',address.street=='11 Avenue';address.street=='East   74 Street',name=='Glorious Food'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(3, getCollection(db).countDocuments(query));
+    }
+
+    @Test
     public void testDatePredicate() {
         String input = "grades.date=ge=2015-01-01,grades.score=lt=1";
 
