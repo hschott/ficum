@@ -353,28 +353,31 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         node.getRight().accept(this);
 
         Predicate pred = null;
+        Predicate leftHandSide = predicates.get(predicates.size() - 2);
+        Predicate rightHandSide = predicates.get(predicates.size() - 1);
         switch (node.getOperator()) {
             case AND:
-                pred = criteriaBuilder.and(predicates.get(0), predicates.get(1));
+                pred = criteriaBuilder.and(leftHandSide, rightHandSide);
                 break;
 
             case OR:
-                pred = criteriaBuilder.or(predicates.get(0), predicates.get(1));
+                pred = criteriaBuilder.or(leftHandSide, rightHandSide);
                 break;
 
             case NAND:
-                pred = criteriaBuilder.or(criteriaBuilder.not(predicates.get(0)), criteriaBuilder.not(predicates.get(1)));
+                pred = criteriaBuilder.or(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
                 break;
 
             case NOR:
-                pred = criteriaBuilder.and(criteriaBuilder.not(predicates.get(0)), criteriaBuilder.not(predicates.get(1)));
+                pred = criteriaBuilder.and(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
                 break;
 
             default:
                 throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
-        predicates.clear();
+        predicates.remove(leftHandSide);
+        predicates.remove(rightHandSide);
         predicates.add(pred);
     }
 

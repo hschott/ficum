@@ -68,6 +68,20 @@ public class JPAPredicateVisitorTest {
     }
 
     @Test
+    public void testAndPredicateWithThreeCriteria() {
+        String input = "name=='Chuck',owner.firstName=='Jeff',visits.type=='EMERGENCY'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(1, results.size());
+    }
+
+    @Test
     public void testCollectionCount() {
         String input = "visits=ge=2";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
@@ -278,6 +292,20 @@ public class JPAPredicateVisitorTest {
     @Test
     public void testOrPredicate() {
         String input = "name=='Leo';owner.firstName=='Jeff'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(2, results.size());
+    }
+
+    @Test
+    public void testAndPredicateCombinedWithOrPredicate() {
+        String input = "name=='Chuck';owner.firstName=='Jean',visits.type=='EMERGENCY'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
