@@ -137,28 +137,31 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
         node.getRight().accept(this);
 
         Predicate<?, ?> pred = null;
+        Predicate<?, ?> leftHandSide = filters.get(filters.size() - 2);
+        Predicate<?, ?> rightHandSide = filters.get(filters.size() - 1);
         switch (node.getOperator()) {
             case AND:
-                pred = Predicates.and(filters.get(0), filters.get(1));
+                pred = Predicates.and(leftHandSide, rightHandSide);
                 break;
 
             case OR:
-                pred = Predicates.or(filters.get(0), filters.get(1));
+                pred = Predicates.or(leftHandSide, rightHandSide);
                 break;
 
             case NAND:
-                pred = Predicates.or(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
+                pred = Predicates.or(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
                 break;
 
             case NOR:
-                pred = Predicates.and(Predicates.not(filters.get(0)), Predicates.not(filters.get(1)));
+                pred = Predicates.and(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
                 break;
 
             default:
                 throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
-        filters.clear();
+        filters.remove(leftHandSide);
+        filters.remove(rightHandSide);
         filters.add(pred);
     }
 
