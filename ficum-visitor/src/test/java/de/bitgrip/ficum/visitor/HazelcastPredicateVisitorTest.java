@@ -113,6 +113,26 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Test
+    public void testAndPredicateConcatenation() {
+        String input = "borough=='Manhattan',address.street=='11 Avenue',name=='Mcquaids Public House'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(1, getMap().values(query).size());
+    }
+
+    @Test
+    public void testAndPredicateOrPredicateConcatenation() {
+        String input = "borough=='Manhattan',address.street=='11 Avenue';address.street=='East   74 Street',name=='Glorious Food'";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(3, getMap().values(query).size());
+    }
+
+    @Test
     public void testDatePredicate() {
         String input = "grade.date=ge=2015-01-01,grade.score=gt=1";
 

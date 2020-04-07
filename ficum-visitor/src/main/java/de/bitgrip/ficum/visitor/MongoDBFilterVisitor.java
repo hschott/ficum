@@ -215,28 +215,31 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         node.getRight().accept(this);
 
         Bson pred = null;
+        Bson leftHandSide = filters.get(filters.size() - 2);
+        Bson rightHandSide = filters.get(filters.size() - 1);
         switch (node.getOperator()) {
             case AND:
-                pred = Filters.and(filters.get(0), filters.get(1));
+                pred = Filters.and(leftHandSide, rightHandSide);
                 break;
 
             case OR:
-                pred = Filters.or(filters.get(0), filters.get(1));
+                pred = Filters.or(leftHandSide, rightHandSide);
                 break;
 
             case NAND:
-                pred = Filters.or(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
+                pred = Filters.or(Filters.not(leftHandSide), Filters.not(rightHandSide));
                 break;
 
             case NOR:
-                pred = Filters.and(Filters.not(filters.get(0)), Filters.not(filters.get(1)));
+                pred = Filters.and(Filters.not(leftHandSide), Filters.not(rightHandSide));
                 break;
 
             default:
                 throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
         }
 
-        filters.clear();
+        filters.remove(leftHandSide);
+        filters.remove(rightHandSide);
         filters.add(pred);
     }
 
