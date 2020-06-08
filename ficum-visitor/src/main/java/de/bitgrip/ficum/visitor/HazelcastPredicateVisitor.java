@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -70,6 +71,10 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
 
             case GREATER_EQUALS:
                 return Predicates.greaterEqual(fieldName, argument);
+
+            case IN:
+            case NIN:
+                return doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
 
             default:
                 return null;
