@@ -12,6 +12,7 @@ import org.bson.conversions.Bson;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -143,6 +144,9 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             case GREATER_EQUALS:
                 return Filters.gte(fieldName, argument);
 
+            case IN:
+            case NIN:
+                return doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
             default:
                 return null;
         }

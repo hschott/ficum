@@ -230,6 +230,16 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Test
+    public void testInPredicateSingletonList() {
+        String input = "borough=in=['Queens']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(987, getMap().values(query).size());
+    }
+
+    @Test
     public void testNinPredicate() {
         String input = "borough=nin=['Queens','Manhattan']";
 
@@ -237,6 +247,16 @@ public class HazelcastPredicateVisitorTest {
         Predicate<?, ?> query = visitor.start(node);
 
         Assert.assertEquals(1524, getMap().values(query).size());
+    }
+
+    @Test
+    public void testNinPredicateSingletonList() {
+        String input = "borough=nin=['Queens']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Predicate<?, ?> query = visitor.start(node);
+
+        Assert.assertEquals(4012, getMap().values(query).size());
     }
 
     @Test

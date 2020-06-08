@@ -332,6 +332,20 @@ public class JPAPredicateVisitorTest {
     }
 
     @Test
+    public void testInPredicateSingletonList() {
+        String input = "name=in=['Leo']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(1, results.size());
+    }
+
+    @Test
     public void testInPredicateWithNestedEnum() {
         String input = "visits.type=in=['SCHEDULED','EMERGENCY']";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
@@ -356,6 +370,20 @@ public class JPAPredicateVisitorTest {
         List<Pet> results = query.getResultList();
 
         Assert.assertEquals(11, results.size());
+    }
+
+    @Test
+    public void testNinPredicateSingletonList() {
+        String input = "name=nin=['Leo']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+
+        Predicate predicate = petVisitor.start(node);
+        TypedQuery<Pet> query = getTypedQuery(predicate);
+
+        List<Pet> results = query.getResultList();
+
+        Assert.assertEquals(12, results.size());
     }
 
     @Test
