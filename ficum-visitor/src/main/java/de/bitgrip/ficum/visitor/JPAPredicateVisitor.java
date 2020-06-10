@@ -161,6 +161,10 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
             case GREATER_EQUALS:
                 return criteriaBuilder.greaterThanOrEqualTo(path, argument);
 
+            case IN:
+            case NIN:
+                return doBuildPredicate(comparison, path, Collections.singletonList(argument));
+
             default:
                 return null;
         }

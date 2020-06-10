@@ -319,6 +319,16 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Test
+    public void testInPredicateSingletonList() {
+        String input = "borough=in=['Queens']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(987, getCollection(db).countDocuments(query));
+    }
+
+    @Test
     public void testNinPredicate() {
         String input = "borough=nin=['Queens','Manhattan']";
 
@@ -326,6 +336,16 @@ public class MongoDBFilterVisitorTest {
         Bson query = visitor.start(node);
 
         Assert.assertEquals(1524, getCollection(db).countDocuments(query));
+    }
+
+    @Test
+    public void testNinPredicateSingletonList() {
+        String input = "borough=nin=['Queens']";
+
+        Node node = ParseHelper.parse(input, allowedSelectorNames);
+        Bson query = visitor.start(node);
+
+        Assert.assertEquals(4012, getCollection(db).countDocuments(query));
     }
 
     @Test
