@@ -31,7 +31,7 @@ public class Builder {
     /**
      * Build a {@link Node} tree from an infix stack
      *
-     * @param stack
+     * @param stack the stack
      * @return {@link Node} root node of the tree
      */
     public static Node build(Iterable<Object> stack) {
