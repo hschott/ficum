@@ -10,9 +10,6 @@ import de.bitgrip.ficum.parser.ParseHelper;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,8 +17,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = MongoDBFilterVisitorTest.class)
 public class MongoDBFilterVisitorTest {
 
     private MongoClient client;

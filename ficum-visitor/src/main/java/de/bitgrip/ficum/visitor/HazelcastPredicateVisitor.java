@@ -122,7 +122,7 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
         } else if (argument instanceof List) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, sanatizeToComparable((List) argument));
+            pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable((List) argument));
 
         } else if (argument == null) {
             pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);

@@ -15,28 +15,9 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.beans.support.MutableSortDefinition;
-import org.springframework.beans.support.PropertyComparator;
+import javax.persistence.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Simple business object representing a pet.
@@ -66,7 +47,7 @@ public class Pet extends NamedEntity {
 
     @Column(name = "nickname")
     @ElementCollection
-    @CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "pet_id") )
+    @CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "pet_id"))
     private List<String> nicknames;
 
     public void addNicknameVisit(String nickname) {
@@ -93,18 +74,18 @@ public class Pet extends NamedEntity {
         return this.nicknames;
     }
 
-    public Owner getOwner() {
-        return this.owner;
-    }
-
     public PetType getType() {
         return this.type;
     }
 
+    public Owner getOwner() {
+        return this.owner;
+    }
+
     public List<Visit> getVisits() {
-        List<Visit> sortedVisits = new ArrayList<Visit>(getVisitsInternal());
-        PropertyComparator.sort(sortedVisits, new MutableSortDefinition("date", false, false));
-        return Collections.unmodifiableList(sortedVisits);
+        return getVisitsInternal().stream()
+                .sorted(Comparator.comparing(Visit::getDate))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     protected Set<Visit> getVisitsInternal() {

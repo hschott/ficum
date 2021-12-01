@@ -1,35 +1,25 @@
 package de.bitgrip.ficum.visitor;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.config.CacheDeserializedValues;
-import com.hazelcast.config.Config;
-import com.hazelcast.config.InMemoryFormat;
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.config.MapIndexConfig;
+import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.query.Predicate;
 import de.bitgrip.ficum.node.Node;
 import de.bitgrip.ficum.parser.ParseHelper;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = HazelcastPredicateVisitorTest.class)
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 public class HazelcastPredicateVisitorTest {
 
     static {
@@ -41,7 +31,7 @@ public class HazelcastPredicateVisitorTest {
 
     private HazelcastPredicateVisitor visitor;
 
-    private String[] allowedSelectorNames = { "name", "borough", "address.street", "address.zipcode", "grade.date", "grade.score" };
+    private String[] allowedSelectorNames = {"name", "borough", "address.street", "address.zipcode", "grade.date", "grade.score"};
 
     private static HazelcastInstance getHazelcastInstance() {
         Config config = new Config();

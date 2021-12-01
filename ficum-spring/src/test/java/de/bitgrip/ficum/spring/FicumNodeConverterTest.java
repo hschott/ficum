@@ -1,4 +1,4 @@
-package de.bitgrip.ficum.converter.spring;
+package de.bitgrip.ficum.spring;
 
 import de.bitgrip.ficum.annotation.FicumExpression;
 import de.bitgrip.ficum.node.Builder;

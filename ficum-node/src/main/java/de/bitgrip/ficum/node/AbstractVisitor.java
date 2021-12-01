@@ -1,12 +1,13 @@
 package de.bitgrip.ficum.node;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoField.*;
 
@@ -26,7 +27,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
             .appendFraction(MILLI_OF_SECOND, 3, 3, true)
             .appendOffsetId()
             .toFormatter(Locale.ROOT);
-    
+
     private boolean alwaysWildcard = false;
 
     private Map<String, String> selectorToFieldMapping = new HashMap<String, String>();
@@ -70,8 +71,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
         }
     }
 
-    protected List<Comparable> sanatizeToComparable(List<?> arguments) {
-        Iterator<Comparable> value = Iterators.filter(arguments.iterator(), Comparable.class);
-        return Lists.newArrayList(value);
+    protected List<Comparable> sanitizeToComparable(List<?> arguments) {
+        return arguments.stream().filter(Comparable.class::isInstance).map(Comparable.class::cast).collect(Collectors.toList());
     }
 }

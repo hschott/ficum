@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>FicumExpression which marks, that the parameter is a FicumExpression with defined allowedSectorNames.</p>
+ * <p>FicumExpression which marks, that the parameter is a FicumExpression with defined allowedSelectorNames.</p>
  * <p>
  * (w) marcelmuller
  * (c) bitgrip GmbH, 2019
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 public @interface FicumExpression {
 
   /**
-   * List of allowedSectorNames
+   * List of allowedSelectorNames
    * @return
    */
   String[] value();

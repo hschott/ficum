@@ -15,24 +15,15 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.springframework.beans.support.MutableSortDefinition;
-import org.springframework.beans.support.PropertyComparator;
-import org.springframework.core.style.ToStringCreator;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Simple JavaBean domain object representing an owner.
@@ -80,8 +71,7 @@ public class Owner extends Person {
     /**
      * Return the Pet with the given name, or null if none found for this Owner.
      *
-     * @param name
-     *            to test
+     * @param name to test
      * @return true if pet name is already in use
      */
     public Pet getPet(String name) {
@@ -91,8 +81,7 @@ public class Owner extends Person {
     /**
      * Return the Pet with the given name, or null if none found for this Owner.
      *
-     * @param name
-     *            to test
+     * @param name to test
      * @return true if pet name is already in use
      */
     public Pet getPet(String name, boolean ignoreNew) {
@@ -110,9 +99,9 @@ public class Owner extends Person {
     }
 
     public List<Pet> getPets() {
-        List<Pet> sortedPets = new ArrayList<Pet>(getPetsInternal());
-        PropertyComparator.sort(sortedPets, new MutableSortDefinition("name", true, true));
-        return Collections.unmodifiableList(sortedPets);
+        return getPetsInternal().stream()
+                .sorted(Comparator.comparing(NamedEntity::getName))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     protected Set<Pet> getPetsInternal() {
@@ -142,12 +131,4 @@ public class Owner extends Person {
         this.telephone = telephone;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringCreator(this)
-
-        .append("id", this.getId()).append("new", this.isNew()).append("lastName", this.getLastName())
-                .append("firstName", this.getFirstName()).append("address", this.address).append("city", this.city)
-                .append("telephone", this.telephone).toString();
-    }
 }

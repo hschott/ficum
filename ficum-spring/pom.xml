@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>ficum-converter-spring</artifactId>
+  <artifactId>ficum-spring</artifactId>
   <packaging>jar</packaging>
-  <name>FICUM - Converter - Spring</name>
-  <description>Spring Converter for FICUM</description>
+  <name>FICUM - Spring</name>
+  <description>Spring util classes for FICUM</description>
 
   <parent>
     <groupId>de.bitgrip.ficum</groupId>
-    <artifactId>ficum-converter</artifactId>
+    <artifactId>ficum</artifactId>
     <version>0.13.0-SNAPSHOT</version>
   </parent>
 
@@ -27,6 +27,17 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
+       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
