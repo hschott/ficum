@@ -15,21 +15,12 @@
  */
 package org.springframework.samples.petclinic.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import javax.persistence.*;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
-import org.springframework.beans.support.MutableSortDefinition;
-import org.springframework.beans.support.PropertyComparator;
+import java.util.stream.Collectors;
 
 /**
  * Simple JavaBean domain object representing a veterinarian.
@@ -44,7 +35,7 @@ import org.springframework.beans.support.PropertyComparator;
 public class Vet extends Person {
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id") , inverseJoinColumns = @JoinColumn(name = "specialty_id") )
+    @JoinTable(name = "vet_specialties", joinColumns = @JoinColumn(name = "vet_id"), inverseJoinColumns = @JoinColumn(name = "specialty_id"))
     private Set<Specialty> specialties;
 
     public void addSpecialty(Specialty specialty) {
@@ -52,9 +43,9 @@ public class Vet extends Person {
     }
 
     public List<Specialty> getSpecialties() {
-        List<Specialty> sortedSpecs = new ArrayList<Specialty>(getSpecialtiesInternal());
-        PropertyComparator.sort(sortedSpecs, new MutableSortDefinition("name", true, true));
-        return Collections.unmodifiableList(sortedSpecs);
+        return getSpecialtiesInternal().stream()
+                .sorted(Comparator.comparing(NamedEntity::getName))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     protected Set<Specialty> getSpecialtiesInternal() {

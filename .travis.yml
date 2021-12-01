@@ -3,7 +3,7 @@ install: true
 
 language: java
 
-jdk: openjdk8
+jdk: openjdk11
 
 services: mongodb
 

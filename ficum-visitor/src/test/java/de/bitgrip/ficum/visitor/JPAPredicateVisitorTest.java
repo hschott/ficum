@@ -6,15 +6,9 @@ import de.bitgrip.ficum.parser.ParseHelper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.samples.petclinic.model.Pet;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
@@ -23,11 +17,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/petclinic-jpa-model-ctx.xml"})
 public class JPAPredicateVisitorTest {
 
-    @PersistenceContext
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("org.springframework.samples.petclinic");
+
     private EntityManager entityManager;
 
     private CriteriaQuery cq;
@@ -43,9 +36,9 @@ public class JPAPredicateVisitorTest {
                 cq.select(root).distinct(true).where(predicate));
     }
 
-
     @Before
     public void setUp() {
+        entityManager = emf.createEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         cq = criteriaBuilder.createQuery(Pet.class);
         root = cq.from(Pet.class);

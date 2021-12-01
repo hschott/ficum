@@ -1,7 +1,5 @@
 package de.bitgrip.ficum.visitor;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.geojson.LineString;
 import com.mongodb.client.model.geojson.Point;
@@ -15,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
@@ -57,7 +56,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
     }
 
     private Bson doBuildPredicate(Comparison comparison, String fieldName, List<Comparable> comparables) {
-        List<Double> geoargs = sanatizeToDouble(comparables);
+        List<Double> geoargs = sanitizeToDouble(comparables);
         switch (comparison) {
             case NEAR:
                 if (geoargs.size() == 3) {
@@ -180,9 +179,8 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         return positions;
     }
 
-    private List<Double> sanatizeToDouble(List<Comparable> arguments) {
-        Iterator<Double> value = Iterators.filter(arguments.iterator(), Double.class);
-        return Lists.newArrayList(value);
+    private List<Double> sanitizeToDouble(List<Comparable> arguments) {
+        return arguments.stream().filter(Double.class::isInstance).map(Double.class::cast).collect(Collectors.toList());
     }
 
     public void visit(ConstraintNode<?> node) {
@@ -200,7 +198,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             pred = doBuildPredicate(node.getComparison(), fieldName, value);
 
         } else if (argument instanceof List) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, sanatizeToComparable((List) argument));
+            pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable((List) argument));
         } else if (argument == null) {
             pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
         } else {

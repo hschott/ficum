@@ -70,12 +70,12 @@ Add dependencies for FICUM and JPA
 <dependency>
     <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.4.0</version>
+    <version>0.13.0</version>
 </dependency>
 <dependency>
-    <groupId>org.hibernate.javax.persistence</groupId>
-    <artifactId>hibernate-jpa-2.1-api</artifactId>
-    <version>1.0.2.Final</version>
+    <groupId>javax.persistence</groupId>
+    <artifactId>javax.persistence-api</artifactId>
+    <version>2.2</version>
 </dependency>
 ```
 
@@ -104,12 +104,12 @@ Add dependencies for FICUM and MongoDB
 <dependency>
     <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.4.0</version>
+    <version>0.13.0</version>
 </dependency>
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver</artifactId>
-    <version>3.10.2</version>
+    <version>3.12.10</version>
 </dependency>
 ```
 
@@ -139,12 +139,12 @@ Add dependencies for FICUM and Hazelcast
 <dependency>
     <groupId>de.bitgrip.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.4.0</version>
+    <version>0.13.0</version>
 </dependency>
 <dependency>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-client</artifactId>
-    <version>3.12.1</version>
+    <version>3.12.12</version>
 </dependency>
 ```
 
@@ -162,6 +162,10 @@ String query = new QueryPrinterVisitor().start(root);
 
 The Builder.constraint() method excepts as argument any `java.lang.Comparable`.
 
+**with Java 11**
+
+If you're running Java 11, you need to open standard java modules for reflective access.
+Add the `--add-opens  java.base/java.lang=ALL-UNNAMED` Java argument to the commandline.   
 
 ## FICUM Query Language
 
