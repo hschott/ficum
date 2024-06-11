@@ -2,26 +2,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.bitgrip.ficum</groupId>
+    <groupId>org.hschott.ficum</groupId>
     <artifactId>ficum</artifactId>
-    <version>0.14.0-SNAPSHOT</version>
+    <version>0.15.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>FICUM - Dynamic Filters</name>
     <description>A query DSL and parser for real dynamic queries.</description>
 
-    <url>https://github.com/bitgrip/ficum</url>
+    <url>https://github.com/hschott/ficum</url>
     <developers>
         <developer>
             <name>Holger Balow-Schott</name>
-            <organization>bitgrip GmbH</organization>
-            <organizationUrl>https://github.com/bitgrip</organizationUrl>
+            <organizationUrl>https://github.com/hschott</organizationUrl>
             <timezone>+1</timezone>
         </developer>
     </developers>
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/bitgrip/ficum/issues</url>
+        <url>https://github.com/hschott/ficum/issues</url>
     </issueManagement>
     <licenses>
         <license>
@@ -30,9 +29,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/bitgrip/ficum</connection>
-        <developerConnection>scm:git:https://github.com/bitgrip/ficum</developerConnection>
-        <url>https://github.com/bitgrip/ficum</url>
+        <connection>scm:git:https://github.com/hschott/ficum</connection>
+        <developerConnection>scm:git:https://github.com/hschott/ficum</developerConnection>
+        <url>https://github.com/hschott/ficum</url>
         <tag>HEAD</tag>
     </scm>
     <modules>
@@ -227,7 +226,7 @@
                     </executions>
                     <configuration>
                         <includes>
-                            <include>de/bitgrip/ficum/**</include>
+                            <include>de/hschott/ficum/**</include>
                         </includes>
                     </configuration>
                 </plugin>
