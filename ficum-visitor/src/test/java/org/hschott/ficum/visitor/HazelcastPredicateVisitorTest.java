@@ -22,11 +22,6 @@ import java.net.URISyntaxException;
 
 public class HazelcastPredicateVisitorTest {
 
-    static {
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-    }
-
     private static HazelcastInstance hazelcastInstance = getHazelcastInstance();
 
     private HazelcastPredicateVisitor visitor;
@@ -35,7 +30,6 @@ public class HazelcastPredicateVisitorTest {
 
     private static HazelcastInstance getHazelcastInstance() {
         Config config = new Config();
-        config.setProperty("hazelcast.logging.type", "slf4j");
         config.setProperty("hazelcast.phone.home.enabled", "false");
 
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
