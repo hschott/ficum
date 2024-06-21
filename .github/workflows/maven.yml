@@ -20,21 +20,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    strategy:
-      matrix:
-        mongodb-version: ['4.4.14']
 
     steps:
     - uses: actions/checkout@v4
     - name: Start MongoDB
-      uses: MongoCamp/mongodb-github-action@1.0.0
+      uses: supercharge/mongodb-github-action@1.11.0
       with:
-        mongodb-version: ${{ matrix.mongodb-version }}
+        mongodb-version: '7.0'
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven

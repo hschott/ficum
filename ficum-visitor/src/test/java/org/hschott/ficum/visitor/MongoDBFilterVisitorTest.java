@@ -1,14 +1,15 @@
 package org.hschott.ficum.visitor;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-import org.hschott.ficum.node.Node;
-import org.hschott.ficum.parser.ParseHelper;
+import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.hschott.ficum.node.Node;
+import org.hschott.ficum.parser.ParseHelper;
 import org.junit.*;
 
 import java.io.BufferedReader;
@@ -16,6 +17,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MongoDBFilterVisitorTest {
 
@@ -37,8 +40,7 @@ public class MongoDBFilterVisitorTest {
         File input = new File(ClassLoader.getSystemResource("db/mongodb/dataset.json").toURI());
         BufferedReader reader = new BufferedReader(new FileReader(input));
 
-        MongoClient setup = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017/"));
-
+        MongoClient setup = createMongoClient();
         MongoDatabase database = setup.getDatabase("ficum");
         MongoCollection<Document> collection = database.getCollection("restaurants");
         collection.drop();
@@ -49,12 +51,16 @@ public class MongoDBFilterVisitorTest {
         }
         reader.close();
 
-        collection.createIndex(new Document("address.location", "2dsphere"), new IndexOptions().background(false));
+        collection.createIndex(Indexes.geo2dsphere("address.location"), new IndexOptions().background(false));
+    }
+
+    private static MongoClient createMongoClient() {
+        return MongoClients.create("mongodb://127.0.0.1:27017/");
     }
 
     @Before
     public void setUp() throws IOException {
-        client = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017"));
+        client = createMongoClient();
         db = client.getDatabase("ficum");
         visitor = new MongoDBFilterVisitor();
     }
@@ -184,8 +190,11 @@ public class MongoDBFilterVisitorTest {
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
+        
+        List results = new ArrayList();
+        getCollection(db).find(query).forEach(document -> results.add(document.get("name")));
 
-        Assert.assertEquals(2, getCollection(db).count(query));
+        Assert.assertEquals(2, results.size());
     }
 
     @Test
@@ -195,7 +204,10 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        Assert.assertEquals(4, getCollection(db).count(query));
+        List results = new ArrayList();
+        getCollection(db).find(query).forEach(document -> results.add(document.get("name")));
+
+        Assert.assertEquals(4, results.size());
     }
 
     @Test
