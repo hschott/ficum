@@ -1,15 +1,14 @@
 package org.hschott.ficum.parser;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
+import org.hschott.ficum.node.Operator;
 import org.parboiled.Action;
 import org.parboiled.Context;
 import org.parboiled.Rule;
 import org.parboiled.annotations.BuildParseTree;
 import org.parboiled.annotations.SuppressSubnodes;
 
-import org.hschott.ficum.node.Operator;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 @BuildParseTree
 public class ExpressionParser extends ConstraintParser {
@@ -25,7 +24,7 @@ public class ExpressionParser extends ConstraintParser {
 
     @SuppressSubnodes
     protected Rule Operation() {
-        return Sequence(FirstOf(Operator.allSigns()), new Action<Object>() {
+        return Sequence(FirstOf(Operator.allSigns()), new Action<>() {
             public boolean run(Context<Object> context) {
                 return push(Operator.from(match()));
             }
@@ -34,9 +33,9 @@ public class ExpressionParser extends ConstraintParser {
 
     @Override
     public Rule root() {
-        return Sequence(Expression(), EOI, new Action<Object>() {
+        return Sequence(Expression(), EOI, new Action<>() {
             public boolean run(Context<Object> context) {
-                Deque<Object> output = new ArrayDeque<Object>();
+                Deque<Object> output = new ArrayDeque<>();
                 for (Object element : context.getValueStack()) {
                     output.push(element);
                 }

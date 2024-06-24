@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.List;
 
 public class BuilderTest {
 
@@ -25,7 +26,7 @@ public class BuilderTest {
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
-        Assert.assertEquals(1l, leftConstraint.getArgument());
+        Assert.assertEquals(1L, leftConstraint.getArgument());
 
         Node right = node.getRight();
 
@@ -34,7 +35,7 @@ public class BuilderTest {
 
         Assert.assertEquals("second", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
-        Assert.assertEquals(2l, rightConstraint.getArgument());
+        Assert.assertEquals(2L, rightConstraint.getArgument());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -50,7 +51,7 @@ public class BuilderTest {
     @Test()
     public void testInfixToPostfix_NaturalOrderLeft() {
 
-        Deque<Object> input = new ArrayDeque<Object>();
+        Deque<Object> input = new ArrayDeque<>();
 
         input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.AND);
@@ -60,7 +61,7 @@ public class BuilderTest {
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.add(Operator.OR);
         expected.add(Operator.AND);
@@ -74,7 +75,7 @@ public class BuilderTest {
     @Test()
     public void testInfixToPostfix_NaturalOrderRight() {
 
-        Deque<Object> input = new ArrayDeque<Object>();
+        Deque<Object> input = new ArrayDeque<>();
 
         input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.OR);
@@ -84,7 +85,7 @@ public class BuilderTest {
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.add(Operator.OR);
         expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
@@ -98,7 +99,7 @@ public class BuilderTest {
     @Test()
     public void testInfixToPostfix_PrecededNested() {
 
-        Deque<Object> input = new ArrayDeque<Object>();
+        Deque<Object> input = new ArrayDeque<>();
 
         input.push(Operator.RIGHT);
         input.push(new Constraint<Comparable<?>>("fifth", Comparison.LESS_THAN, "5"));
@@ -116,7 +117,7 @@ public class BuilderTest {
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.add(Operator.AND);
         expected.add(Operator.OR);
@@ -134,7 +135,7 @@ public class BuilderTest {
     @Test()
     public void testInfixToPostfix_PrecededOrderLeft() {
 
-        Deque<Object> input = new ArrayDeque<Object>();
+        Deque<Object> input = new ArrayDeque<>();
 
         input.push(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         input.push(Operator.AND);
@@ -146,7 +147,7 @@ public class BuilderTest {
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.add(Operator.AND);
         expected.add(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
@@ -160,7 +161,7 @@ public class BuilderTest {
     @Test()
     public void testInfixToPostfix_PrecededOrderRight() {
 
-        Deque<Object> input = new ArrayDeque<Object>();
+        Deque<Object> input = new ArrayDeque<>();
 
         input.push(Operator.RIGHT);
         input.push(new Constraint<Comparable<?>>("third", Comparison.GREATER_THAN, 3L));
@@ -172,7 +173,7 @@ public class BuilderTest {
 
         Deque<Object> actual = Builder.infixToPostfix(input);
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.add(Operator.AND);
         expected.add(Operator.OR);
@@ -212,7 +213,7 @@ public class BuilderTest {
         @SuppressWarnings("unchecked")
         ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
         Double expected = 1.1;
-        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+        Assert.assertEquals(List.of(expected), constraintNode.getArgument());
     }
 
     @Test()
@@ -222,7 +223,7 @@ public class BuilderTest {
         @SuppressWarnings("unchecked")
         ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
         String expected = "hello";
-        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+        Assert.assertEquals(List.of(expected), constraintNode.getArgument());
     }
 
     @Test()
@@ -243,7 +244,7 @@ public class BuilderTest {
         @SuppressWarnings("unchecked")
         ConstraintNode<Iterable<Comparable<?>>> constraintNode = (ConstraintNode<Iterable<Comparable<?>>>) root;
         Integer expected = 1;
-        Assert.assertEquals(Arrays.asList(expected), constraintNode.getArgument());
+        Assert.assertEquals(List.of(expected), constraintNode.getArgument());
     }
 
     @Test()
@@ -263,7 +264,7 @@ public class BuilderTest {
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
-        Assert.assertEquals(1l, leftConstraint.getArgument());
+        Assert.assertEquals(1L, leftConstraint.getArgument());
 
         Node right = orNode.getRight();
 
@@ -289,7 +290,7 @@ public class BuilderTest {
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
         Assert.assertEquals("first", leftConstraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
-        Assert.assertEquals(1l, leftConstraint.getArgument());
+        Assert.assertEquals(1L, leftConstraint.getArgument());
 
         Node right = orNode.getRight();
 
@@ -298,7 +299,7 @@ public class BuilderTest {
 
         Assert.assertEquals("second", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
-        Assert.assertEquals(2l, rightConstraint.getArgument());
+        Assert.assertEquals(2L, rightConstraint.getArgument());
     }
 
     @Test()
@@ -310,7 +311,7 @@ public class BuilderTest {
 
         Assert.assertEquals("first", constraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, constraint.getComparison());
-        Assert.assertEquals(1l, constraint.getArgument());
+        Assert.assertEquals(1L, constraint.getArgument());
     }
 
     @Test()
@@ -322,12 +323,12 @@ public class BuilderTest {
 
         Assert.assertEquals("first", constraint.getSelector());
         Assert.assertEquals(Comparison.EQUALS, constraint.getComparison());
-        Assert.assertEquals(1l, constraint.getArgument());
+        Assert.assertEquals(1L, constraint.getArgument());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testSubCloseConstraint() {
-        Builder.start().constraint("first", Comparison.EQUALS, 1L).endsub().build();
+        Builder.start().constraint("first", Comparison.EQUALS, 1L).endSub().build();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -339,7 +340,7 @@ public class BuilderTest {
     @Test()
     public void testSubPrecededConstraint() {
         Node root = Builder.start().sub().constraint("first", Comparison.EQUALS, 1L).or()
-                .constraint("second", Comparison.NOT_EQUALS, 2L).endsub().and()
+                .constraint("second", Comparison.NOT_EQUALS, 2L).endSub().and()
                 .constraint("third", Comparison.GREATER_EQUALS, 3L).build();
         Assert.assertTrue(root.getClass().isAssignableFrom(LogicalOperationNode.class));
 
@@ -353,7 +354,7 @@ public class BuilderTest {
         ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
         Assert.assertEquals("third", rightConstraint.getSelector());
         Assert.assertEquals(Comparison.GREATER_EQUALS, rightConstraint.getComparison());
-        Assert.assertEquals(3l, rightConstraint.getArgument());
+        Assert.assertEquals(3L, rightConstraint.getArgument());
 
         Node left = andNode.getLeft();
         Assert.assertTrue(left.getClass().isAssignableFrom(LogicalOperationNode.class));

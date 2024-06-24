@@ -15,12 +15,12 @@ import java.util.*;
 @BuildParseTree
 public class ConstraintParser extends ArgumentParser {
 
-    protected String[] allowedSelectors = {};
+    protected String[] allowedSelectors;
 
     public ConstraintParser(String... allowedSelectors) {
         super();
         this.allowedSelectors = allowedSelectors;
-        Arrays.sort(this.allowedSelectors, new Comparator<String>() {
+        Arrays.sort(this.allowedSelectors, new Comparator<>() {
             public int compare(String o1, String o2) {
                 return o2.compareTo(o1);
             }
@@ -34,7 +34,7 @@ public class ConstraintParser extends ArgumentParser {
 
     @SuppressSubnodes
     protected Rule Selector() {
-        return Sequence(FirstOf(allowedSelectors), new Action<Object>() {
+        return Sequence(FirstOf(allowedSelectors), new Action<>() {
             public boolean run(Context<Object> context) {
                 return push(new SimpleSelector(match()));
             }
@@ -55,7 +55,7 @@ public class ConstraintParser extends ArgumentParser {
                         ZeroOrMore(Sequence(Ch(','), Optional(Ch(' ')), Argument())), Ch(']'))),
                 new Action<Comparable<?>>() {
                     public boolean run(Context<Comparable<?>> context) {
-                        List<Comparable<?>> arguments = new ArrayList<Comparable<?>>();
+                        List<Comparable<?>> arguments = new ArrayList<>();
                         Comparison comparison = null;
                         Selector selector = null;
                         while (!context.getValueStack().isEmpty()) {
@@ -71,10 +71,10 @@ public class ConstraintParser extends ArgumentParser {
                         }
 
                         if (arguments.size() == 1) {
-                            return push(new Constraint<Comparable<?>>(selector, comparison, arguments.get(0)));
+                            return push(new Constraint<Comparable<?>>(selector, comparison, arguments.getFirst()));
                         } else {
                             Collections.reverse(arguments);
-                            return push(new Constraint<List<Comparable<?>>>(selector, comparison, arguments));
+                            return push(new Constraint<>(selector, comparison, arguments));
                         }
                     }
                 });

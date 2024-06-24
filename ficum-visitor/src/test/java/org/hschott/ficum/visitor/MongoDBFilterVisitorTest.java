@@ -26,7 +26,7 @@ public class MongoDBFilterVisitorTest {
 
     private MongoDBFilterVisitor visitor;
 
-    private String[] allowedSelectorNames = {"name", "borough", "cuisine", "address.location", "address.street", "address.zipcode",
+    private final String[] allowedSelectorNames = {"name", "borough", "cuisine", "address.location", "address.street", "address.zipcode",
             "grades.date", "grades.score"};
 
     private MongoDatabase db;
@@ -59,7 +59,7 @@ public class MongoDBFilterVisitorTest {
     }
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         client = createMongoClient();
         db = client.getDatabase("ficum");
         visitor = new MongoDBFilterVisitor();
@@ -190,9 +190,9 @@ public class MongoDBFilterVisitorTest {
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
-        
-        List results = new ArrayList();
-        getCollection(db).find(query).forEach(document -> results.add(document.get("name")));
+
+        List<Document> results = new ArrayList<>();
+        getCollection(db).find(query).forEach(results::add);
 
         Assert.assertEquals(2, results.size());
     }
@@ -204,8 +204,8 @@ public class MongoDBFilterVisitorTest {
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         Bson query = visitor.start(node);
 
-        List results = new ArrayList();
-        getCollection(db).find(query).forEach(document -> results.add(document.get("name")));
+        List<Document> results = new ArrayList<>();
+        getCollection(db).find(query).forEach(results::add);
 
         Assert.assertEquals(4, results.size());
     }

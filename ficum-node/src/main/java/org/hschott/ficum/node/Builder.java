@@ -9,16 +9,16 @@ import java.util.Deque;
  */
 public class Builder {
 
-    private Deque<Object> infixStack;
+    private final Deque<Object> infixStack;
 
-    private UnbalancedBuilder unbalancedBuilder;
+    private final UnbalancedBuilder unbalancedBuilder;
 
-    private DefinedBuilder definedBuilder;
+    private final DefinedBuilder definedBuilder;
 
     private Builder parent;
 
     private Builder() {
-        infixStack = new ArrayDeque<Object>();
+        infixStack = new ArrayDeque<>();
         unbalancedBuilder = new UnbalancedBuilder(this);
         definedBuilder = new DefinedBuilder();
     }
@@ -45,13 +45,11 @@ public class Builder {
     private static Node eval(Deque<Object> postfix) {
         while (!postfix.isEmpty()) {
             Object element = postfix.removeFirst();
-            if (element instanceof Constraint) {
-                Constraint<?> constraint = (Constraint<?>) element;
+            if (element instanceof Constraint<?> constraint) {
                 return new ConstraintNode(constraint);
             }
 
-            if (element instanceof Operator) {
-                Operator operator = (Operator) element;
+            if (element instanceof Operator operator) {
                 OperationNode node = new LogicalOperationNode(operator);
                 Node operand1 = eval(postfix);
                 Node operand2 = eval(postfix);
@@ -64,17 +62,15 @@ public class Builder {
     }
 
     protected static Deque<Object> infixToPostfix(Iterable<Object> infixStack) {
-        Deque<Object> output = new ArrayDeque<Object>();
-        Deque<Operator> operatorStack = new ArrayDeque<Operator>();
+        Deque<Object> output = new ArrayDeque<>();
+        Deque<Operator> operatorStack = new ArrayDeque<>();
 
         for (Object element : infixStack) {
             if (element instanceof Constraint) {
                 output.push(element);
             }
 
-            if (element instanceof Operator) {
-                Operator op = (Operator) element;
-
+            if (element instanceof Operator op) {
                 switch (op) {
                 case AND:
                 case NOR:
@@ -120,7 +116,7 @@ public class Builder {
     }
 
     protected static Deque<Object> reverse(Iterable<Object> stack) {
-        Deque<Object> deque = new ArrayDeque<Object>();
+        Deque<Object> deque = new ArrayDeque<>();
         for (Object element : stack) {
             deque.addFirst(element);
         }
@@ -166,7 +162,7 @@ public class Builder {
          *
          * @return {@link Builder} this builder object
          */
-        public DefinedBuilder endsub() {
+        public DefinedBuilder endSub() {
             if (parent == null) {
                 throw new IllegalStateException("No open subexpression found!");
             }
@@ -191,7 +187,7 @@ public class Builder {
     }
 
     public class UnbalancedBuilder {
-        private Builder builder;
+        private final Builder builder;
 
         public UnbalancedBuilder(Builder builder) {
             this.builder = builder;
@@ -201,7 +197,7 @@ public class Builder {
          * Add a {@link Constraint} to the stack
          *
          * @param selector
-         *            identifier for an field this constraint applies to
+         *            identifier for a field this constraint applies to
          * @param comparison
          *            {@link Comparison} to apply
          * @param argument
@@ -218,7 +214,7 @@ public class Builder {
          * Add a {@link Constraint} to the stack
          *
          * @param selector
-         *            identifier for an field this constraint applies to
+         *            identifier for a field this constraint applies to
          * @param comparison
          *            {@link Comparison} to apply
          * @param argument
@@ -235,7 +231,7 @@ public class Builder {
          * Add a {@link Constraint} to the stack
          *
          * @param selector
-         *            identifier for an field this constraint applies to
+         *            identifier for a field this constraint applies to
          * @param comparison
          *            {@link Comparison} to apply
          * @param argument

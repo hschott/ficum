@@ -2,11 +2,11 @@ package org.hschott.ficum.node;
 
 public class Constraint<T> {
 
-    private String selector;
+    private final String selector;
 
-    private Comparison comparison;
+    private final Comparison comparison;
 
-    private T argument;
+    private final T argument;
 
     public Constraint(String selector, Comparison comparison, T argument) {
         super();
@@ -18,7 +18,7 @@ public class Constraint<T> {
     }
 
     public Constraint(Selector selector, Comparison comparison, T argument) {
-        this(checkArgNotNull(selector, "selector").getValue(), comparison, argument);
+        this(checkArgNotNull(selector, "selector").value(), comparison, argument);
     }
 
     public static <T> T checkArgNotNull(T reference, String parameterName) {
@@ -34,9 +34,8 @@ public class Constraint<T> {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof Constraint))
+        if (!(obj instanceof Constraint<?> other))
             return false;
-        Constraint<?> other = (Constraint<?>) obj;
         if (argument == null) {
             if (other.argument != null)
                 return false;

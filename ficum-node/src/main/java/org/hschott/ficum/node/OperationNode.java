@@ -8,8 +8,8 @@ public interface OperationNode extends Node {
 
     Node getRight();
 
-    OperationNode setLeft(Node node);
+    void setLeft(Node node);
 
-    OperationNode setRight(Node node);
+    void setRight(Node node);
 
 }

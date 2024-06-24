@@ -18,9 +18,7 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
 
     private Predicate<?, ?> buildEquals(String fieldName, Comparable<?> argument) {
         Predicate<?, ?> pred;
-        if (argument instanceof String) {
-            final String value = (String) argument;
-
+        if (argument instanceof String value) {
             if (containsWildcard(value) || isAlwaysWildcard()) {
                 String like = Wildcards.escapeAndConvertToSQLWildcards(value, isAlwaysWildcard());
                 pred = Predicates.like(fieldName, like);
@@ -36,9 +34,7 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
 
     private Predicate<?, ?> buildNotEquals(String fieldName, Comparable<?> argument) {
         Predicate<?, ?> pred;
-        if (argument instanceof String) {
-            final String value = (String) argument;
-
+        if (argument instanceof String value) {
             if (containsWildcard(value) || isAlwaysWildcard()) {
                 String like = Wildcards.escapeAndConvertToSQLWildcards(value, isAlwaysWildcard());
                 pred = Predicates.not(Predicates.like(fieldName, like));
@@ -53,81 +49,54 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
     }
 
     private Predicate<?, ?> doBuildPredicate(Comparison comparison, String fieldName, Comparable<?> argument) {
-        switch (comparison) {
-            case GREATER_THAN:
-                return Predicates.greaterThan(fieldName, argument);
-
-            case EQUALS:
-                return buildEquals(fieldName, argument);
-
-            case NOT_EQUALS:
-                return buildNotEquals(fieldName, argument);
-
-            case LESS_THAN:
-                return Predicates.lessThan(fieldName, argument);
-
-            case LESS_EQUALS:
-                return Predicates.lessEqual(fieldName, argument);
-
-            case GREATER_EQUALS:
-                return Predicates.greaterEqual(fieldName, argument);
-
-            case IN:
-            case NIN:
-                return doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
-
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case GREATER_THAN -> Predicates.greaterThan(fieldName, argument);
+            case EQUALS -> buildEquals(fieldName, argument);
+            case NOT_EQUALS -> buildNotEquals(fieldName, argument);
+            case LESS_THAN -> Predicates.lessThan(fieldName, argument);
+            case LESS_EQUALS -> Predicates.lessEqual(fieldName, argument);
+            case GREATER_EQUALS -> Predicates.greaterEqual(fieldName, argument);
+            case IN, NIN -> doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
+            default -> null;
+        };
     }
 
     private Predicate<?, ?> doBuildPredicate(Comparison comparison, String fieldName, List<Comparable> arguments) {
-        switch (comparison) {
-            case IN:
-                return Predicates.in(fieldName, arguments.toArray(new Comparable[arguments.size()]));
-
-            case NIN:
-                return Predicates.not(Predicates.in(fieldName, arguments.toArray(new Comparable[arguments.size()])));
-
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case IN -> Predicates.in(fieldName, arguments.toArray(new Comparable[0]));
+            case NIN -> Predicates.not(Predicates.in(fieldName, arguments.toArray(new Comparable[0])));
+            default -> null;
+        };
     }
 
     public Predicate<?, ?> start(Node node) {
-        filters = new ArrayList<Predicate<?, ?>>();
+        filters = new ArrayList<>();
         node.accept(this);
         if (filters.size() != 1) {
             throw new IllegalStateException("single predicate expected, but was: " + filters);
         }
-        return filters.get(0);
+        return filters.getFirst();
     }
 
     public void visit(ConstraintNode<?> node) {
         Object argument = node.getArgument();
         String fieldName = getMappedField(node.getSelector());
 
-        Predicate<?, ?> pred = null;
-        if (argument instanceof Comparable<?>) {
-            Comparable<?> value = (Comparable<?>) argument;
-
-            if (argument instanceof LocalDate) {
-                value = Date.from(((LocalDate) value).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant());
+        Predicate<?, ?> pred;
+        switch (argument) {
+            case Comparable<?> value -> {
+                if (argument instanceof LocalDate localDate) {
+                    value = Date.from((localDate).atStartOfDay().atZone(ZoneId.of("UTC")).toInstant());
+                }
+                if (argument instanceof OffsetDateTime offsetDateTime) {
+                    value = Date.from((offsetDateTime).toInstant());
+                }
+                pred = doBuildPredicate(node.getComparison(), fieldName, value);
             }
-
-            if (argument instanceof OffsetDateTime) {
-                value = Date.from(((OffsetDateTime) value).toInstant());
-            }
-
-            pred = doBuildPredicate(node.getComparison(), fieldName, value);
-
-        } else if (argument instanceof List) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable((List) argument));
-
-        } else if (argument == null) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
-        } else {
-            throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
+            case List list -> pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable(list));
+            case null -> pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
+            default -> throw new IllegalArgumentException(
+                    "Unable to handle argument of type " + argument.getClass().getName());
         }
 
         if (pred != null) {
@@ -141,29 +110,17 @@ public class HazelcastPredicateVisitor extends AbstractVisitor<Predicate<?, ?>> 
         node.getLeft().accept(this);
         node.getRight().accept(this);
 
-        Predicate<?, ?> pred = null;
+        Predicate<?, ?> pred;
         Predicate<?, ?> leftHandSide = filters.get(filters.size() - 2);
         Predicate<?, ?> rightHandSide = filters.get(filters.size() - 1);
-        switch (node.getOperator()) {
-            case AND:
-                pred = Predicates.and(leftHandSide, rightHandSide);
-                break;
-
-            case OR:
-                pred = Predicates.or(leftHandSide, rightHandSide);
-                break;
-
-            case NAND:
-                pred = Predicates.or(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
-                break;
-
-            case NOR:
-                pred = Predicates.and(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
-                break;
-
-            default:
-                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
-        }
+        pred = switch (node.getOperator()) {
+            case AND -> Predicates.and(leftHandSide, rightHandSide);
+            case OR -> Predicates.or(leftHandSide, rightHandSide);
+            case NAND -> Predicates.or(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
+            case NOR -> Predicates.and(Predicates.not(leftHandSide), Predicates.not(rightHandSide));
+            default ->
+                    throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        };
 
         filters.remove(leftHandSide);
         filters.remove(rightHandSide);

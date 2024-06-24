@@ -41,11 +41,7 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
     }
 
     public String getMappedField(String selector) {
-        if (selectorToFieldMapping.containsKey(selector)) {
-            return selectorToFieldMapping.get(selector);
-        } else {
-            return selector;
-        }
+        return selectorToFieldMapping.getOrDefault(selector, selector);
     }
 
     public boolean isAlwaysWildcard() {
@@ -61,13 +57,11 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
     }
 
     public void visit(Node node) {
-        if (node instanceof ConstraintNode) {
-            visit((ConstraintNode<?>) node);
-            return;
+        if (node instanceof ConstraintNode constraintNode) {
+            visit(constraintNode);
         }
-        if (node instanceof OperationNode) {
-            visit((OperationNode) node);
-            return;
+        if (node instanceof OperationNode operationNode) {
+            visit(operationNode);
         }
     }
 
