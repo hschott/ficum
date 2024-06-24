@@ -2,7 +2,7 @@ package org.hschott.ficum.node;
 
 public class ConstraintNode<T> implements OperandNode {
 
-    private Constraint<T> constraint;
+    private final Constraint<T> constraint;
 
     public ConstraintNode(Constraint<T> constraint) {
         super();
@@ -19,9 +19,8 @@ public class ConstraintNode<T> implements OperandNode {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof ConstraintNode))
+        if (!(obj instanceof ConstraintNode<?> other))
             return false;
-        ConstraintNode<?> other = (ConstraintNode<?>) obj;
         if (constraint == null) {
             if (other.constraint != null)
                 return false;

@@ -21,15 +21,15 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
 
     public static final char ESCAPE_CHAR = '\\';
 
-    private CriteriaBuilder criteriaBuilder;
+    private final CriteriaBuilder criteriaBuilder;
 
-    private Root<T> root;
+    private final Root<T> root;
 
-    private Class<T> queryClass;
+    private final Class<T> queryClass;
 
     private List<Predicate> predicates;
 
-    private Set<Class<? extends Comparable<?>>> mappedTypes = new HashSet<Class<? extends Comparable<?>>>();
+    private final Set<Class<? extends Comparable<?>>> mappedTypes = new HashSet<>();
 
     public JPAPredicateVisitor(Class<T> queryClass, Root<T> root, CriteriaBuilder criteriaBuilder) {
         super();
@@ -63,11 +63,11 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Predicate buildEquals(Object value, Expression<? extends Comparable> path) {
+    private Predicate buildEquals(Comparable value, Expression<? extends Comparable> path) {
         Predicate pred;
         if (value == null) {
             pred = path.isNull();
-        } else if (path.getJavaType().equals(String.class)) {
+        } else if (String.class.isAssignableFrom(path.getJavaType())) {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
@@ -87,11 +87,11 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Predicate buildNotEquals(Object value, Expression<? extends Comparable> path) {
+    private Predicate buildNotEquals(Comparable value, Expression<? extends Comparable> path) {
         Predicate pred;
         if (value == null) {
             pred = path.isNotNull();
-        } else if (path.getJavaType().equals(String.class)) {
+        } else if (String.class.isAssignableFrom(path.getJavaType())) {
             final String originalValue = value.toString();
 
             if (containsWildcard(originalValue) || isAlwaysWildcard()) {
@@ -114,76 +114,42 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     private Predicate doBuildCollectionSizePredicate(Comparison comparison, Path<?> path, Integer argument) {
         Expression<Integer> exp = criteriaBuilder.size((Expression<? extends Collection>) path);
 
-        switch (comparison) {
-            case GREATER_THAN:
-                return criteriaBuilder.greaterThan(exp, argument);
-
-            case EQUALS:
-                return criteriaBuilder.equal(exp, argument);
-
-            case NOT_EQUALS:
-                return criteriaBuilder.notEqual(exp, argument);
-
-            case LESS_THAN:
-                return criteriaBuilder.lessThan(exp, argument);
-
-            case LESS_EQUALS:
-                return criteriaBuilder.lessThanOrEqualTo(exp, argument);
-
-            case GREATER_EQUALS:
-                return criteriaBuilder.greaterThanOrEqualTo(exp, argument);
-
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case GREATER_THAN -> criteriaBuilder.greaterThan(exp, argument);
+            case EQUALS -> criteriaBuilder.equal(exp, argument);
+            case NOT_EQUALS -> criteriaBuilder.notEqual(exp, argument);
+            case LESS_THAN -> criteriaBuilder.lessThan(exp, argument);
+            case LESS_EQUALS -> criteriaBuilder.lessThanOrEqualTo(exp, argument);
+            case GREATER_EQUALS -> criteriaBuilder.greaterThanOrEqualTo(exp, argument);
+            default -> null;
+        };
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private Predicate doBuildPredicate(Comparison comparison, Expression<? extends Comparable> path,
                                        Comparable argument) {
 
-        switch (comparison) {
-            case GREATER_THAN:
-                return criteriaBuilder.greaterThan(path, argument);
-
-            case EQUALS:
-                return buildEquals(argument, path);
-
-            case NOT_EQUALS:
-                return buildNotEquals(argument, path);
-
-            case LESS_THAN:
-                return criteriaBuilder.lessThan(path, argument);
-
-            case LESS_EQUALS:
-                return criteriaBuilder.lessThanOrEqualTo(path, argument);
-
-            case GREATER_EQUALS:
-                return criteriaBuilder.greaterThanOrEqualTo(path, argument);
-
-            case IN:
-            case NIN:
-                return doBuildPredicate(comparison, path, Collections.singletonList(argument));
-
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case GREATER_THAN -> criteriaBuilder.greaterThan(path, argument);
+            case EQUALS -> buildEquals(argument, path);
+            case NOT_EQUALS -> buildNotEquals(argument, path);
+            case LESS_THAN -> criteriaBuilder.lessThan(path, argument);
+            case LESS_EQUALS -> criteriaBuilder.lessThanOrEqualTo(path, argument);
+            case GREATER_EQUALS -> criteriaBuilder.greaterThanOrEqualTo(path, argument);
+            case IN, NIN -> doBuildPredicate(comparison, path, Collections.singletonList(argument));
+            default -> null;
+        };
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({"rawtypes"})
     private Predicate doBuildPredicate(Comparison comparison, Expression<? extends Comparable> path,
                                        List<Comparable> argument) {
 
-        switch (comparison) {
-            case IN:
-                return path.in(argument);
-
-            case NIN:
-                return criteriaBuilder.not(path.in(argument));
-
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case IN -> path.in(argument);
+            case NIN -> criteriaBuilder.not(path.in(argument));
+            default -> null;
+        };
     }
 
     private Path<?> findPath(String names) {
@@ -224,9 +190,8 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     }
 
     private Path<?> getExistingJoin(From<?, ?> element, String prop) {
-        final Set<?> joins = element.getJoins();
-        for (Object object : joins) {
-            Join<?, ?> join = (Join<?, ?>) object;
+        final Set<? extends Join<?, ?>> joins = element.getJoins();
+        for (Join<?, ?> join : joins) {
             if (join.getAttribute().getName().equals(prop)) {
                 return join;
             }
@@ -277,6 +242,7 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         return false;
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private Comparable<?> convertValue(Comparable<?> value,  Class<? extends Comparable> clazz ){
         // convert from string to enum
         if (value instanceof String && clazz.isEnum()) {
@@ -313,7 +279,7 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
     public Predicate start(Node node) {
         predicates = new ArrayList<>();
         node.accept(this);
-        return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+        return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
 
     }
 
@@ -324,24 +290,28 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         Class<? extends Comparable> clazz = (Class<? extends Comparable>) path.getJavaType();
         Object argument = node.getArgument();
 
-        Predicate pred = null;
-        if (argument instanceof Comparable<?>) {
-            Comparable<?> value = (Comparable<?>) argument;
+        Predicate pred;
+        switch (argument) {
+            case Comparable<?> comparable -> {
+                Comparable<?> value = comparable;
 
-            value = convertValue(value,clazz);
+                value = convertValue(value, clazz);
 
-            pred = isCollectionSizeCheck(path, value)
-                    ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) value)
-                    : doBuildPredicate(node.getComparison(), path.as(clazz), value);
-
-        } else if (argument instanceof List) {
-            //convert all values to the supported data-type
-            List<Comparable<?>> transformedValues = ((List<Comparable<?>>) argument).stream().map(v -> convertValue(v, clazz)).collect(Collectors.toList());
-            pred = doBuildPredicate(node.getComparison(), path.as(clazz), sanitizeToComparable(transformedValues));
-        } else if (argument == null) {
-            pred = doBuildPredicate(node.getComparison(), path.as(clazz), (Comparable<?>) null);
-        } else {
-            throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
+                pred = isCollectionSizeCheck(path, value)
+                        ? doBuildCollectionSizePredicate(node.getComparison(), path, (Integer) value)
+                        : doBuildPredicate(node.getComparison(), path.as(clazz), value);
+            }
+            case List ignored -> {
+                //convert all values to the supported data-type
+                List<Comparable<?>> transformedValues =
+                        ((List<Comparable<?>>) argument).stream()
+                                                        .map(v -> convertValue(v, clazz))
+                                                        .collect(Collectors.toList());
+                pred = doBuildPredicate(node.getComparison(), path.as(clazz), sanitizeToComparable(transformedValues));
+            }
+            case null -> pred = doBuildPredicate(node.getComparison(), path.as(clazz), (Comparable<?>) null);
+            default -> throw new IllegalArgumentException(
+                    "Unable to handle argument of type " + argument.getClass().getName());
         }
 
         if (pred != null) {
@@ -356,29 +326,17 @@ public class JPAPredicateVisitor<T> extends AbstractVisitor<Predicate> {
         node.getLeft().accept(this);
         node.getRight().accept(this);
 
-        Predicate pred = null;
+        Predicate pred;
         Predicate leftHandSide = predicates.get(predicates.size() - 2);
         Predicate rightHandSide = predicates.get(predicates.size() - 1);
-        switch (node.getOperator()) {
-            case AND:
-                pred = criteriaBuilder.and(leftHandSide, rightHandSide);
-                break;
-
-            case OR:
-                pred = criteriaBuilder.or(leftHandSide, rightHandSide);
-                break;
-
-            case NAND:
-                pred = criteriaBuilder.or(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
-                break;
-
-            case NOR:
-                pred = criteriaBuilder.and(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
-                break;
-
-            default:
-                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
-        }
+        pred = switch (node.getOperator()) {
+            case AND -> criteriaBuilder.and(leftHandSide, rightHandSide);
+            case OR -> criteriaBuilder.or(leftHandSide, rightHandSide);
+            case NAND -> criteriaBuilder.or(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
+            case NOR -> criteriaBuilder.and(criteriaBuilder.not(leftHandSide), criteriaBuilder.not(rightHandSide));
+            default ->
+                    throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        };
 
         predicates.remove(leftHandSide);
         predicates.remove(rightHandSide);

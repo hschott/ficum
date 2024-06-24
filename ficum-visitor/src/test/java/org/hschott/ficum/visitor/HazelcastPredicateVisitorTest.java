@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.config.*;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import com.hazelcast.query.Predicate;
 import org.hschott.ficum.node.Node;
 import org.hschott.ficum.parser.ParseHelper;
@@ -27,11 +27,11 @@ public class HazelcastPredicateVisitorTest {
         SLF4JBridgeHandler.install();
     }
 
-    private static HazelcastInstance hazelcastInstance = getHazelcastInstance();
+    private static final HazelcastInstance hazelcastInstance = getHazelcastInstance();
 
     private HazelcastPredicateVisitor visitor;
 
-    private String[] allowedSelectorNames = {"name", "borough", "address.street", "address.zipcode", "grade.date", "grade.score"};
+    private final String[] allowedSelectorNames = {"name", "borough", "address.street", "address.zipcode", "grade.date", "grade.score"};
 
     private static HazelcastInstance getHazelcastInstance() {
         Config config = new Config();
@@ -45,11 +45,11 @@ public class HazelcastPredicateVisitorTest {
         MapConfig mapConfig = new MapConfig();
         mapConfig.setName("restaurants").setInMemoryFormat(InMemoryFormat.BINARY)
                 .setCacheDeserializedValues(CacheDeserializedValues.ALWAYS);
-        mapConfig.addMapIndexConfig(new MapIndexConfig("name", false));
-        mapConfig.addMapIndexConfig(new MapIndexConfig("borough", false));
-        mapConfig.addMapIndexConfig(new MapIndexConfig("address.street", false));
-        mapConfig.addMapIndexConfig(new MapIndexConfig("grade.date", true));
-        mapConfig.addMapIndexConfig(new MapIndexConfig("grade.score", true));
+        mapConfig.addIndexConfig(new IndexConfig(IndexType.HASH, "name"));
+        mapConfig.addIndexConfig(new IndexConfig(IndexType.HASH, "borough"));
+        mapConfig.addIndexConfig(new IndexConfig(IndexType.HASH, "address.street"));
+        mapConfig.addIndexConfig(new IndexConfig(IndexType.HASH, "grade.date"));
+        mapConfig.addIndexConfig(new IndexConfig(IndexType.HASH, "grade.score"));
         config.addMapConfig(mapConfig);
 
         return Hazelcast.newHazelcastInstance(config);
@@ -76,7 +76,7 @@ public class HazelcastPredicateVisitorTest {
     }
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         visitor = new HazelcastPredicateVisitor();
     }
 
@@ -86,7 +86,7 @@ public class HazelcastPredicateVisitorTest {
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
         visitor.setAlwaysWildcard(true);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
         visitor.setAlwaysWildcard(false);
 
         Assert.assertEquals(53, getMap().values(query).size());
@@ -97,7 +97,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=='Manhattan',address.street=='11 Avenue'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(2, getMap().values(query).size());
     }
@@ -107,7 +107,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=='Manhattan',address.street=='11 Avenue',name=='Mcquaids Public House'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(1, getMap().values(query).size());
     }
@@ -117,7 +117,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=='Manhattan',address.street=='11 Avenue';address.street=='East   74 Street',name=='Glorious Food'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(3, getMap().values(query).size());
     }
@@ -127,7 +127,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "grade.date=ge=2015-01-01,grade.score=gt=1";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(306, getMap().values(query).size());
     }
@@ -137,7 +137,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "grade.date=ge=2015-01-01T00:00:00.000Z,grade.score=gt=1";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(306, getMap().values(query).size());
     }
@@ -147,7 +147,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "address.zipcode==null";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(1, getMap().values(query).size());
     }
@@ -157,7 +157,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "address.zipcode!=null";
         Node node = ParseHelper.parse(input, allowedSelectorNames);
 
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(4998, getMap().values(query).size());
     }
@@ -167,7 +167,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough!='Manhattan'.name!='*Cafe'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(2574, getMap().values(query).size());
 
@@ -184,7 +184,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "name=='*Kitchen':name=='*Cafe'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(4750, getMap().values(query).size());
     }
@@ -194,7 +194,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough!='Manhattan'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(2511, getMap().values(query).size());
     }
@@ -204,7 +204,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "name=='*Kitchen';name=='*Cafe'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(249, getMap().values(query).size());
     }
@@ -214,7 +214,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=in=['Queens','Manhattan']";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(3475, getMap().values(query).size());
     }
@@ -224,7 +224,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=in=['Queens']";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(987, getMap().values(query).size());
     }
@@ -234,7 +234,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=nin=['Queens','Manhattan']";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(1524, getMap().values(query).size());
     }
@@ -244,7 +244,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "borough=nin=['Queens']";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(4012, getMap().values(query).size());
     }
@@ -254,7 +254,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "(name=='*Kitchen';name=='*Cafe'),borough=='Manhattan'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(141, getMap().values(query).size());
     }
@@ -264,7 +264,7 @@ public class HazelcastPredicateVisitorTest {
         String input = "name=='*Kitchen'";
 
         Node node = ParseHelper.parse(input, allowedSelectorNames);
-        Predicate<?, ?> query = visitor.start(node);
+        Predicate query = visitor.start(node);
 
         Assert.assertEquals(44, getMap().values(query).size());
     }

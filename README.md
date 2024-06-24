@@ -161,11 +161,6 @@ String query = new QueryPrinterVisitor().start(root);
 
 The Builder.constraint() method excepts as argument any `java.lang.Comparable`.
 
-**with Java 11**
-
-If you're running Java 11, you need to open standard java modules for reflective access.
-Add the `--add-opens  java.base/java.lang=ALL-UNNAMED` Java argument to the commandline.   
-
 ## FICUM Query Language
 
 A FICUM query's input is a string of Unicode characters in the form of an expression.

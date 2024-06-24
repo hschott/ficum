@@ -23,12 +23,12 @@ public class JPAPredicateVisitorTest {
 
     private EntityManager entityManager;
 
-    private CriteriaQuery cq;
+    private CriteriaQuery<Pet> cq;
 
     private Root<Pet> root;
 
     private JPAPredicateVisitor<Pet> petVisitor;
-    private String[] allowedSelectorNames = {"nicknames", "owner.firstName", "name", "visits", "visits.type",
+    private final String[] allowedSelectorNames = {"nicknames", "owner.firstName", "name", "visits", "visits.type",
             "visits.date", "birthDate", "unknown", "born"};
 
     private TypedQuery<Pet> getTypedQuery(Predicate predicate) {
@@ -42,7 +42,7 @@ public class JPAPredicateVisitorTest {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         cq = criteriaBuilder.createQuery(Pet.class);
         root = cq.from(Pet.class);
-        petVisitor = new JPAPredicateVisitor<Pet>(Pet.class, root, criteriaBuilder);
+        petVisitor = new JPAPredicateVisitor<>(Pet.class, root, criteriaBuilder);
         petVisitor.addSelectorToFieldMapping("born", "birthDate");
     }
 

@@ -23,10 +23,9 @@ public class LogicalOperationNode implements OperationNode {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof LogicalOperationNode))
+        if (!(obj instanceof LogicalOperationNode other))
             return false;
 
-        LogicalOperationNode other = (LogicalOperationNode) obj;
         if (left == null) {
             if (other.left != null)
                 return false;
@@ -65,14 +64,12 @@ public class LogicalOperationNode implements OperationNode {
         return result;
     }
 
-    public OperationNode setLeft(Node left) {
+    public void setLeft(Node left) {
         this.left = left;
-        return this;
     }
 
-    public OperationNode setRight(Node right) {
+    public void setRight(Node right) {
         this.right = right;
-        return this;
     }
 
     @Override

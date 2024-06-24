@@ -20,9 +20,7 @@ public class LongToDateDeserializer extends StdScalarDeserializer<Date> {
             throws IOException {
         ObjectCodec oc = jsonParser.getCodec();
         JsonNode node = oc.readTree(jsonParser);
-        Long dateValue = node.get("$date").asLong();
-        Date date = new Date(dateValue);
-
-        return date;
+        long dateValue = node.get("$date").asLong();
+        return new Date(dateValue);
     }
 }

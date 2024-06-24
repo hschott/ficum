@@ -24,8 +24,8 @@ import org.hschott.ficum.node.Operator;
 public class ExpressionParserTest {
     private static final Logger LOG = LoggerFactory.getLogger(ExpressionParserTest.class);
 
-    private static String[] allowedPaths = { "first", "second", "third", "fourth", "fifth" };
-    private static ConstraintParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedPaths);
+    private static final String[] allowedPaths = { "first", "second", "third", "fourth", "fifth" };
+    private static final ConstraintParser parser = Parboiled.createParser(ExpressionParser.class, (Object) allowedPaths);
 
     private TracingParseRunner<Deque<Object>> parseRunner;
 
@@ -56,7 +56,7 @@ public class ExpressionParserTest {
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: {}\n", ParseTreeUtils.printNodeTree(result));
         }
     }
 
@@ -70,7 +70,7 @@ public class ExpressionParserTest {
     public void testAndOperator() {
         String input = "first=gt=1l,second=le=2l,third=gt=3l";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.AND);
@@ -85,7 +85,7 @@ public class ExpressionParserTest {
     public void testNestedPrecededOperator() {
         String input = "first=gt=1l,(second=le=2l;(third=gt=3;fourth==4f),fifth=lt='five')";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.AND);
@@ -108,7 +108,7 @@ public class ExpressionParserTest {
     public void testOrBeforeAndOperator() {
         String input = "first==true;second=le=2l,third=gt=3.34f";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.EQUALS, true));
         expected.addLast(Operator.OR);
@@ -123,7 +123,7 @@ public class ExpressionParserTest {
     public void testOrOperator() {
         String input = "first=gt=1L;second=le=2F;third=gt=3";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1L));
         expected.addLast(Operator.OR);
@@ -138,7 +138,7 @@ public class ExpressionParserTest {
     public void testOrPrecededOperator() {
         String input = "first=gt=1,(second=le=2;third=gt=3)";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, 1));
         expected.addLast(Operator.AND);
@@ -169,7 +169,7 @@ public class ExpressionParserTest {
     public void testPrecededOperator() {
         String input = "(first=gt=-1f)";
 
-        Deque<Object> expected = new ArrayDeque<Object>();
+        Deque<Object> expected = new ArrayDeque<>();
 
         expected.addLast(Operator.LEFT);
         expected.addLast(new Constraint<Comparable<?>>("first", Comparison.GREATER_THAN, -1F));
