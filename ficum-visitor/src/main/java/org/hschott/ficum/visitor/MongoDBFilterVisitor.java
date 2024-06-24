@@ -21,8 +21,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
     private Bson buildEquals(String fieldName, Comparable<?> argument) {
         Bson pred;
-        if (argument instanceof String) {
-            final String value = (String) argument;
+        if (argument instanceof String value) {
 
             if (containsWildcard(value) || isAlwaysWildcard()) {
                 String regex = Wildcards.escapeAndConvertToRegexWildcards(value, isAlwaysWildcard());
@@ -39,8 +38,7 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
 
     private Bson buildNotEquals(String fieldName, Comparable<?> argument) {
         Bson pred;
-        if (argument instanceof String) {
-            final String value = (String) argument;
+        if (argument instanceof String value) {
 
             if (containsWildcard(value) || isAlwaysWildcard()) {
                 String regex = Wildcards.escapeAndConvertToRegexWildcards(value, isAlwaysWildcard());
@@ -85,7 +83,6 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
                                 geoargs.get(3));
 
                     default:
-                        @SuppressWarnings("unchecked")
                         Polygon geometry = new Polygon(toPositions(geoargs, true));
                         return Filters.geoWithin(fieldName, geometry);
                 }
@@ -105,7 +102,6 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
                         return Filters.geoIntersects(fieldName, new LineString(toPositions(geoargs, false)));
 
                     default:
-                        @SuppressWarnings("unchecked")
                         Polygon geometry = new Polygon(toPositions(geoargs, true));
                         return Filters.geoIntersects(fieldName, geometry);
                 }
@@ -124,45 +120,30 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
     }
 
     private Bson doBuildPredicate(Comparison comparison, String fieldName, Comparable<?> argument) {
-        switch (comparison) {
-            case GREATER_THAN:
-                return Filters.gt(fieldName, argument);
-
-            case EQUALS:
-                return buildEquals(fieldName, argument);
-
-            case NOT_EQUALS:
-                return buildNotEquals(fieldName, argument);
-
-            case LESS_THAN:
-                return Filters.lt(fieldName, argument);
-
-            case LESS_EQUALS:
-                return Filters.lte(fieldName, argument);
-
-            case GREATER_EQUALS:
-                return Filters.gte(fieldName, argument);
-
-            case IN:
-            case NIN:
-                return doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
-            default:
-                return null;
-        }
+        return switch (comparison) {
+            case GREATER_THAN -> Filters.gt(fieldName, argument);
+            case EQUALS -> buildEquals(fieldName, argument);
+            case NOT_EQUALS -> buildNotEquals(fieldName, argument);
+            case LESS_THAN -> Filters.lt(fieldName, argument);
+            case LESS_EQUALS -> Filters.lte(fieldName, argument);
+            case GREATER_EQUALS -> Filters.gte(fieldName, argument);
+            case IN, NIN -> doBuildPredicate(comparison, fieldName, Collections.singletonList(argument));
+            default -> null;
+        };
     }
 
     public Bson start(Node node) {
-        filters = new ArrayList<Bson>();
+        filters = new ArrayList<>();
         node.accept(this);
         if (filters.size() != 1) {
             throw new IllegalStateException("single predicate expected, but was: " + filters);
         }
-        return filters.get(0);
+        return filters.getFirst();
     }
 
     private List<Position> toPositions(List<Double> arguments, boolean close) {
         Iterator<Double> it = arguments.iterator();
-        List<Position> positions = new ArrayList<Position>();
+        List<Position> positions = new ArrayList<>();
 
         while (it.hasNext()) {
             Double lon = it.next();
@@ -172,8 +153,8 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
             }
         }
 
-        if (close && positions.size() >= 3 && !positions.get(0).equals(positions.get(positions.size() - 1))) {
-            positions.add(positions.get(0));
+        if (close && positions.size() >= 3 && !positions.getFirst().equals(positions.getLast())) {
+            positions.add(positions.getFirst());
         }
 
         return positions;
@@ -187,22 +168,21 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         Object argument = node.getArgument();
         String fieldName = getMappedField(node.getSelector());
 
-        Bson pred = null;
-        if (argument instanceof Comparable<?>) {
-            Comparable<?> value = (Comparable<?>) argument;
+        Bson pred;
+        switch (argument) {
+            case Comparable<?> comparable -> {
+                Comparable<?> value = comparable;
 
-            if (value instanceof OffsetDateTime) {
-                value = ((OffsetDateTime) value).toLocalDateTime();
+                if (value instanceof OffsetDateTime) {
+                    value = ((OffsetDateTime) value).toLocalDateTime();
+                }
+
+                pred = doBuildPredicate(node.getComparison(), fieldName, value);
             }
-
-            pred = doBuildPredicate(node.getComparison(), fieldName, value);
-
-        } else if (argument instanceof List) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable((List) argument));
-        } else if (argument == null) {
-            pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
-        } else {
-            throw new IllegalArgumentException("Unable to handle argument of type " + argument.getClass().getName());
+            case List list -> pred = doBuildPredicate(node.getComparison(), fieldName, sanitizeToComparable(list));
+            case null -> pred = doBuildPredicate(node.getComparison(), fieldName, (Comparable<?>) null);
+            default -> throw new IllegalArgumentException(
+                    "Unable to handle argument of type " + argument.getClass().getName());
         }
 
         if (pred != null) {
@@ -216,29 +196,17 @@ public class MongoDBFilterVisitor extends AbstractVisitor<Bson> {
         node.getLeft().accept(this);
         node.getRight().accept(this);
 
-        Bson pred = null;
+        Bson pred;
         Bson leftHandSide = filters.get(filters.size() - 2);
         Bson rightHandSide = filters.get(filters.size() - 1);
-        switch (node.getOperator()) {
-            case AND:
-                pred = Filters.and(leftHandSide, rightHandSide);
-                break;
-
-            case OR:
-                pred = Filters.or(leftHandSide, rightHandSide);
-                break;
-
-            case NAND:
-                pred = Filters.or(Filters.not(leftHandSide), Filters.not(rightHandSide));
-                break;
-
-            case NOR:
-                pred = Filters.and(Filters.not(leftHandSide), Filters.not(rightHandSide));
-                break;
-
-            default:
-                throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
-        }
+        pred = switch (node.getOperator()) {
+            case AND -> Filters.and(leftHandSide, rightHandSide);
+            case OR -> Filters.or(leftHandSide, rightHandSide);
+            case NAND -> Filters.or(Filters.not(leftHandSide), Filters.not(rightHandSide));
+            case NOR -> Filters.and(Filters.not(leftHandSide), Filters.not(rightHandSide));
+            default ->
+                    throw new IllegalArgumentException("OperationNode: " + node + " does not resolve to a operation");
+        };
 
         filters.remove(leftHandSide);
         filters.remove(rightHandSide);
