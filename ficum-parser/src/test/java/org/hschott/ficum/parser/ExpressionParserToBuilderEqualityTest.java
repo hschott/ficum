@@ -72,7 +72,7 @@ public class ExpressionParserToBuilderEqualityTest {
         Node expected = Builder.start().constraint("first", Comparison.GREATER_THAN, 1).and().sub()
                 .constraint("second", Comparison.LESS_EQUALS, 2l).or().sub()
                 .constraint("third", Comparison.GREATER_THAN, 3).or().constraint("fourth", Comparison.EQUALS, 4f)
-                .endsub().and().constraint("fifth", Comparison.LESS_THAN, "five").endsub().build();
+                .endSub().and().constraint("fifth", Comparison.LESS_THAN, "five").endSub().build();
 
         assertSameNodetree(input, expected);
     }
@@ -92,7 +92,7 @@ public class ExpressionParserToBuilderEqualityTest {
         String input = "(first==1l;second=gt='two'),third=le=3f";
 
         Node expected = Builder.start().sub().constraint("first", Comparison.EQUALS, 1l).or()
-                .constraint("second", Comparison.GREATER_THAN, "two").endsub().and()
+                .constraint("second", Comparison.GREATER_THAN, "two").endSub().and()
                 .constraint("third", Comparison.LESS_EQUALS, 3f).build();
 
         assertSameNodetree(input, expected);
@@ -104,7 +104,7 @@ public class ExpressionParserToBuilderEqualityTest {
 
         Node expected = Builder.start().constraint("first", Comparison.EQUALS, 1l).and().sub()
                 .constraint("second", Comparison.GREATER_THAN, "two").or()
-                .constraint("third", Comparison.LESS_EQUALS, 3f).endsub().build();
+                .constraint("third", Comparison.LESS_EQUALS, 3f).endSub().build();
 
         assertSameNodetree(input, expected);
     }

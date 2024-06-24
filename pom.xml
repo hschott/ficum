@@ -80,8 +80,8 @@
             </dependency>
             <dependency>
                 <groupId>com.hazelcast</groupId>
-                <artifactId>hazelcast-client</artifactId>
-                <version>3.12.13</version>
+                <artifactId>hazelcast</artifactId>
+                <version>5.4.0</version>
                 <optional>true</optional>
             </dependency>
             <dependency>
@@ -228,11 +228,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <argLine>
-                            --add-opens java.base/java.lang=ALL-UNNAMED
-                        </argLine>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

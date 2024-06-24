@@ -8,7 +8,7 @@ public enum Operator {
 
     AND(",", true), NAND(".", false), OR(";", false), NOR(":", true), LEFT("(", false), RIGHT(")", true);
 
-    private static final Map<String, Operator> lookup = new HashMap<String, Operator>();
+    private static final Map<String, Operator> lookup = new HashMap<>();
 
     static {
         for (Operator operator : EnumSet.allOf(Operator.class)) {
@@ -20,7 +20,7 @@ public enum Operator {
 
     public final boolean preceded;
 
-    private Operator(String sign, boolean preceded) {
+    Operator(String sign, boolean preceded) {
         this.sign = sign;
         this.preceded = preceded;
     }

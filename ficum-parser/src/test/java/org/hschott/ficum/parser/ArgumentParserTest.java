@@ -14,7 +14,6 @@ import org.parboiled.support.ParsingResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -37,7 +36,7 @@ public class ArgumentParserTest {
         logInfo(result);
         Assert.assertTrue(result.hasErrors());
         Assert.assertEquals(1, result.parseErrors.size());
-        Assert.assertTrue(result.parseErrors.get(0).getClass().isAssignableFrom(expected));
+        Assert.assertTrue(result.parseErrors.getFirst().getClass().isAssignableFrom(expected));
     }
 
     private void assertValue(Comparable<?> expected, String input) {
@@ -53,7 +52,7 @@ public class ArgumentParserTest {
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: {}\n", ParseTreeUtils.printNodeTree(result));
         }
     }
 
@@ -137,7 +136,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testDateAD10000() {
-        LocalDate date = LocalDate.now().plus(12500, ChronoUnit.YEARS);
+        LocalDate date = LocalDate.now().plusYears(12500);
         String input = DateTimeFormatter.ISO_LOCAL_DATE.format(date);
 
         assertValue(date, input);
@@ -145,7 +144,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testDateBC() {
-        LocalDate date = LocalDate.now().minus(12500, ChronoUnit.YEARS);
+        LocalDate date = LocalDate.now().minusYears(12500);
         String input = DateTimeFormatter.ISO_LOCAL_DATE.format(date);
 
         assertValue(date, input);
@@ -255,7 +254,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testNegative_long() {
-        final Long expected = -123l;
+        final Long expected = -123L;
         String input = "-123l";
 
         assertValue(expected, input);
@@ -263,7 +262,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testNegative_Long() {
-        final Long expected = -123l;
+        final Long expected = -123L;
         String input = "-123L";
 
         assertValue(expected, input);
@@ -375,7 +374,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testPositive_long() {
-        final Long expected = 123l;
+        final Long expected = 123L;
         String input = "+123l";
 
         assertValue(expected, input);
@@ -383,7 +382,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testPositive_Long() {
-        final Long expected = 123l;
+        final Long expected = 123L;
         String input = "+123L";
 
         assertValue(expected, input);
@@ -416,7 +415,7 @@ public class ArgumentParserTest {
     @Test()
     public void testError_invalid_uuid() {
         final UUID expected = UUID.randomUUID();
-        String input = expected.toString() + "a";
+        String input = expected + "a";
 
         assertError(InvalidInputError.class, input);
     }
@@ -446,7 +445,7 @@ public class ArgumentParserTest {
     }
 
     @Test()
-    public void testStringPctEncoded() throws UnsupportedEncodingException {
+    public void testStringPctEncoded() {
         final String expected = "/\u00a7$()";
         String input = "'%2F%C2%A7%24%28%29'";
 
@@ -463,7 +462,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testTimestampAD10000() {
-        OffsetDateTime dateTime = OffsetDateTime.now().plus(10000, ChronoUnit.YEARS).truncatedTo(ChronoUnit.MILLIS);
+        OffsetDateTime dateTime = OffsetDateTime.now().plusYears(10000).truncatedTo(ChronoUnit.MILLIS);
         String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
@@ -471,7 +470,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testTimestampBC() {
-        OffsetDateTime dateTime = OffsetDateTime.now().minus(2500, ChronoUnit.YEARS).truncatedTo(ChronoUnit.MILLIS);
+        OffsetDateTime dateTime = OffsetDateTime.now().minusYears(2500).truncatedTo(ChronoUnit.MILLIS);
         String input = AbstractVisitor.ISO_OFFSET_DATE_TIME.format(dateTime);
 
         assertValue(dateTime, input);
@@ -575,7 +574,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testUnsigned_long() {
-        final Long expected = 123l;
+        final Long expected = 123L;
         String input = "123l";
 
         assertValue(expected, input);
@@ -583,7 +582,7 @@ public class ArgumentParserTest {
 
     @Test()
     public void testUnsigned_Long() {
-        final Long expected = 123l;
+        final Long expected = 123L;
         String input = "123L";
 
         assertValue(expected, input);

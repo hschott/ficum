@@ -36,7 +36,7 @@ public class ConstraintParserTest {
         logInfo(result);
         Assert.assertTrue(result.hasErrors());
         Assert.assertEquals(1, result.parseErrors.size());
-        Assert.assertTrue(result.parseErrors.get(0).getClass().isAssignableFrom(expected));
+        Assert.assertTrue(result.parseErrors.getFirst().getClass().isAssignableFrom(expected));
     }
 
     private void assertValue(Constraint<?> expected, String input) {
@@ -52,7 +52,7 @@ public class ConstraintParserTest {
         if (result.hasErrors()) {
             LOG.info(ErrorUtils.printParseErrors(result.parseErrors));
         } else if (result.matched) {
-            LOG.info("NodeTree: " + ParseTreeUtils.printNodeTree(result) + '\n');
+            LOG.info("NodeTree: {}\n", ParseTreeUtils.printNodeTree(result));
         }
     }
 
@@ -64,7 +64,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testEquals() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.EQUALS, 1);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.EQUALS, 1);
         String input = "first.second==1";
 
         assertValue(expected, input);
@@ -72,8 +72,8 @@ public class ConstraintParserTest {
 
     @Test()
     public void testGreaterEquals() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.GREATER_EQUALS,
-                1);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.GREATER_EQUALS,
+                                                              1);
         String input = "first.second=ge=1";
 
         assertValue(expected, input);
@@ -81,7 +81,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testGreaterThan() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.GREATER_THAN, 1);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.GREATER_THAN, 1);
         String input = "first.second=gt=1";
 
         assertValue(expected, input);
@@ -91,8 +91,8 @@ public class ConstraintParserTest {
     public void testIntersects() {
         Comparable<?>[] args = { 1.34f, 2.4, "300" };
 
-        Constraint<List<Comparable<?>>> expected = new Constraint<List<Comparable<?>>>("second", Comparison.INTERSECT,
-                Arrays.asList(args));
+        Constraint<List<Comparable<?>>> expected = new Constraint<>("second", Comparison.INTERSECT,
+                                                                    Arrays.asList(args));
         String input = "second=ix=[1.34f, 2.4d, '300']";
 
         assertValue(expected, input);
@@ -100,7 +100,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testLessEquals() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.LESS_EQUALS, 1l);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.LESS_EQUALS, 1L);
         String input = "first.second=le=1l";
 
         assertValue(expected, input);
@@ -108,7 +108,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testLessThan() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.LESS_THAN, 1l);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.LESS_THAN, 1L);
         String input = "first.second=lt=1L";
 
         assertValue(expected, input);
@@ -117,9 +117,8 @@ public class ConstraintParserTest {
     @Test()
     public void testNear() {
         Integer[] args = { 1, 2, 3, 4 };
-        Arrays.asList(args);
-        Constraint<List<Integer>> expected = new Constraint<List<Integer>>("second", Comparison.NEAR,
-                Arrays.asList(args));
+        Constraint<List<Integer>> expected = new Constraint<>("second", Comparison.NEAR,
+                                                              Arrays.asList(args));
         String input = "second=nr=[1, 2, 3, 4]";
 
         assertValue(expected, input);
@@ -127,7 +126,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testNotEquals() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.NOT_EQUALS, 1l);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.NOT_EQUALS, 1L);
         String input = "first.second!=1L";
 
         assertValue(expected, input);
@@ -135,7 +134,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testOneSelector() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first", Comparison.EQUALS, 1);
+        Constraint<Comparable<?>> expected = new Constraint<>("first", Comparison.EQUALS, 1);
         String input = "first==1";
 
         assertValue(expected, input);
@@ -143,7 +142,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testSingleArgArray() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("second", Comparison.NEAR, 1);
+        Constraint<Comparable<?>> expected = new Constraint<>("second", Comparison.NEAR, 1);
         String input = "second=nr=[1]";
 
         assertValue(expected, input);
@@ -162,7 +161,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testThreeSelector() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second.third", Comparison.EQUALS, 1l);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second.third", Comparison.EQUALS, 1L);
         String input = "first.second.third==1l";
 
         assertValue(expected, input);
@@ -170,7 +169,7 @@ public class ConstraintParserTest {
 
     @Test()
     public void testTwoSelector() {
-        Constraint<Comparable<?>> expected = new Constraint<Comparable<?>>("first.second", Comparison.EQUALS, 1);
+        Constraint<Comparable<?>> expected = new Constraint<>("first.second", Comparison.EQUALS, 1);
         String input = "first.second==1";
 
         assertValue(expected, input);
@@ -190,8 +189,8 @@ public class ConstraintParserTest {
     public void testWithin() {
         Comparable<?>[] args = { true, 's', null };
 
-        Constraint<List<Comparable<?>>> expected = new Constraint<List<Comparable<?>>>("second", Comparison.WITHIN,
-                Arrays.asList(args));
+        Constraint<List<Comparable<?>>> expected = new Constraint<>("second", Comparison.WITHIN,
+                                                                    Arrays.asList(args));
         String input = "second=wi=[true,'s',null]";
 
         assertValue(expected, input);

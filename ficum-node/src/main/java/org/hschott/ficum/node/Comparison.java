@@ -9,7 +9,7 @@ public enum Comparison {
     EQUALS("=="), NOT_EQUALS("!="), GREATER_EQUALS("=ge="), LESS_EQUALS("=le="), GREATER_THAN("=gt="), LESS_THAN(
             "=lt="), IN("=in="), NIN("=nin="), NEAR("=nr="), WITHIN("=wi="), INTERSECT("=ix=");
 
-    private static final Map<String, Comparison> lookup = new HashMap<String, Comparison>();
+    private static final Map<String, Comparison> lookup = new HashMap<>();
 
     static {
         for (Comparison comparison : EnumSet.allOf(Comparison.class)) {
@@ -19,7 +19,7 @@ public enum Comparison {
 
     private final String sign;
 
-    private Comparison(String sign) {
+    Comparison(String sign) {
         this.sign = sign;
     }
 

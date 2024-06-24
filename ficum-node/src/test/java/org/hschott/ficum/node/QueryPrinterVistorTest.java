@@ -81,7 +81,7 @@ public class QueryPrinterVistorTest {
     @Test
     public void testBuilderUuid() {
         UUID uuid = UUID.randomUUID();
-        String expected = "first==" + uuid.toString();
+        String expected = "first==" + uuid;
 
         Node node = Builder.start().constraint("first", Comparison.EQUALS, uuid).build();
         String actual = new QueryPrinterVisitor().start(node);
@@ -114,7 +114,7 @@ public class QueryPrinterVistorTest {
         String expected = "first=wi=[23,3.5f,7.02,null,true,'hello hello']";
 
         Node node = Builder.start()
-                .constraint("first", Comparison.WITHIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .constraint("first", Comparison.WITHIN, 23, 3.5f, 7.02, null, true, "hello hello")
                 .build();
         String actual = new QueryPrinterVisitor().start(node);
 
@@ -123,10 +123,10 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderInIterable() {
-        String expected = "first=in=[23,3.5f,7.02,null,true,'hello hello']";
+        String expected = "first=in=[-23,3.5f,7.02,null,true,'hello hello']";
 
         Node node = Builder.start()
-                .constraint("first", Comparison.IN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .constraint("first", Comparison.IN, -23, 3.5f, 7.02, null, true, "hello hello")
                 .build();
         String actual = new QueryPrinterVisitor().start(node);
 
@@ -138,7 +138,7 @@ public class QueryPrinterVistorTest {
         String expected = "first=nin=[23,3.5f,7.02,null,true,'hello hello']";
 
         Node node = Builder.start()
-                .constraint("first", Comparison.NIN, 23, 3.5f, 7.02, (Comparable<?>) null, true, "hello hello")
+                .constraint("first", Comparison.NIN, 23, 3.5f, 7.02, null, true, "hello hello")
                 .build();
         String actual = new QueryPrinterVisitor().start(node);
 
@@ -158,9 +158,9 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testBuilderLong() {
-        String expected = "first=gt=45l";
+        String expected = "first=gt=45L";
 
-        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 45l).build();
+        Node node = Builder.start().constraint("first", Comparison.GREATER_THAN, 45L).build();
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -211,11 +211,11 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testNaturalOrder() {
-        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1l).and()
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1L).and()
                 .constraint("second", Comparison.GREATER_THAN, "two").or()
                 .constraint("third", Comparison.LESS_EQUALS, 3.0f).build();
 
-        String expected = "first==1l,second=gt='two';third=le=3.0f";
+        String expected = "first==1L,second=gt='two';third=le=3.0f";
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -223,12 +223,12 @@ public class QueryPrinterVistorTest {
 
     @Test
     public void testNestedPreceded() {
-        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1l).and().sub().sub()
+        Node node = Builder.start().constraint("first", Comparison.EQUALS, 1L).and().sub().sub()
                 .constraint("second", Comparison.GREATER_THAN, "two").or()
-                .constraint("third", Comparison.LESS_EQUALS, 3.0f).endsub().or()
-                .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
+                .constraint("third", Comparison.LESS_EQUALS, 3.0f).endSub().or()
+                .constraint("fourth", Comparison.LESS_THAN, "five").endSub().build();
 
-        String expected = "first==1l,((second=gt='two';third=le=3.0f);fourth=lt='five')";
+        String expected = "first==1L,((second=gt='two';third=le=3.0f);fourth=lt='five')";
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
@@ -237,12 +237,12 @@ public class QueryPrinterVistorTest {
     @Test
     public void testPrecededOrder() {
 
-        Node node = Builder.start().sub().constraint("first", Comparison.EQUALS, 1l).or()
-                .constraint("second", Comparison.GREATER_THAN, "two").endsub().and().sub()
+        Node node = Builder.start().sub().constraint("first", Comparison.EQUALS, 1L).or()
+                .constraint("second", Comparison.GREATER_THAN, "two").endSub().and().sub()
                 .constraint("third", Comparison.LESS_EQUALS, 3.0f).or()
-                .constraint("fourth", Comparison.LESS_THAN, "five").endsub().build();
+                .constraint("fourth", Comparison.LESS_THAN, "five").endSub().build();
 
-        String expected = "(first==1l;second=gt='two'),(third=le=3.0f;fourth=lt='five')";
+        String expected = "(first==1L;second=gt='two'),(third=le=3.0f;fourth=lt='five')";
         String actual = new QueryPrinterVisitor().start(node);
 
         Assert.assertEquals(expected, actual);
