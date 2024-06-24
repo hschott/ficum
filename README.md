@@ -69,7 +69,7 @@ Add dependencies for FICUM and JPA
 <dependency>
     <groupId>org.hschott.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.13.0</version>
+    <version>0.15.0</version>
 </dependency>
 <dependency>
     <groupId>javax.persistence</groupId>
@@ -103,12 +103,12 @@ Add dependencies for FICUM and MongoDB
 <dependency>
     <groupId>org.hschott.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.13.0</version>
+    <version>0.15.0</version>
 </dependency>
 <dependency>
     <groupId>org.mongodb</groupId>
     <artifactId>mongodb-driver</artifactId>
-    <version>3.12.10</version>
+    <version>5.1.1</version>
 </dependency>
 ```
 
@@ -138,12 +138,12 @@ Add dependencies for FICUM and Hazelcast
 <dependency>
     <groupId>org.hschott.ficum</groupId>
     <artifactId>ficum-visitor</artifactId>
-    <version>0.13.0</version>
+    <version>0.15.0</version>
 </dependency>
 <dependency>
     <groupId>com.hazelcast</groupId>
     <artifactId>hazelcast-client</artifactId>
-    <version>3.12.12</version>
+    <version>3.12.13</version>
 </dependency>
 ```
 
