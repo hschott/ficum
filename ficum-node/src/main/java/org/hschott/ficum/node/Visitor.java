@@ -6,8 +6,6 @@ public interface Visitor<T> {
 
     void visit(ConstraintNode<?> node);
 
-    void visit(Node node);
-
     void visit(OperationNode node);
 
 }

@@ -49,7 +49,7 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     }
 
     public void visit(ConstraintNode<?> node) {
-        output.append(node.getSelector());
+        output.append(node.getSelector().value());
         output.append(node.getComparison().getSign());
         output.append(print(node.getArgument()));
     }

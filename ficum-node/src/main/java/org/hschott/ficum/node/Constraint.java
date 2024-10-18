@@ -2,23 +2,24 @@ package org.hschott.ficum.node;
 
 public class Constraint<T> {
 
-    private final String selector;
+    private final Selector selector;
 
     private final Comparison comparison;
 
     private final T argument;
 
     public Constraint(String selector, Comparison comparison, T argument) {
-        super();
+        this(new SimpleSelector(checkArgNotNull(selector, "selector")), comparison, argument);
+
+    }
+
+    public Constraint(Selector selector, Comparison comparison, T argument) {
         checkArgNotNull(comparison, "comparison");
         checkArgNotNull(selector, "selector");
         this.selector = selector;
         this.comparison = comparison;
         this.argument = argument;
-    }
 
-    public Constraint(Selector selector, Comparison comparison, T argument) {
-        this(checkArgNotNull(selector, "selector").value(), comparison, argument);
     }
 
     public static <T> T checkArgNotNull(T reference, String parameterName) {
@@ -59,7 +60,7 @@ public class Constraint<T> {
         return comparison;
     }
 
-    public String getSelector() {
+    public Selector getSelector() {
         return selector;
     }
 

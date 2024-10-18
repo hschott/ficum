@@ -37,7 +37,7 @@ public class ConstraintNode<T> implements OperandNode {
         return constraint != null ? constraint.getComparison() : null;
     }
 
-    public String getSelector() {
+    public Selector getSelector() {
         return constraint != null ? constraint.getSelector() : null;
     }
 

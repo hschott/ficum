@@ -24,7 +24,7 @@ public class BuilderTest {
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
-        Assert.assertEquals("first", leftConstraint.getSelector());
+        Assert.assertEquals("first", leftConstraint.getSelector().value());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1L, leftConstraint.getArgument());
 
@@ -33,7 +33,7 @@ public class BuilderTest {
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
         ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
 
-        Assert.assertEquals("second", rightConstraint.getSelector());
+        Assert.assertEquals("second", rightConstraint.getSelector().value());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
         Assert.assertEquals(2L, rightConstraint.getArgument());
     }
@@ -262,7 +262,7 @@ public class BuilderTest {
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
-        Assert.assertEquals("first", leftConstraint.getSelector());
+        Assert.assertEquals("first", leftConstraint.getSelector().value());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1L, leftConstraint.getArgument());
 
@@ -288,7 +288,7 @@ public class BuilderTest {
         Assert.assertTrue(left.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> leftConstraint = (ConstraintNode<?>) left;
-        Assert.assertEquals("first", leftConstraint.getSelector());
+        Assert.assertEquals("first", leftConstraint.getSelector().value());
         Assert.assertEquals(Comparison.EQUALS, leftConstraint.getComparison());
         Assert.assertEquals(1L, leftConstraint.getArgument());
 
@@ -297,7 +297,7 @@ public class BuilderTest {
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
         ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
 
-        Assert.assertEquals("second", rightConstraint.getSelector());
+        Assert.assertEquals("second", rightConstraint.getSelector().value());
         Assert.assertEquals(Comparison.NOT_EQUALS, rightConstraint.getComparison());
         Assert.assertEquals(2L, rightConstraint.getArgument());
     }
@@ -309,7 +309,7 @@ public class BuilderTest {
 
         ConstraintNode<?> constraint = (ConstraintNode<?>) n;
 
-        Assert.assertEquals("first", constraint.getSelector());
+        Assert.assertEquals("first", constraint.getSelector().value());
         Assert.assertEquals(Comparison.EQUALS, constraint.getComparison());
         Assert.assertEquals(1L, constraint.getArgument());
     }
@@ -321,7 +321,7 @@ public class BuilderTest {
 
         ConstraintNode<?> constraint = (ConstraintNode<?>) n;
 
-        Assert.assertEquals("first", constraint.getSelector());
+        Assert.assertEquals("first", constraint.getSelector().value());
         Assert.assertEquals(Comparison.EQUALS, constraint.getComparison());
         Assert.assertEquals(1L, constraint.getArgument());
     }
@@ -352,7 +352,7 @@ public class BuilderTest {
         Assert.assertTrue(right.getClass().isAssignableFrom(ConstraintNode.class));
 
         ConstraintNode<?> rightConstraint = (ConstraintNode<?>) right;
-        Assert.assertEquals("third", rightConstraint.getSelector());
+        Assert.assertEquals("third", rightConstraint.getSelector().value());
         Assert.assertEquals(Comparison.GREATER_EQUALS, rightConstraint.getComparison());
         Assert.assertEquals(3L, rightConstraint.getArgument());
 

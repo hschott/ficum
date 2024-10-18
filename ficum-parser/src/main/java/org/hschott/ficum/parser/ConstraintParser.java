@@ -20,11 +20,7 @@ public class ConstraintParser extends ArgumentParser {
     public ConstraintParser(String... allowedSelectors) {
         super();
         this.allowedSelectors = allowedSelectors;
-        Arrays.sort(this.allowedSelectors, new Comparator<>() {
-            public int compare(String o1, String o2) {
-                return o2.compareTo(o1);
-            }
-        });
+        Arrays.sort(this.allowedSelectors, Comparator.reverseOrder());
     }
 
     @Override

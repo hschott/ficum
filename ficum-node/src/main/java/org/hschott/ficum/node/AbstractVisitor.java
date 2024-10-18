@@ -30,18 +30,18 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
 
     private boolean alwaysWildcard = false;
 
-    private Map<String, String> selectorToFieldMapping = new HashMap<String, String>();
+    private Map<Selector, String> selectorToFieldMapping = new HashMap<>();
 
     public static boolean containsWildcard(String value) {
         return value.contains("*") || value.contains("?");
     }
 
     public void addSelectorToFieldMapping(String selector, String field) {
-        selectorToFieldMapping.put(selector, field);
+        selectorToFieldMapping.put(new SimpleSelector(selector), field);
     }
 
-    public String getMappedField(String selector) {
-        return selectorToFieldMapping.getOrDefault(selector, selector);
+    public String getMappedField(Selector selector) {
+        return selectorToFieldMapping.getOrDefault(selector, selector.value());
     }
 
     public boolean isAlwaysWildcard() {
@@ -52,17 +52,8 @@ public abstract class AbstractVisitor<T> implements Visitor<T> {
         this.alwaysWildcard = alwaysWildcardMatch;
     }
 
-    public void setSelectorToFieldMapping(Map<String, String> selectorToFieldMapping) {
+    public void setSelectorToFieldMapping(Map<Selector, String> selectorToFieldMapping) {
         this.selectorToFieldMapping = selectorToFieldMapping;
-    }
-
-    public void visit(Node node) {
-        if (node instanceof ConstraintNode constraintNode) {
-            visit(constraintNode);
-        }
-        if (node instanceof OperationNode operationNode) {
-            visit(operationNode);
-        }
     }
 
     protected List<Comparable> sanitizeToComparable(List<?> arguments) {
