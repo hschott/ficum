@@ -20,7 +20,7 @@ public class StringToFicumNodeConverterTest {
     private StringToFicumNodeConverter converter;
     private GenericConversionService conversionService;
 
-    @FicumExpression({"fool"})
+    @FicumExpression({"foo"})
     private Node node;
 
     @Before
