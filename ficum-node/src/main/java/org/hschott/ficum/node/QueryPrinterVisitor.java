@@ -43,6 +43,8 @@ public class QueryPrinterVisitor extends AbstractVisitor<String> {
     }
 
     public String start(Node node) {
+        if (node == null)
+            return null;
         output = new StringBuffer();
         node.accept(this);
         return output.toString();

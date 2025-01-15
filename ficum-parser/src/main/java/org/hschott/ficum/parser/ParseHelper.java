@@ -16,7 +16,11 @@ public class ParseHelper {
     }
 
     public static Node parse(String query, String... allowedSelectorNames) {
-        ExpressionParser parser = Parboiled.createParser(ExpressionParser.class, (Object) Arrays.copyOf(allowedSelectorNames, allowedSelectorNames.length));
+        if (query == null)
+            return null;
+        ExpressionParser parser = Parboiled.createParser(ExpressionParser.class,
+                                                         (Object) Arrays.copyOf(allowedSelectorNames,
+                                                                                allowedSelectorNames.length));
         ReportingParseRunner<Deque<Object>> parseRunner = new ReportingParseRunner<>(parser.root());
         ParsingResult<Deque<Object>> result = parseRunner.run(query);
 
